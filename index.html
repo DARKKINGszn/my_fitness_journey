@@ -176,84 +176,105 @@
         const EXERCISE_DB = {
             squats: {
                 name: "Bodyweight Squats", target: "Quads, Glutes, Core",
-                desc: "Stand with feet shoulder-width apart. Lower your hips back and down as if sitting in a chair. Keep your chest up and back straight.",
-                alt: "Hold onto a sturdy chair or doorframe for balance.",
+                desc: "Stand with feet shoulder-width apart. Hinge at your hips and bend your knees to lower your body into a squat, keeping your chest proud and heels flat on the floor.",
+                alt: "Hold onto a sturdy chair or doorframe for balance if needed.",
                 img: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=600&q=80",
-                levels: { easy: { sets: 2, reps: 10, label: "10 reps" }, steady: { sets: 3, reps: 15, label: "15 reps" }, hard: { sets: 4, reps: 20, label: "20 reps (Slow)" } }
+                levels: { easy: { sets: 2, reps: 10, label: "10 reps" }, steady: { sets: 3, reps: 15, label: "15 reps" }, hard: { sets: 4, reps: 20, label: "20 reps (Slow Tempo)" } }
             },
             pushups_wall: {
-                name: "Wall / Incline Push-ups", target: "Chest, Shoulders, Triceps",
-                desc: "Place hands flat against a wall or elevated surface. Lower your chest towards the surface, keeping your body in a straight line.",
-                alt: "Adjust the height of the incline; the higher the surface, the easier it is.",
+                name: "Wall Push-ups", target: "Chest, Shoulders, Arms",
+                desc: "Stand arm's length from a wall. Place palms flat against the wall at shoulder height. Bend elbows to bring your chest toward the wall, then push back out.",
+                alt: "Step your feet closer to the wall to make it easier, or further back to increase resistance.",
                 img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=600&q=80",
                 levels: { easy: { sets: 2, reps: 8, label: "8 reps" }, steady: { sets: 3, reps: 12, label: "12 reps" }, hard: { sets: 3, reps: 15, label: "15 reps" } }
             },
-            pushups_standard: {
-                name: "Knee / Standard Push-ups", target: "Chest, Shoulders, Triceps, Core",
-                desc: "Start in a high plank position. Lower your body until your chest is just above the floor. Push back up forcefully.",
-                alt: "If standard push-ups are too hard, drop to your knees. Keep your hips in line with your torso.",
+            pushups_incline: {
+                name: "Incline Push-ups", target: "Chest, Triceps, Shoulders",
+                desc: "Place your hands firmly on a stable elevated surface like a sturdy table, couch, or countertop. Lower your chest toward the edge, then press back up.",
+                alt: "Use a higher surface (like a wall or high railing) to make it easier.",
                 img: "https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=600&q=80",
-                levels: { easy: { sets: 2, reps: 8, label: "8 reps (Knees)" }, steady: { sets: 3, reps: 12, label: "12 reps" }, hard: { sets: 4, reps: 15, label: "15 reps" } }
+                levels: { easy: { sets: 2, reps: 6, label: "6 reps" }, steady: { sets: 3, reps: 10, label: "10 reps" }, hard: { sets: 4, reps: 12, label: "12 reps" } }
             },
-            glute_bridges: {
-                name: "Glute Bridges", target: "Glutes, Hamstrings, Lower Back",
-                desc: "Lie on your back with knees bent. Squeeze your glutes and push your hips towards the ceiling. Hold for a second at the top.",
-                alt: "Focus on smaller ranges of motion if lifting high causes lower back discomfort.",
+            pushups_standard: {
+                name: "Standard Push-ups", target: "Chest, Shoulders, Core",
+                desc: "Assume a high plank position with hands under shoulders. Lower your entire body until your chest is just above the floor, then press back up forcefully.",
+                alt: "Drop to incline push-ups immediately if your lower back starts sagging.",
+                img: "https://images.unsplash.com/photo-1598971639058-fab3c3109a00?auto=format&fit=crop&w=600&q=80",
+                levels: { easy: { sets: 2, reps: 5, label: "5 reps" }, steady: { sets: 3, reps: 10, label: "10 reps" }, hard: { sets: 4, reps: 15, label: "15 reps" } }
+            },
+            step_ups: {
+                name: "Bodyweight Step-Ups", target: "Quads, Glutes, Balance",
+                desc: "Stand facing a sturdy low platform, stable chair, or bottom staircase step. Step up with one foot, driving through your heel to lift your body, then step back down safely.",
+                alt: "Hold onto a wall or sturdy banister for stability support.",
+                img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=600&q=80",
+                levels: { easy: { sets: 2, reps: 8, label: "8 reps / leg" }, steady: { sets: 3, reps: 12, label: "12 reps / leg" }, hard: { sets: 4, reps: 15, label: "15 reps / leg (Controlled)" } }
+            },
+            superman: {
+                name: "Superman Extensions", target: "Lower Back, Glutes, Posture",
+                desc: "Lie face down on the floor with your arms extended straight overhead. Simultaneously lift your arms, chest, and straight legs a few inches off the floor, hold briefly, and lower.",
+                alt: "Lift only your upper body or only your legs separately if needed.",
                 img: "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=600&q=80",
-                levels: { easy: { sets: 2, reps: 10, label: "10 reps" }, steady: { sets: 3, reps: 15, label: "15 reps" }, hard: { sets: 4, reps: 20, label: "20 reps (2s Hold)" } }
+                levels: { easy: { sets: 2, reps: 8, label: "8 reps" }, steady: { sets: 3, reps: 12, label: "12 reps" }, hard: { sets: 4, reps: 15, label: "15 reps (2s hold)" } }
             },
             single_leg_bridges: {
-                name: "Single-leg Glute Bridges", target: "Glutes, Hamstrings",
-                desc: "Lie on your back, knees bent. Extend one leg straight out. Push through the heel of the planted foot to raise your hips.",
-                alt: "Revert to standard two-leg glute bridges if hips drop or it causes pain.",
+                name: "Standing Balance Reaches", target: "Glutes, Balance, Stability",
+                desc: "Stand on one leg, hinge forward slightly at the hips while extending the other leg straight back behind you for balance, then return to upright.",
+                alt: "Lightly touch a wall with your fingertips for balance.",
                 img: "https://images.unsplash.com/photo-1566241142559-40e1dab266c6?auto=format&fit=crop&w=600&q=80",
-                levels: { easy: { sets: 2, reps: 6, label: "6 reps / leg" }, steady: { sets: 3, reps: 10, label: "10 reps / leg" }, hard: { sets: 3, reps: 15, label: "15 reps / leg" } }
+                levels: { easy: { sets: 2, reps: 6, label: "6 reps / leg" }, steady: { sets: 3, reps: 8, label: "8 reps / leg" }, hard: { sets: 3, reps: 12, label: "12 reps / leg" } }
             },
-            plank: {
-                name: "Forearm Plank", target: "Core, Shoulders",
-                desc: "Rest on your forearms and toes, keeping your body in a perfectly straight line from head to heels. Brace your core.",
-                alt: "Drop to your knees while maintaining a straight line from head to knees.",
-                img: "https://images.unsplash.com/photo-1566241142559-40e1dab266c6?auto=format&fit=crop&w=600&q=80",
-                levels: { easy: { sets: 2, reps: 20, label: "20 seconds" }, steady: { sets: 3, reps: 40, label: "40 seconds" }, hard: { sets: 3, reps: 60, label: "60 seconds" } }
-            },
-            lunges: {
-                name: "Reverse Lunges", target: "Quads, Glutes, Hamstrings",
-                desc: "Stand tall. Step one foot backward and lower your hips until both knees are bent at a 90-degree angle. Push off the back foot.",
-                alt: "Hold onto a chair for balance, or don't step back as far.",
-                img: "https://images.unsplash.com/photo-1434682881907-b43d60773b3c?auto=format&fit=crop&w=600&q=80",
-                levels: { easy: { sets: 2, reps: 6, label: "6 reps / leg" }, steady: { sets: 3, reps: 10, label: "10 reps / leg" }, hard: { sets: 4, reps: 12, label: "12 reps / leg" } }
+            calf_raises: {
+                name: "Standing Calf Raises", target: "Calves, Lower Legs",
+                desc: "Stand tall near a wall for balance. Rise up onto your toes as high as possible, hold for a second, then lower your heels slowly back to the floor.",
+                alt: "Perform seated on a chair if standing balance is challenging.",
+                img: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=600&q=80",
+                levels: { easy: { sets: 2, reps: 12, label: "12 reps" }, steady: { sets: 3, reps: 15, label: "15 reps" }, hard: { sets: 4, reps: 25, label: "25 reps" } }
             },
             bird_dog: {
-                name: "Bird Dogs", target: "Core, Lower Back",
-                desc: "Start on all fours. Simultaneously extend your right arm forward and left leg backward until parallel to the floor.",
-                alt: "Extend only the arm, or only the leg, until balance improves.",
+                name: "Bird Dogs", target: "Core, Spine Stability",
+                desc: "Start on your hands and knees on the floor. Simultaneously extend your right arm forward and left leg backward until parallel to the floor. Return and switch sides.",
+                alt: "Move only your arms or only your legs if balance is difficult.",
                 img: "https://images.unsplash.com/photo-1518310383802-640c2de311b2?auto=format&fit=crop&w=600&q=80",
-                levels: { easy: { sets: 2, reps: 10, label: "10 total reps" }, steady: { sets: 3, reps: 16, label: "16 total reps" }, hard: { sets: 3, reps: 20, label: "20 total reps (2s Hold)" } }
+                levels: { easy: { sets: 2, reps: 8, label: "8 total reps" }, steady: { sets: 3, reps: 12, label: "12 total reps" }, hard: { sets: 3, reps: 16, label: "16 total reps (3s hold)" } }
             },
-            dead_bug: {
-                name: "Dead Bugs", target: "Deep Core",
-                desc: "Lie on your back, arms extended up, knees bent at 90 degrees. Slowly lower your right arm and left leg towards the floor without arching back.",
-                alt: "Keep knees bent and tap heels to the floor instead of fully extending the leg.",
+            mountain_climbers: {
+                name: "Mountain Climbers", target: "Core, Cardio, Stamina",
+                desc: "Start in a high plank position. Alternately drive your knees toward your chest in a running motion while keeping your core tight and hips stable.",
+                alt: "Perform standing or against an elevated countertop to reduce intensity.",
                 img: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=600&q=80",
-                levels: { easy: { sets: 2, reps: 10, label: "10 total reps" }, steady: { sets: 3, reps: 16, label: "16 total reps" }, hard: { sets: 3, reps: 20, label: "20 total reps" } }
+                levels: { easy: { sets: 2, reps: 16, label: "16 total reps" }, steady: { sets: 3, reps: 24, label: "24 total reps" }, hard: { sets: 3, reps: 40, label: "40 total reps" } }
+            },
+            plank: {
+                name: "Forearm Plank", target: "Full Core, Shoulders",
+                desc: "Support your weight on your forearms and toes. Keep your body in a straight line from head to heels, engaging your core and glutes firmly.",
+                alt: "Drop your knees to the floor while maintaining a straight line from knees to shoulders.",
+                img: "https://images.unsplash.com/photo-1566241142559-40e1dab266c6?auto=format&fit=crop&w=600&q=80",
+                levels: { easy: { sets: 2, reps: 20, label: "20 seconds" }, steady: { sets: 3, reps: 30, label: "30 seconds" }, hard: { sets: 3, reps: 60, label: "60 seconds" } }
+            },
+            wall_sit: {
+                name: "Wall Sits", target: "Quads, Glutes, Endurance",
+                desc: "Lean your back flat against a wall and slide down until your knees are bent at a 90-degree angle (like sitting in an imaginary chair). Hold the position.",
+                alt: "Slide slightly higher up the wall to reduce knee strain.",
+                img: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=600&q=80",
+                levels: { easy: { sets: 2, reps: 20, label: "20 seconds" }, steady: { sets: 3, reps: 30, label: "30 seconds" }, hard: { sets: 3, reps: 45, label: "45 seconds" } }
             },
             jogging: {
-                name: "Outdoor Jogging", target: "Cardio, Legs",
-                desc: "A steady-paced outdoor jog to build cardiovascular endurance. Focus on controlling your breathing. If you need to stop and walk, that is perfectly fine—just keep moving to complete the distance.",
-                alt: "If weather prevents going outside, do brisk marching in place or jumping jacks for the equivalent time.",
+                name: "Outdoor Jogging", target: "Cardiovascular Endurance",
+                desc: "A steady outdoor jog or brisk walk/jog interval to boost stamina and heart health without equipment.",
+                alt: "March in place or do indoor step-touches if staying inside.",
                 img: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=600&q=80",
-                levels: { easy: { sets: 1, reps: 1.5, label: "1.5 km (or 15 min run/walk)" }, steady: { sets: 1, reps: 3.0, label: "3.0 km (or 25 min jog)" }, hard: { sets: 1, reps: 5.0, label: "5.0 km (or 35 min run)" } }
+                levels: { easy: { sets: 1, reps: 1.5, label: "1.5 km outdoor jog" }, steady: { sets: 1, reps: 3.0, label: "3.0 km outdoor jog" }, hard: { sets: 1, reps: 5.0, label: "5.0 km outdoor jog" } }
             }
         };
 
         const SCHEDULE = [
-            { day: 1, type: 'strength', title: 'Full Body A', desc: 'Fundamental strength building.', exercises: ['squats', 'pushups_wall', 'glute_bridges', 'plank'] }, // Mon
-            { day: 2, type: 'cardio', title: 'Cardio & Core', desc: 'Outdoor jogging followed by light core stability work.', exercises: ['jogging', 'bird_dog'] }, // Tue
-            { day: 3, type: 'strength', title: 'Full Body B', desc: 'Focusing on stability and unilateral strength.', exercises: ['lunges', 'pushups_standard', 'bird_dog', 'plank'] }, // Wed
-            { day: 4, type: 'cardio', title: 'Cardio & Recovery', desc: 'Steady jogging to build cardiovascular health.', exercises: ['jogging', 'glute_bridges'] }, // Thu
-            { day: 5, type: 'strength', title: 'Full Body C', desc: 'Advanced core and lower body focus.', exercises: ['squats', 'pushups_standard', 'single_leg_bridges', 'dead_bug'] }, // Fri
-            { day: 6, type: 'light', title: 'Weekend Play', desc: 'Mix it up! 15 min Dance Party, a Nature Walk, Stretching Flow, or play a sport.' }, // Sat
-            { day: 0, type: 'rest', title: 'Complete Rest', desc: 'Allow your muscles to recover and rebuild. No formal exercise today.' } // Sun
+            { day: 1, type: 'strength', title: 'Full Body A', desc: 'Lower body and chest focus.', exercises: ['squats', 'pushups_incline', 'superman', 'plank'] }, // Mon
+            { day: 2, type: 'cardio', title: 'Cardio & Core', desc: 'Outdoor jogging & core stability.', exercises: ['jogging', 'mountain_climbers'] }, // Tue
+            { day: 3, type: 'strength', title: 'Full Body B', desc: 'Step-ups and upper body pressing.', exercises: ['step_ups', 'pushups_wall', 'bird_dog', 'calf_raises'] }, // Wed
+            { day: 4, type: 'cardio', title: 'Cardio & Recovery', desc: 'Aerobic conditioning.', exercises: ['jogging', 'wall_sit'] }, // Thu
+            { day: 5, type: 'strength', title: 'Full Body C', desc: 'Full body endurance and control.', exercises: ['squats', 'pushups_standard', 'step_ups', 'plank'] }, // Fri
+            { day: 6, type: 'light', title: 'Weekend Play', desc: '15 min Dance Party, nature walk, or gentle stretching.' }, // Sat
+            { day: 0, type: 'rest', title: 'Complete Rest', desc: 'Muscle recovery and growth.' } // Sun
         ];
 
         const MEDALS = [
