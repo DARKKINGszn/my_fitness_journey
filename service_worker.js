@@ -1,11 +1,11 @@
-const CACHE_NAME = 'mfj-cache-v3';
+const CACHE_NAME = 'mfj-cache-v4';
 const ASSETS_TO_CACHE = [
-'./index.html' , 
-  './manifest.webmanifest' , 
-  './icon.png?v=3' ,
+  './index.html',
+  './manifest.webmanifest',
+  './icon.png?v=4',
   'https://cdn.tailwindcss.com',
   'https://unpkg.com/lucide@latest',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'
+  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap'
 ];
 
 self.addEventListener('install', (event) => {
