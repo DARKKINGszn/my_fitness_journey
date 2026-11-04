@@ -7,8 +7,8 @@
     <meta name="theme-color" content="#09090b">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="My Fitness">
-    <title>My Fitness Journey</title>
+    <meta name="apple-mobile-web-app-title" content="Fits">
+    <title>Fits</title>
     
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" type="image/png" href="icon.png?v=3">
@@ -135,6 +135,17 @@
         <!-- Modals and Overlays -->
         <div id="workout-session" class="fixed inset-0 bg-zinc-950 z-50 hidden flex-col w-full max-w-md mx-auto slide-up-modal ios-safe-modal"></div>
         <div id="workout-complete" class="fixed inset-0 bg-zinc-950 text-white z-[60] hidden flex-col w-full max-w-md mx-auto slide-up-modal ios-safe-modal"></div>
+        
+        <!-- Name Prompt Modal (Shown on first load) -->
+        <div id="name-prompt-modal" class="fixed inset-0 bg-zinc-950/95 backdrop-blur-xl z-[100] hidden flex-col items-center justify-center p-6 text-center w-full max-w-md mx-auto fade-in">
+            <div class="w-20 h-20 bg-brand-bg rounded-full flex items-center justify-center mb-6 border border-brand-main/30 shadow-[0_0_30px_var(--brand-bg)]">
+                <i data-lucide="crown" class="w-10 h-10 text-brand-main"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-white mb-2 tracking-tight">Welcome to Fits</h2>
+            <p class="text-zinc-400 mb-8 text-sm">What would you like to be called?</p>
+            <input type="text" id="user-name-input" placeholder="e.g. King" class="w-full max-w-[240px] bg-zinc-900 border border-zinc-700 rounded-full py-4 px-6 text-white text-center mb-8 focus:border-brand-main focus:ring-1 focus:ring-brand-main outline-none text-lg font-bold placeholder-zinc-600 transition-all shadow-inner">
+            <button onclick="saveUserName()" class="bg-brand-main text-brand-contrast rounded-full py-4 px-12 font-bold shadow-xl shadow-brand-main/20 active:scale-95 transition-transform tracking-wide">Continue</button>
+        </div>
     </div>
 
     <!-- Bottom Navigation -->
@@ -294,6 +305,7 @@
 
         // --- 2. STATE MANAGEMENT & UTILS ---
         const defaultState = {
+            userName: null, // New field for personalization
             difficulty: 'steady', 
             theme: 'lemon', 
             workouts: [], 
@@ -314,7 +326,8 @@
                         if(!this.data.workouts) this.data.workouts = [];
                         if(!this.data.achievements) this.data.achievements = [];
                         if(!this.data.theme) this.data.theme = 'lemon';
-                        if(!this.data.profilePic) this.data.profilePic = null;
+                        if(this.data.profilePic === undefined) this.data.profilePic = null;
+                        if(this.data.userName === undefined) this.data.userName = null;
                     } catch(e) {
                         this.data = JSON.parse(JSON.stringify(defaultState));
                     }
@@ -340,6 +353,45 @@
             }
         };
 
+        // --- INITIALIZATION SCRIPT (Handles Name Prompt) ---
+        window.onload = () => {
+            store.load();
+            if (!store.data.userName) {
+                const modal = document.getElementById('name-prompt-modal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                lucide.createIcons();
+            } else {
+                checkAchievements(); 
+                router.navigate('home');
+            }
+        };
+
+        function saveUserName() {
+            let nameInput = document.getElementById('user-name-input').value.trim();
+            store.data.userName = nameInput || 'King'; // Default to King
+            store.save();
+            
+            const modal = document.getElementById('name-prompt-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+            
+            checkAchievements();
+            router.navigate('home');
+            showNotification(`Welcome to Fits, ${store.data.userName}!`);
+        }
+
+        function updateUserNameFromSettings() {
+            let currentName = store.data.userName || 'King';
+            let newName = prompt("What would you like to be called?", currentName);
+            if (newName && newName.trim() !== '') {
+                store.data.userName = newName.trim();
+                store.save();
+                renderView(router.current);
+                showNotification("Name updated!");
+            }
+        }
+
         function calculateStreak() {
             let activeDates = [...new Set([
                 ...store.data.workouts.map(w => w.date.split('T')[0]),
@@ -364,6 +416,86 @@
                 checkDateStr = d.toISOString().split('T')[0];
             }
             return streak;
+        }
+
+        // --- INTENSITY PROGRESSION GOAL CALCULATOR ---
+        function getProgressionGoal() {
+            const wCount = store.data.workouts.length;
+            const current = store.data.difficulty;
+            
+            if (current === 'easy') {
+                const target = 5;
+                const progress = Math.min(wCount, target);
+                const percentage = Math.round((progress / target) * 100);
+                const ready = wCount >= target;
+                return {
+                    currentLevel: 'Easy',
+                    nextLevel: 'Steady',
+                    workoutsNeeded: Math.max(0, target - wCount),
+                    progress,
+                    target,
+                    percentage,
+                    ready
+                };
+            } else if (current === 'steady') {
+                const target = 15;
+                const progress = Math.min(wCount, target);
+                const percentage = Math.round((progress / target) * 100);
+                const ready = wCount >= target;
+                return {
+                    currentLevel: 'Steady',
+                    nextLevel: 'Hard',
+                    workoutsNeeded: Math.max(0, target - wCount),
+                    progress,
+                    target,
+                    percentage,
+                    ready
+                };
+            } else {
+                return {
+                    currentLevel: 'Hard',
+                    nextLevel: 'Max Peak',
+                    workoutsNeeded: 0,
+                    progress: wCount,
+                    target: wCount,
+                    percentage: 100,
+                    ready: true
+                };
+            }
+        }
+
+        // --- SMART REFLECTION AI COACH ---
+        function generateReflectionFeedback(checkIn) {
+            const { activity, water, sleep, energy, notes } = checkIn;
+            const score = [activity, water, sleep, energy].filter(Boolean).length;
+            
+            let statusTitle = "";
+            let statusColor = "";
+            let feedback = "";
+
+            if (score === 4) {
+                statusTitle = "Thriving & In The Zone!";
+                statusColor = "text-green-400 bg-green-950/30 border-green-900/40";
+                feedback = `Outstanding job today, ${store.data.userName}! You checked all the boxes for physical and mental recovery. Your consistency is building unstoppable momentum.`;
+            } else if (score === 3) {
+                statusTitle = "Solid & Balanced Day";
+                statusColor = "text-brand-main bg-brand-bg/40 border-brand-muted/40";
+                feedback = "You're doing great! You hit most of your key recovery pillars. Keep protecting your rest and hydration to fuel your muscle growth.";
+            } else if (score === 2) {
+                statusTitle = "Steady Progress";
+                statusColor = "text-blue-400 bg-blue-950/30 border-blue-900/40";
+                feedback = "Recovery is a journey, not a straight line. Give yourself grace today, focus on getting a good night's sleep, and bounce back strong tomorrow!";
+            } else {
+                statusTitle = "Gentle Recovery Needed";
+                statusColor = "text-orange-400 bg-orange-950/30 border-orange-900/40";
+                feedback = "It looks like today presented some hurdles. Remember that rest days and low-energy days are part of the process. Hydrate, rest up, and take it one step at a time.";
+            }
+
+            if (notes && notes.length > 0) {
+                feedback += ` <br><br><span class="italic text-zinc-300">Coach Note on your journal: "${notes}" — Thanks for keeping tabs on how your body feels!</span>`;
+            }
+
+            return { statusTitle, statusColor, feedback };
         }
 
         function handleProfilePicUpload(event) {
@@ -545,23 +677,28 @@
 
         function renderHome(container) {
             const hour = new Date().getHours();
-            let greeting = 'Good evening';
-            if (hour < 12) greeting = 'Good morning';
-            else if (hour < 17) greeting = 'Good afternoon';
+            let timeGreeting = 'Good evening';
+            if (hour < 12) timeGreeting = 'Good morning';
+            else if (hour < 17) timeGreeting = 'Good afternoon';
+            
+            // Personalized Greeting
+            const userName = store.data.userName || 'King';
+            const greeting = `${timeGreeting}, ${userName}`;
 
             const todayNum = new Date().getDay();
             const todayPlan = SCHEDULE.find(s => s.day === todayNum);
             
             const isCompleted = store.hasCompletedWorkoutToday() || (store.getTodayCheckIn()?.activity);
-            const hasCheckedIn = !!store.getTodayCheckIn();
+            const todayCheckIn = store.getTodayCheckIn();
             const nextMedal = MEDALS.find(m => !store.data.achievements.find(a => a.id === m.id));
             const streak = calculateStreak();
+            const goal = getProgressionGoal();
 
             container.innerHTML = `
                 <!-- Header with Avatar -->
                 <div class="mb-6 flex justify-between items-center">
                     <div>
-                        <h1 class="text-3xl font-bold text-white tracking-tight">${greeting},</h1>
+                        <h1 class="text-3xl font-bold text-white tracking-tight">${greeting}</h1>
                         <p class="text-zinc-400 text-sm mt-1">Let's build strength one day at a time.</p>
                     </div>
                     <!-- Profile Picture Upload / Display -->
@@ -576,11 +713,15 @@
                     </label>
                 </div>
                 
-                <!-- Streak Pill -->
-                <div class="flex items-center gap-2 mb-6">
+                <!-- Streak Pill & Intensity Goal Pill -->
+                <div class="flex items-center gap-2 mb-6 flex-wrap">
                     <div class="glass-card px-4 py-1.5 rounded-full inline-flex items-center gap-2 border ${streak > 0 ? 'border-orange-500/30 bg-orange-950/20' : 'border-zinc-800'}">
                         <span class="text-sm">🔥</span>
                         <span class="text-xs font-bold ${streak > 0 ? 'text-orange-400' : 'text-zinc-500'}">${streak > 0 ? `${streak} Day Streak!` : 'Start your streak today!'}</span>
+                    </div>
+                    <div class="glass-card px-4 py-1.5 rounded-full inline-flex items-center gap-2 border border-brand-muted/40 bg-brand-bg/20">
+                        <span class="text-brand-main text-xs font-bold">⚡ ${goal.currentLevel}</span>
+                        <span class="text-[11px] text-zinc-400">${goal.ready ? 'Ready to Upgrade!' : `${goal.workoutsNeeded} workouts to ${goal.nextLevel}`}</span>
                     </div>
                 </div>
                 
@@ -617,15 +758,31 @@
                     </div>
                 </div>
 
-                ${!hasCheckedIn && isCompleted ? `
+                <!-- Daily Reflection AI Feedback Card (If checked in today) -->
+                ${todayCheckIn ? (() => {
+                    const feedbackData = generateReflectionFeedback(todayCheckIn);
+                    return `
+                    <div class="glass-card rounded-[2rem] p-6 mb-6 border border-brand-muted/30 relative overflow-hidden">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="bg-brand-bg p-2 rounded-full text-brand-main"><i data-lucide="sparkles" class="w-4 h-4"></i></div>
+                                <span class="text-xs font-bold uppercase tracking-wider text-brand-main">Coach Feedback</span>
+                            </div>
+                            <button onclick="openCheckIn()" class="text-xs text-zinc-400 hover:text-white underline">Edit Reflection</button>
+                        </div>
+                        <h3 class="font-bold text-white text-base mb-1 tracking-tight">${feedbackData.statusTitle}</h3>
+                        <p class="text-xs text-zinc-300 leading-relaxed">${feedbackData.feedback}</p>
+                    </div>
+                    `;
+                })() : `
                 <div class="glass-card bg-blue-950/20 border-blue-900/40 p-4 rounded-[1.5rem] flex items-center justify-between mb-6 shadow-lg shadow-blue-900/10">
                     <div class="flex items-center gap-3">
                         <div class="bg-blue-900/50 p-2 rounded-full"><i data-lucide="coffee" class="text-blue-400 w-4 h-4"></i></div>
-                        <span class="text-sm text-blue-300 font-medium">Log your daily reflection!</span>
+                        <span class="text-sm text-blue-300 font-medium">Log your daily reflection for AI feedback!</span>
                     </div>
                     <button onclick="openCheckIn()" class="text-xs font-bold text-blue-950 bg-blue-400 px-4 py-2 rounded-full shadow-sm active:scale-95 transition-transform">Do it now</button>
                 </div>
-                ` : ''}
+                `}
 
                 <!-- Next Achievement -->
                 ${nextMedal ? `
@@ -732,6 +889,7 @@
             const wCount = store.data.workouts.length;
             const cCount = new Set(store.data.checkIns.map(c=>c.date.split('T')[0])).size;
             const streak = calculateStreak();
+            const goal = getProgressionGoal();
             
             const heatmapData = [];
             const todayDate = new Date();
@@ -765,6 +923,23 @@
                             <p class="text-4xl font-bold text-brand-main flex items-center gap-2">${streak} <span class="text-xl">🔥</span></p>
                         </div>
                     </div>
+                </div>
+
+                <!-- Intensity Progression Goal Card -->
+                <div class="glass-card rounded-[2rem] p-6 mb-6">
+                    <div class="flex justify-between items-center mb-3">
+                        <div>
+                            <p class="text-[10px] font-bold text-brand-main uppercase tracking-widest mb-1">Intensity Goal</p>
+                            <h3 class="font-bold text-white text-base">Level Up to ${goal.nextLevel}</h3>
+                        </div>
+                        <div class="bg-brand-bg text-brand-main px-3 py-1 rounded-full text-xs font-bold">${goal.progress} / ${goal.target}</div>
+                    </div>
+                    <div class="w-full bg-zinc-900 h-2.5 rounded-full overflow-hidden mb-3 border border-zinc-800">
+                        <div class="bg-brand-main h-full rounded-full transition-all duration-500 shadow-[0_0_10px_var(--brand-main)]" style="width: ${goal.percentage}%"></div>
+                    </div>
+                    <p class="text-xs text-zinc-400 leading-relaxed">
+                        ${goal.ready ? `🎉 You have completed enough workouts at <b class="text-white">${goal.currentLevel}</b>! You can now safely upgrade your difficulty in the Menu settings.` : `Complete <b class="text-white">${goal.workoutsNeeded} more workouts</b> to unlock the next level safely with proper form and endurance.`}
+                    </p>
                 </div>
 
                 <div class="glass-card p-6 rounded-[2rem] mb-8">
@@ -865,6 +1040,8 @@
 
         function renderSettings(container) {
             const themes = ['lemon', 'purple', 'cyan', 'rose'];
+            const goal = getProgressionGoal();
+
             let themeHtml = `
                 <div class="glass-card p-5 rounded-[2rem] mb-6">
                     <div class="flex items-center gap-4 mb-5">
@@ -894,7 +1071,7 @@
                 <div class="space-y-6 pb-8">
                     <!-- Profile Management -->
                     <div class="glass-card p-5 rounded-[2rem]">
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center gap-4">
                                 <label class="w-16 h-16 rounded-full bg-zinc-800 border-2 border-brand-main overflow-hidden flex items-center justify-center cursor-pointer shadow-lg shadow-brand-main/20 relative group">
                                     <input type="file" class="hidden" accept="image/*" onchange="handleProfilePicUpload(event)">
@@ -908,27 +1085,41 @@
                             </div>
                             ${store.data.profilePic ? `<button onclick="removeProfilePic()" class="text-xs font-bold text-red-400 bg-red-950/40 px-3 py-1.5 rounded-full border border-red-900/50">Remove</button>` : ''}
                         </div>
+                        
+                        <!-- Name Update Row -->
+                        <div class="flex items-center justify-between border-t border-zinc-800 pt-4 mt-2">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="edit-3" class="w-4 h-4 text-zinc-500"></i>
+                                <span class="text-sm font-medium text-zinc-300">Name: <b class="text-white">${store.data.userName || 'King'}</b></span>
+                            </div>
+                            <button onclick="updateUserNameFromSettings()" class="text-xs font-bold text-brand-main bg-brand-bg px-4 py-1.5 rounded-full shadow-sm active:scale-95 transition-transform">Edit</button>
+                        </div>
                     </div>
 
                     <!-- Themes -->
                     ${themeHtml}
 
-                    <!-- Difficulty -->
+                    <!-- Difficulty & Progression Goal -->
                     <div class="glass-card p-5 rounded-[2rem]">
                         <div class="flex items-center gap-4 mb-5">
                             <div class="bg-zinc-800 p-3 rounded-full text-zinc-300 shadow-inner"><i data-lucide="zap" class="w-5 h-5"></i></div>
                             <div>
                                 <h3 class="font-bold text-white tracking-tight">Difficulty Level</h3>
-                                <p class="text-xs text-zinc-400">Adjusts sets, reps, and distance.</p>
+                                <p class="text-xs text-zinc-400">Progression Goal: ${goal.progress}/${goal.target} workouts</p>
                             </div>
                         </div>
-                        <div class="grid grid-cols-3 gap-3 flex-wrap bg-zinc-950/60 p-1.5 rounded-[2rem]">
+                        <div class="grid grid-cols-3 gap-3 flex-wrap bg-zinc-950/60 p-1.5 rounded-[2rem] mb-4">
                             ${['easy', 'steady', 'hard'].map(level => `
                                 <button onclick="changeDifficulty('${level}')" class="py-3 px-1 text-center rounded-full text-xs font-bold transition-all ${store.data.difficulty === level ? 'bg-brand-main text-brand-contrast shadow-md shadow-brand-main/20' : 'text-zinc-500 hover:text-zinc-300'} capitalize">
                                     ${level}
                                 </button>
                             `).join('')}
                         </div>
+                        ${!goal.ready && goal.nextLevel !== 'Max Peak' ? `
+                            <p class="text-xs text-yellow-400/90 bg-yellow-950/20 border border-yellow-900/40 p-3 rounded-xl leading-relaxed">
+                                💡 Tip: You need <b class="text-white">${goal.workoutsNeeded} more workouts</b> at your current level before safely graduating to <b>${goal.nextLevel}</b>.
+                            </p>
+                        ` : ''}
                     </div>
 
                     <!-- Reminders -->
@@ -989,6 +1180,12 @@
         }
 
         function changeDifficulty(level) {
+            const goal = getProgressionGoal();
+            if (level === 'hard' && store.data.workouts.length < 5 && store.data.difficulty === 'easy') {
+                if (!confirm("You haven't completed 5 workouts yet. Are you sure you want to skip straight to Hard?")) {
+                    return;
+                }
+            }
             store.data.difficulty = level;
             store.save();
             renderSettings(document.getElementById('view-settings'));
@@ -1292,7 +1489,7 @@
                 guideHtml += `
                     <div class="glass-card rounded-[2rem] border border-zinc-800/60 overflow-hidden">
                         <div class="h-44 w-full relative overflow-hidden bg-zinc-900">
-                            <img src="${ex.img}" alt="${ex.name}" class="w-full h-full object-cover opacity-80 hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/600x400/18181b/e0ff33?text=Fitness+Journey'">
+                            <img src="${ex.img}" alt="${ex.name}" class="w-full h-full object-cover opacity-80 hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/600x400/18181b/e0ff33?text=Fits'">
                             <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent"></div>
                             <span class="absolute bottom-3 left-4 text-[10px] font-bold text-brand-main bg-brand-bg px-3 py-1 rounded-full border border-brand-muted uppercase">${ex.target}</span>
                         </div>
@@ -1313,7 +1510,6 @@
                 </div>
             `;
             overlay.innerHTML = guideHtml;
-            overlay.classList.add('hidden'); // Fix: ensure it was hidden before toggling if needed, but here we show it directly
             overlay.classList.remove('hidden');
             lucide.createIcons();
         }
@@ -1418,7 +1614,7 @@
             store.save();
             checkAchievements();
             closeWorkoutSession();
-            showNotification("Reflection saved!");
+            showNotification("Reflection saved & analyzed!");
             if(router.current === 'progress') { renderProgress(document.getElementById('view-progress')); }
             else { router.navigate('home'); }
         }
@@ -1428,7 +1624,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(store.data));
             const downloadAnchorNode = document.createElement('a');
             downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "my_fitness_journey_backup.json");
+            downloadAnchorNode.setAttribute("download", "fits_backup.json");
             document.body.appendChild(downloadAnchorNode);
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
@@ -1447,6 +1643,7 @@
                             if(!store.data.achievements) store.data.achievements = [];
                             if(!store.data.theme) store.data.theme = 'lemon';
                             if(store.data.profilePic === undefined) store.data.profilePic = null;
+                            if(store.data.userName === undefined) store.data.userName = null;
                             store.save();
                             document.documentElement.className = `theme-${store.data.theme}`;
                             checkAchievements(); 
@@ -1482,7 +1679,7 @@
 
             const icsContent = `BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//My Fitness Journey//EN
+PRODID:-//Fits//EN
 BEGIN:VEVENT
 SUMMARY:Morning Fitness Reflection
 DESCRIPTION:Time to show up for yourself. Let's build strength one day at a time.
@@ -1500,7 +1697,7 @@ END:VCALENDAR`;
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'fitness-reminder.ics';
+            a.download = 'fits-reminder.ics';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1510,13 +1707,6 @@ END:VCALENDAR`;
                 alert("iPhone Installation:\n\n1. Safari will prompt you to download the file.\n2. Tap 'Download'.\n3. Tap the Downloads icon (↓) in the Safari address bar, open the file, and tap 'Add All' to save the recurring reminder with an alarm.");
             }, 600);
         }
-
-        // --- 9. INITIALIZATION ---
-        window.onload = () => {
-            store.load();
-            checkAchievements(); 
-            router.navigate('home');
-        };
 
     </script>
 </body>
