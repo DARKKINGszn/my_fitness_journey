@@ -118,6 +118,32 @@
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(63, 63, 70, 0.4);
         }
+
+        /* Pet Floating & Pulse Animations */
+        @keyframes floatPet {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+        .pet-float {
+            animation: floatPet 3s ease-in-out infinite;
+        }
+        @keyframes popScale {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .pop-in {
+            animation: popScale 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes hitShake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px) rotate(-2deg); }
+            40% { transform: translateX(8px) rotate(2deg); }
+            60% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+        }
+        .hit-shake {
+            animation: hitShake 0.35s ease-in-out;
+        }
     </style>
 </head>
 <body class="h-screen w-screen overflow-hidden flex flex-col selection:bg-brand-bg">
@@ -135,6 +161,8 @@
         <!-- Modals and Overlays -->
         <div id="workout-session" class="fixed inset-0 bg-zinc-950 z-50 hidden flex-col w-full max-w-md mx-auto slide-up-modal ios-safe-modal"></div>
         <div id="workout-complete" class="fixed inset-0 bg-zinc-950 text-white z-[60] hidden flex-col w-full max-w-md mx-auto slide-up-modal ios-safe-modal"></div>
+        <div id="pet-modal" class="fixed inset-0 bg-zinc-950 z-[70] hidden flex-col w-full max-w-md mx-auto slide-up-modal ios-safe-modal"></div>
+        <div id="custom-dialog" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[110] hidden items-center justify-center p-6 w-full max-w-md mx-auto"></div>
         
         <!-- Name Prompt Modal (Shown on first load) -->
         <div id="name-prompt-modal" class="fixed inset-0 bg-zinc-950/95 backdrop-blur-xl z-[100] hidden flex-col items-center justify-center p-6 text-center w-full max-w-md mx-auto fade-in">
@@ -142,8 +170,13 @@
                 <i data-lucide="crown" class="w-10 h-10 text-brand-main"></i>
             </div>
             <h2 class="text-3xl font-bold text-white mb-2 tracking-tight">Welcome to Fits</h2>
-            <p class="text-zinc-400 mb-8 text-sm">What would you like to be called?</p>
-            <input type="text" id="user-name-input" placeholder="e.g. King" class="w-full max-w-[240px] bg-zinc-900 border border-zinc-700 rounded-full py-4 px-6 text-white text-center mb-8 focus:border-brand-main focus:ring-1 focus:ring-brand-main outline-none text-lg font-bold placeholder-zinc-600 transition-all shadow-inner">
+            <p class="text-zinc-400 mb-6 text-sm">What would you like to be called?</p>
+            <input type="text" id="user-name-input" placeholder="e.g. King" class="w-full max-w-[240px] bg-zinc-900 border border-zinc-700 rounded-full py-4 px-6 text-white text-center mb-5 focus:border-brand-main focus:ring-1 focus:ring-brand-main outline-none text-lg font-bold placeholder-zinc-600 transition-all shadow-inner">
+            <p class="text-zinc-400 mb-2.5 text-xs uppercase tracking-wider font-bold">Select Fighter Gender</p>
+            <div class="flex gap-3 mb-8 w-full max-w-[240px]">
+                <button type="button" id="prompt-gender-male" onclick="selectPromptGender('male')" class="flex-1 py-3 rounded-full text-xs font-bold bg-brand-main text-brand-contrast transition-all">Male</button>
+                <button type="button" id="prompt-gender-female" onclick="selectPromptGender('female')" class="flex-1 py-3 rounded-full text-xs font-bold bg-zinc-900 text-zinc-400 border border-zinc-700 transition-all">Female</button>
+            </div>
             <button onclick="saveUserName()" class="bg-brand-main text-brand-contrast rounded-full py-4 px-12 font-bold shadow-xl shadow-brand-main/20 active:scale-95 transition-transform tracking-wide">Continue</button>
         </div>
     </div>
@@ -289,29 +322,91 @@
         ];
 
         const MEDALS = [
-            { id: 'first_step', title: 'First Step', desc: 'Complete your first workout.' },
-            { id: 'rhythm', title: 'Finding a Rhythm', desc: 'Complete 3 workouts.' },
-            { id: 'momentum', title: 'Building Momentum', desc: 'Complete 5 workouts.' },
-            { id: 'double_digits', title: 'Double Digits', desc: 'Complete 10 workouts.' },
-            { id: 'consistency_champ', title: 'Consistency Champ', desc: 'Complete 20 workouts.' },
-            { id: 'strength_builder', title: 'Strength Builder', desc: 'Complete 30 workouts.' },
-            { id: 'showing_up', title: 'Showing Up', desc: 'Complete check-ins on 5 different days.' },
-            { id: 'weekly_commitment', title: 'Weekly Commitment', desc: 'Log 3 strength workouts in a Mon-Sun week.' },
-            { id: 'two_weeks', title: 'Two-Week Journey', desc: 'Record activity across 14 different days.' },
-            { id: 'marathon_runner', title: 'Cardio Engine', desc: 'Log 3 cardio or jogging sessions.' },
-            { id: 'hydration_hero', title: 'Hydration Hero', desc: 'Check off water intake on 7 different days.' },
-            { id: 'early_bird', title: 'Early Riser', desc: 'Complete a workout or check-in before 9 AM.' }
+            { id: 'first_step', title: 'First Blood', desc: 'Complete your first workout.', reward: 50, icon: 'sword' },
+            { id: 'rhythm', title: 'Hat Trick', desc: 'Complete 3 workouts.', reward: 75, icon: 'flame' },
+            { id: 'momentum', title: 'Unstoppable Force', desc: 'Complete 5 workouts.', reward: 100, icon: 'zap' },
+            { id: 'double_digits', title: 'Double Digits', desc: 'Complete 10 workouts.', reward: 150, icon: 'award' },
+            { id: 'consistency_champ', title: 'Iron Will', desc: 'Complete 20 workouts.', reward: 250, icon: 'shield' },
+            { id: 'strength_builder', title: 'Spartan 30', desc: 'Complete 30 workouts.', reward: 400, icon: 'crown' },
+            { id: 'half_century', title: 'Titan 50', desc: 'Complete 50 workouts.', reward: 600, icon: 'trophy' },
+            { id: 'showing_up', title: 'Self-Aware', desc: 'Complete check-ins on 5 different days.', reward: 75, icon: 'eye' },
+            { id: 'weekly_commitment', title: 'Clean Sweep', desc: 'Log 3 strength workouts in a Mon-Sun week.', reward: 150, icon: 'calendar-check' },
+            { id: 'two_weeks', title: 'Fortnight Warrior', desc: 'Record activity across 14 different days.', reward: 200, icon: 'compass' },
+            { id: 'marathon_runner', title: 'Roadrunner', desc: 'Log 3 cardio or jogging sessions.', reward: 100, icon: 'wind' },
+            { id: 'hydration_hero', title: 'Hydro Homie', desc: 'Check off water intake on 7 different days.', reward: 100, icon: 'droplets' },
+            { id: 'early_bird', title: '5 AM Club Vibe', desc: 'Complete a workout or reflection before 9 AM.', reward: 100, icon: 'sunrise' },
+            { id: 'night_owl', title: 'Midnight Grinder', desc: 'Log a workout or reflection after 8 PM.', reward: 100, icon: 'moon' },
+            { id: 'weekend_warrior', title: 'No Days Off', desc: 'Stay active on both Saturday and Sunday.', reward: 150, icon: 'sun' },
+            { id: 'phoenix_rising', title: 'Phoenix Rising', desc: 'Use a Streak Restore to save a lost streak.', reward: 100, icon: 'refresh-cw' },
+            { id: 'anti_procrastinator', title: 'Beat Resistance', desc: 'Complete a 2-Minute Anti-Procrastination Spark.', reward: 75, icon: 'battery-charging' },
+            { id: 'fashionista', title: 'Drip Check', desc: 'Equip your first accessory on your Fighter.', reward: 50, icon: 'sparkles' },
+            { id: 'journal_master', title: 'Mindful Athlete', desc: 'Write personal notes in 5 daily reflections.', reward: 100, icon: 'book-open' },
+            { id: 'perfect_day', title: 'Quadruple Threat', desc: 'Hit all 4 reflection boxes + a workout in one day.', reward: 150, icon: 'star' },
+            { id: 'first_victory', title: 'Arena Rookie', desc: 'Win your first Streak Battle in the Arena.', reward: 75, icon: 'swords' },
+            { id: 'boss_slayer', title: 'Boss Slayer', desc: 'Win 5 Streak Battles in the Arena.', reward: 150, icon: 'skull' },
+            { id: 'giant_killer', title: 'Giant Killer', desc: 'Defeat a boss tier higher than your current stage.', reward: 200, icon: 'trophy' }
         ];
+
+        const PET_SHOP = {
+            species: [
+                { id: 'dragon', name: 'Neon Volt', cost: 0, primary: '#e0ff33', secondary: '#84cc16' },
+                { id: 'fox', name: 'Solar Blaze', cost: 150, primary: '#fb923c', secondary: '#ea580c' },
+                { id: 'panther', name: 'Royal Shadow', cost: 250, primary: '#a78bfa', secondary: '#7c3aed' },
+                { id: 'robo', name: 'Cyber Frost', cost: 350, primary: '#22d3ee', secondary: '#0284c7' }
+            ],
+            hat: [
+                { id: 'none', name: 'No Headwear', cost: 0 },
+                { id: 'sweatband', name: 'Pro Sweatband', cost: 60 },
+                { id: 'cap', name: 'Backward Cap', cost: 120 },
+                { id: 'crown', name: 'King Crown', cost: 250 },
+                { id: 'halo', name: 'Champion Halo', cost: 300 }
+            ],
+            glasses: [
+                { id: 'none', name: 'No Eyewear', cost: 0 },
+                { id: 'shades', name: 'Pixel Shades', cost: 80 },
+                { id: 'visor', name: 'Cyber Visor', cost: 180 },
+                { id: 'monocle', name: 'Classy Monocle', cost: 220 }
+            ],
+            gear: [
+                { id: 'none', name: 'No Gear', cost: 0 },
+                { id: 'dumbbell', name: 'Neon Dumbbell', cost: 90 },
+                { id: 'chain', name: 'Gold Chain', cost: 160 },
+                { id: 'cape', name: 'Hero Cape', cost: 280 }
+            ],
+            aura: [
+                { id: 'none', name: 'No Aura', cost: 0 },
+                { id: 'flame', name: 'Fire Aura', cost: 140 },
+                { id: 'lightning', name: 'Volt Surge', cost: 240 },
+                { id: 'stars', name: 'Cosmic Glow', cost: 320 }
+            ]
+        };
 
         // --- 2. STATE MANAGEMENT & UTILS ---
         const defaultState = {
-            userName: null, // New field for personalization
+            userName: null,
+            gender: 'male',
             difficulty: 'steady', 
             theme: 'lemon', 
             workouts: [], 
             checkIns: [], 
             achievements: [], 
             profilePic: null,
+            coins: 150,
+            xp: 0,
+            battlesWon: 0,
+            dailyBattleWins: { date: '', count: 0 },
+            streakRestores: 3,
+            streakBridges: [],
+            microWorkouts: 0,
+            pet: {
+                name: 'Apex',
+                species: 'dragon',
+                hat: 'none',
+                glasses: 'none',
+                gear: 'none',
+                aura: 'none',
+                unlocked: ['species:dragon', 'hat:none', 'glasses:none', 'gear:none', 'aura:none']
+            },
             startDate: new Date().toISOString()
         };
 
@@ -326,8 +421,26 @@
                         if(!this.data.workouts) this.data.workouts = [];
                         if(!this.data.achievements) this.data.achievements = [];
                         if(!this.data.theme) this.data.theme = 'lemon';
+                        if(!this.data.gender) this.data.gender = 'male';
                         if(this.data.profilePic === undefined) this.data.profilePic = null;
                         if(this.data.userName === undefined) this.data.userName = null;
+                        if(this.data.battlesWon === undefined) this.data.battlesWon = 0;
+                        if(!this.data.dailyBattleWins) this.data.dailyBattleWins = { date: '', count: 0 };
+                        if(this.data.streakRestores === undefined) this.data.streakRestores = 3;
+                        if(!Array.isArray(this.data.streakBridges)) this.data.streakBridges = [];
+                        if(this.data.microWorkouts === undefined) this.data.microWorkouts = 0;
+                        if(this.data.xp === undefined) this.data.xp = (this.data.workouts.length * 100) + (this.data.checkIns.length * 30);
+                        if(this.data.coins === undefined) {
+                            let retroCoins = 150;
+                            this.data.achievements.forEach(a => {
+                                const m = MEDALS.find(med => med.id === a.id);
+                                if (m && m.reward) retroCoins += m.reward;
+                            });
+                            this.data.coins = retroCoins;
+                        }
+                        if(!this.data.pet) {
+                            this.data.pet = JSON.parse(JSON.stringify(defaultState.pet));
+                        }
                     } catch(e) {
                         this.data = JSON.parse(JSON.stringify(defaultState));
                     }
@@ -336,21 +449,41 @@
                 }
                 document.documentElement.className = `theme-${this.data.theme}`;
             },
-            save() {
-                localStorage.setItem('mfj_data', JSON.stringify(this.data));
-            },
-            getTodayStr() {
-                const d = new Date();
-                return new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-            },
-            hasCompletedWorkoutToday() {
-                const today = this.getTodayStr();
-                return this.data.workouts.some(w => w.date.startsWith(today));
-            },
-            getTodayCheckIn() {
-                const today = this.getTodayStr();
-                return this.data.checkIns.find(c => c.date.startsWith(today));
+        let selectedPromptGender = 'male';
+        function selectPromptGender(g) {
+            selectedPromptGender = g;
+            const mBtn = document.getElementById('prompt-gender-male');
+            const fBtn = document.getElementById('prompt-gender-female');
+            if (g === 'male') {
+                mBtn.className = 'flex-1 py-3 rounded-full text-xs font-bold bg-brand-main text-brand-contrast transition-all';
+                fBtn.className = 'flex-1 py-3 rounded-full text-xs font-bold bg-zinc-900 text-zinc-400 border border-zinc-700 transition-all';
+            } else {
+                fBtn.className = 'flex-1 py-3 rounded-full text-xs font-bold bg-brand-main text-brand-contrast transition-all';
+                mBtn.className = 'flex-1 py-3 rounded-full text-xs font-bold bg-zinc-900 text-zinc-400 border border-zinc-700 transition-all';
             }
+        }
+
+        function saveUserName() {
+            let nameInput = document.getElementById('user-name-input').value.trim();
+            store.data.userName = nameInput || 'King';
+            store.data.gender = selectedPromptGender;
+            store.save();
+            
+            const modal = document.getElementById('name-prompt-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+            
+            checkAchievements();
+            router.navigate('home');
+            showNotification(`Welcome to Fits, ${store.data.userName}!`);
+        }
+
+        function setUserGender(g) {
+            store.data.gender = g;
+            store.save();
+            renderView(router.current);
+            showNotification(`Fighter physique set to ${g === 'male' ? 'Male' : 'Female'}`);
+        }
         };
 
         // --- INITIALIZATION SCRIPT (Handles Name Prompt) ---
@@ -383,39 +516,187 @@
 
         function updateUserNameFromSettings() {
             let currentName = store.data.userName || 'King';
-            let newName = prompt("What would you like to be called?", currentName);
-            if (newName && newName.trim() !== '') {
-                store.data.userName = newName.trim();
-                store.save();
-                renderView(router.current);
-                showNotification("Name updated!");
-            }
+            showPromptModal("Update Your Name", "What would you like to be called?", currentName, (newName) => {
+                if (newName && newName.trim() !== '') {
+                    store.data.userName = newName.trim();
+                    store.save();
+                    renderView(router.current);
+                    showNotification("Name updated!");
+                }
+            });
         }
 
-        function calculateStreak() {
-            let activeDates = [...new Set([
+        // --- CUSTOM DIALOG SYSTEM (Replaces native alert/confirm) ---
+        function showInfoModal(title, message) {
+            const dialog = document.getElementById('custom-dialog');
+            dialog.innerHTML = `
+                <div class="glass-card bg-zinc-900 border border-zinc-700 rounded-[2rem] p-6 w-full max-w-sm text-center pop-in shadow-2xl">
+                    <h3 class="text-xl font-bold text-white mb-2 tracking-tight">${title}</h3>
+                    <p class="text-sm text-zinc-300 mb-6 whitespace-pre-line leading-relaxed">${message}</p>
+                    <button onclick="closeCustomDialog()" class="w-full bg-brand-main text-brand-contrast rounded-full py-3.5 font-bold text-sm shadow-lg active:scale-95 transition-transform">Got it</button>
+                </div>
+            `;
+            dialog.classList.remove('hidden');
+            dialog.classList.add('flex');
+        }
+
+        function showConfirmModal(title, message, onConfirm, confirmText = "Confirm", isDanger = false) {
+            const dialog = document.getElementById('custom-dialog');
+            window._pendingConfirmAction = () => {
+                closeCustomDialog();
+                onConfirm();
+            };
+            dialog.innerHTML = `
+                <div class="glass-card bg-zinc-900 border border-zinc-700 rounded-[2rem] p-6 w-full max-w-sm text-center pop-in shadow-2xl">
+                    <h3 class="text-xl font-bold text-white mb-2 tracking-tight">${title}</h3>
+                    <p class="text-sm text-zinc-300 mb-6 leading-relaxed">${message}</p>
+                    <div class="flex gap-3">
+                        <button onclick="closeCustomDialog()" class="flex-1 bg-zinc-800 text-zinc-300 rounded-full py-3.5 font-bold text-sm active:scale-95 transition-transform">Cancel</button>
+                        <button onclick="window._pendingConfirmAction()" class="flex-1 ${isDanger ? 'bg-red-500 text-white' : 'bg-brand-main text-brand-contrast'} rounded-full py-3.5 font-bold text-sm shadow-lg active:scale-95 transition-transform">${confirmText}</button>
+                    </div>
+                </div>
+            `;
+            dialog.classList.remove('hidden');
+            dialog.classList.add('flex');
+        }
+
+        function showPromptModal(title, message, defaultValue, onSave) {
+            const dialog = document.getElementById('custom-dialog');
+            window._pendingPromptAction = () => {
+                const val = document.getElementById('custom-prompt-input').value;
+                closeCustomDialog();
+                onSave(val);
+            };
+            dialog.innerHTML = `
+                <div class="glass-card bg-zinc-900 border border-zinc-700 rounded-[2rem] p-6 w-full max-w-sm text-center pop-in shadow-2xl">
+                    <h3 class="text-xl font-bold text-white mb-2 tracking-tight">${title}</h3>
+                    <p class="text-sm text-zinc-400 mb-4">${message}</p>
+                    <input type="text" id="custom-prompt-input" value="${defaultValue}" class="w-full bg-zinc-950 border border-zinc-700 rounded-full py-3 px-5 text-white text-center mb-6 focus:border-brand-main outline-none font-bold">
+                    <div class="flex gap-3">
+                        <button onclick="closeCustomDialog()" class="flex-1 bg-zinc-800 text-zinc-300 rounded-full py-3.5 font-bold text-sm active:scale-95 transition-transform">Cancel</button>
+                        <button onclick="window._pendingPromptAction()" class="flex-1 bg-brand-main text-brand-contrast rounded-full py-3.5 font-bold text-sm shadow-lg active:scale-95 transition-transform">Save</button>
+                    </div>
+                </div>
+            `;
+            dialog.classList.remove('hidden');
+            dialog.classList.add('flex');
+        }
+
+        function closeCustomDialog() {
+            const dialog = document.getElementById('custom-dialog');
+            dialog.classList.add('hidden');
+            dialog.classList.remove('flex');
+        }
+
+        // --- STREAK & 3X STREAK RESTORE ENGINE ---
+        function getAllActiveDates() {
+            return [...new Set([
                 ...store.data.workouts.map(w => w.date.split('T')[0]),
                 ...store.data.checkIns.filter(c => c.activity).map(c => c.date.split('T')[0])
             ])].sort((a, b) => new Date(b) - new Date(a));
+        }
 
-            if (activeDates.length === 0) return 0;
+        function shiftDateStr(dateStr, daysDelta) {
+            const parts = dateStr.split('-').map(Number);
+            const d = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
+            d.setUTCDate(d.getUTCDate() + daysDelta);
+            return d.toISOString().split('T')[0];
+        }
 
-            let streak = 0;
-            let d = new Date();
-            let checkDateStr = store.getTodayStr();
-            
-            if (!activeDates.includes(checkDateStr)) {
-                d.setDate(d.getDate() - 1);
-                checkDateStr = d.toISOString().split('T')[0];
-                if (!activeDates.includes(checkDateStr)) return 0;
+        function findBridgeContaining(dateStr) {
+            const bridges = store.data.streakBridges || [];
+            return bridges.find(b => dateStr >= b.from && dateStr <= b.to);
+        }
+
+        function countStreakFromAnchor(anchorDateStr, activeSet) {
+            let count = 0;
+            let curr = anchorDateStr;
+            let safety = 0;
+
+            while (safety < 3650) {
+                safety++;
+                if (activeSet.has(curr)) {
+                    count++;
+                    curr = shiftDateStr(curr, -1);
+                } else {
+                    const bridge = findBridgeContaining(curr);
+                    if (bridge && bridge.from < curr) {
+                        curr = bridge.from;
+                    } else {
+                        break;
+                    }
+                }
+            }
+            return count;
+        }
+
+        function getStreakStatus() {
+            const activeDates = getAllActiveDates();
+            const activeSet = new Set(activeDates);
+            const todayStr = store.getTodayStr();
+            const yesterdayStr = shiftDateStr(todayStr, -1);
+            const restoresLeft = store.data.streakRestores !== undefined ? store.data.streakRestores : 3;
+
+            if (activeDates.length === 0) {
+                return { streak: 0, canRestore: false, lostStreakCount: 0, restoresLeft, lastActiveDate: null };
             }
 
-            while(activeDates.includes(checkDateStr)) {
-                streak++;
-                d.setDate(d.getDate() - 1);
-                checkDateStr = d.toISOString().split('T')[0];
+            // Check if streak is currently alive (active today, active yesterday, or yesterday is bridged)
+            const isTodayAlive = activeSet.has(todayStr) || !!findBridgeContaining(todayStr);
+            const isYesterdayAlive = activeSet.has(yesterdayStr) || !!findBridgeContaining(yesterdayStr);
+
+            if (isTodayAlive) {
+                return {
+                    streak: countStreakFromAnchor(todayStr, activeSet),
+                    canRestore: false,
+                    lostStreakCount: 0,
+                    restoresLeft,
+                    lastActiveDate: activeDates[0]
+                };
             }
-            return streak;
+
+            if (isYesterdayAlive) {
+                return {
+                    streak: countStreakFromAnchor(yesterdayStr, activeSet),
+                    canRestore: false,
+                    lostStreakCount: 0,
+                    restoresLeft,
+                    lastActiveDate: activeDates[0]
+                };
+            }
+
+            // Otherwise, the user has missed at least 1 full day and their streak is frozen/broken!
+            const lastActive = activeDates[0];
+            const lostStreakCount = countStreakFromAnchor(lastActive, activeSet);
+
+            return {
+                streak: 0,
+                canRestore: lostStreakCount > 0 && restoresLeft > 0,
+                lostStreakCount,
+                restoresLeft,
+                lastActiveDate: lastActive
+            };
+        }
+
+        function calculateStreak() {
+            return getStreakStatus().streak;
+        }
+
+        function restoreLostStreak() {
+            const status = getStreakStatus();
+            if (!status.canRestore || status.restoresLeft <= 0) return;
+
+            const yesterdayStr = shiftDateStr(store.getTodayStr(), -1);
+            store.data.streakBridges.push({
+                from: status.lastActiveDate,
+                to: yesterdayStr
+            });
+            store.data.streakRestores = status.restoresLeft - 1;
+            store.save();
+
+            checkAchievements();
+            renderView(router.current);
+            showNotification(`🔥 ${status.lostStreakCount}-Day Streak Restored! (${store.data.streakRestores}/3 left)`);
         }
 
         // --- INTENSITY PROGRESSION GOAL CALCULATOR ---
@@ -534,7 +815,11 @@
 
             const grant = (id) => {
                 if (!unlocked.includes(id)) {
+                    const medal = MEDALS.find(m => m.id === id);
                     store.data.achievements.push({ id, date: today });
+                    if (medal && medal.reward) {
+                        store.data.coins = (store.data.coins || 0) + medal.reward;
+                    }
                     newUnlocks.push(id);
                 }
             };
@@ -549,7 +834,10 @@
             const aCount = uniqueActivityDates.size;
             const cardioCount = store.data.workouts.filter(w => w.type === 'cardio').length;
             const waterCount = store.data.checkIns.filter(c => c.water).length;
-            const isEarly = new Date().getHours() < 9;
+            const notesCount = store.data.checkIns.filter(c => c.notes && c.notes.trim().length > 5).length;
+            const hourNow = new Date().getHours();
+            const isEarly = hourNow < 9;
+            const isLate = hourNow >= 20;
 
             if (wCount >= 1) grant('first_step');
             if (wCount >= 3) grant('rhythm');
@@ -557,11 +845,34 @@
             if (wCount >= 10) grant('double_digits');
             if (wCount >= 20) grant('consistency_champ');
             if (wCount >= 30) grant('strength_builder');
+            if (wCount >= 50) grant('half_century');
             if (cCount >= 5) grant('showing_up');
             if (aCount >= 14) grant('two_weeks');
             if (cardioCount >= 3) grant('marathon_runner');
             if (waterCount >= 7) grant('hydration_hero');
-            if (isEarly && wCount >= 1) grant('early_bird');
+            if (notesCount >= 5) grant('journal_master');
+            if (isEarly && (wCount >= 1 || cCount >= 1)) grant('early_bird');
+            if (isLate && (wCount >= 1 || cCount >= 1)) grant('night_owl');
+            if ((store.data.streakBridges || []).length > 0) grant('phoenix_rising');
+            if ((store.data.microWorkouts || 0) >= 1) grant('anti_procrastinator');
+
+            const pet = store.data.pet || {};
+            if (pet.hat !== 'none' || pet.glasses !== 'none' || pet.gear !== 'none' || pet.aura !== 'none') {
+                grant('fashionista');
+            }
+
+            // Weekend warrior check (both Sat=6 and Sun=0 present in activity dates)
+            const daysOfWeekActive = new Set([...uniqueActivityDates].map(dStr => {
+                const p = dStr.split('-').map(Number);
+                return new Date(Date.UTC(p[0], p[1] - 1, p[2])).getUTCDay();
+            }));
+            if (daysOfWeekActive.has(6) && daysOfWeekActive.has(0)) grant('weekend_warrior');
+
+            // Quadruple threat check
+            const todayCheck = store.getTodayCheckIn();
+            if (todayCheck && todayCheck.activity && todayCheck.water && todayCheck.sleep && todayCheck.energy && store.hasCompletedWorkoutToday()) {
+                grant('perfect_day');
+            }
 
             if (!unlocked.includes('weekly_commitment')) {
                 const curr = new Date();
@@ -581,40 +892,1000 @@
 
             if (newUnlocks.length > 0) {
                 store.save();
-                showNotification(`🏆 Achievement Unlocked: ${MEDALS.find(m=>m.id===newUnlocks[0]).title}!`);
+                const firstMedal = MEDALS.find(m => m.id === newUnlocks[0]);
+                showNotification(`🏆 Unlocked: ${firstMedal.title} (+${firstMedal.reward} Coins!)`);
             }
         }
 
-        // --- 4. ROUTER & UI UTILS ---
-        const router = {
-            current: 'home',
-            navigate(viewId) {
-                document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
-                document.getElementById(`view-${viewId}`).classList.remove('hidden');
+        // --- STREAK PET ENGINE & WARDROBE STUDIO ---
+        function getPetLevelInfo() {
+            const xp = store.data.xp || 0;
+            const level = Math.floor(xp / 250) + 1;
+            const currentLevelXp = xp % 250;
+            const pct = Math.round((currentLevelXp / 250) * 100);
+            const titles = ['Rookie Cub', 'Gym Trainee', 'Iron Cadet', 'Reps Machine', 'Apex Beast', 'Mythic Titan'];
+            const title = titles[Math.min(level - 1, titles.length - 1)];
+            return { level, xp, currentLevelXp, pct, title };
+        }
+
+        function renderPetSVG(size = 110) {
+            const pet = store.data.pet || defaultState.pet;
+            const specObj = PET_SHOP.species.find(s => s.id === pet.species) || PET_SHOP.species[0];
+            const c1 = specObj.primary;
+            const c2 = specObj.secondary;
+
+            let auraSvg = '';
+            if (pet.aura === 'flame') {
+                auraSvg = `<circle cx="100" cy="105" r="76" fill="none" stroke="#f97316" stroke-width="5" stroke-dasharray="14 8" opacity="0.75"/>
+                           <circle cx="100" cy="105" r="64" fill="#f97316" opacity="0.14"/>`;
+            } else if (pet.aura === 'lightning') {
+                auraSvg = `<circle cx="100" cy="105" r="76" fill="none" stroke="#22d3ee" stroke-width="4" stroke-dasharray="22 6 6 6" opacity="0.85"/>
+                           <path d="M35 60 L50 80 L38 85 L52 108" stroke="#22d3ee" stroke-width="3" fill="none" stroke-linecap="round"/>
+                           <path d="M165 60 L150 80 L162 85 L148 108" stroke="#22d3ee" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+            } else if (pet.aura === 'stars') {
+                auraSvg = `<circle cx="100" cy="105" r="75" fill="#e0ff33" opacity="0.12"/>
+                           <circle cx="42" cy="52" r="3.5" fill="#e0ff33"/><circle cx="158" cy="48" r="4" fill="#a78bfa"/>
+                           <circle cx="34" cy="135" r="3" fill="#22d3ee"/><circle cx="166" cy="130" r="3.5" fill="#e0ff33"/>`;
+            }
+
+            let earsSvg = '';
+            if (pet.species === 'dragon') {
+                earsSvg = `<polygon points="62,65 48,32 80,55" fill="${c2}"/>
+                           <polygon points="138,65 152,32 120,55" fill="${c2}"/>`;
+            } else if (pet.species === 'fox' || pet.species === 'panther') {
+                earsSvg = `<polygon points="58,72 46,28 85,56" fill="${c1}" stroke="${c2}" stroke-width="3"/>
+                           <polygon points="142,72 154,28 115,56" fill="${c1}" stroke="${c2}" stroke-width="3"/>`;
+            } else {
+                earsSvg = `<circle cx="62" cy="52" r="16" fill="${c2}"/><circle cx="138" cy="52" r="16" fill="${c2}"/>
+                           <rect x="97" y="24" width="6" height="18" rx="3" fill="${c1}"/><circle cx="100" cy="22" r="5" fill="#ef4444"/>`;
+            }
+
+            let hatSvg = '';
+            if (pet.hat === 'sweatband') {
+                hatSvg = `<rect x="56" y="64" width="88" height="12" rx="6" fill="#ef4444"/>
+                          <rect x="56" y="68" width="88" height="4" fill="#ffffff"/>`;
+            } else if (pet.hat === 'cap') {
+                hatSvg = `<path d="M62,64 C62,38 138,38 138,64 Z" fill="#18181b" stroke="#3f3f46" stroke-width="2"/>
+                          <rect x="44" y="58" width="44" height="8" rx="4" fill="#27272a"/>`;
+            } else if (pet.hat === 'crown') {
+                hatSvg = `<polygon points="66,54 72,26 88,44 100,20 112,44 128,26 134,54" fill="#facc15" stroke="#ca8a04" stroke-width="2"/>
+                          <circle cx="100" cy="20" r="3.5" fill="#ef4444"/>`;
+            } else if (pet.hat === 'halo') {
+                hatSvg = `<ellipse cx="100" cy="28" rx="34" ry="8" fill="none" stroke="#fde047" stroke-width="4.5"/>`;
+            }
+
+            let glassesSvg = '';
+            if (pet.glasses === 'shades') {
+                glassesSvg = `<rect x="64" y="82" width="30" height="16" rx="4" fill="#09090b" stroke="#ffffff" stroke-width="2"/>
+                              <rect x="106" y="82" width="30" height="16" rx="4" fill="#09090b" stroke="#ffffff" stroke-width="2"/>
+                              <line x1="94" y1="88" x2="106" y2="88" stroke="#ffffff" stroke-width="2.5"/>`;
+            } else if (pet.glasses === 'visor') {
+                glassesSvg = `<rect x="58" y="80" width="84" height="18" rx="9" fill="#22d3ee" opacity="0.85" stroke="#ffffff" stroke-width="2"/>
+                              <line x1="66" y1="86" x2="120" y2="86" stroke="#ffffff" stroke-width="2" opacity="0.7"/>`;
+            } else if (pet.glasses === 'monocle') {
+                glassesSvg = `<circle cx="120" cy="89" r="14" fill="rgba(255,255,255,0.15)" stroke="#facc15" stroke-width="3"/>
+                              <path d="M134,89 Q146,115 136,138" fill="none" stroke="#facc15" stroke-width="2" stroke-dasharray="3 2"/>`;
+            }
+
+            let gearSvg = '';
+            if (pet.gear === 'dumbbell') {
+                gearSvg = `<g transform="translate(136, 128) rotate(-25)">
+                             <rect x="10" y="12" width="28" height="7" rx="3" fill="#a1a1aa"/>
+                             <rect x="2" y="4" width="10" height="23" rx="3" fill="#e0ff33" stroke="#09090b" stroke-width="1.5"/>
+                             <rect x="36" y="4" width="10" height="23" rx="3" fill="#e0ff33" stroke="#09090b" stroke-width="1.5"/>
+                           </g>`;
+            } else if (pet.gear === 'chain') {
+                gearSvg = `<path d="M72,128 Q100,152 128,128" fill="none" stroke="#facc15" stroke-width="5" stroke-linecap="round"/>
+                           <circle cx="100" cy="144" r="7" fill="#facc15" stroke="#ca8a04" stroke-width="2"/>`;
+            } else if (pet.gear === 'cape') {
+                gearSvg = `<path d="M62,126 L36,174 L164,174 L138,126 Z" fill="#ef4444" opacity="0.9"/>`;
+            }
+
+            return `
+                <svg width="${size}" height="${size}" viewBox="0 0 200 200" class="pet-float overflow-visible">
+                    ${auraSvg}
+                    ${pet.gear === 'cape' ? gearSvg : ''}
+                    ${earsSvg}
+                    <!-- Torso -->
+                    <rect x="64" y="118" width="72" height="54" rx="26" fill="${c2}"/>
+                    <rect x="78" y="126" width="44" height="38" rx="18" fill="#ffffff" opacity="0.22"/>
+                    <!-- Head -->
+                    <rect x="54" y="48" width="92" height="80" rx="38" fill="${c1}"/>
+                    <!-- Eyes -->
+                    <circle cx="80" cy="89" r="8" fill="#09090b"/>
+                    <circle cx="120" cy="89" r="8" fill="#09090b"/>
+                    <circle cx="82" cy="86" r="2.8" fill="#ffffff"/>
+                    <circle cx="122" cy="86" r="2.8" fill="#ffffff"/>
+                    <!-- Smile -->
+                    <path d="M88,106 Q100,116 112,106" fill="none" stroke="#09090b" stroke-width="3.5" stroke-linecap="round"/>
+                    <!-- Arms flexing -->
+                    <path d="M64,132 Q42,122 48,105" fill="none" stroke="${c1}" stroke-width="13" stroke-linecap="round"/>
+                    <path d="M136,132 Q158,122 152,105" fill="none" stroke="${c1}" stroke-width="13" stroke-linecap="round"/>
+                    ${glassesSvg}
+                    ${hatSvg}
+                    ${pet.gear !== 'cape' ? gearSvg : ''}
+                </svg>
+            `;
+        }
+
+        function openPetStudio(activeTab = 'hat') {
+            const overlay = document.getElementById('pet-modal');
+            const pet = store.data.pet;
+            const lvl = getPetLevelInfo();
+            const categories = [
+                { id: 'hat', label: 'Headwear' },
+                { id: 'glasses', label: 'Eyewear' },
+                { id: 'gear', label: 'Gear' },
+                { id: 'aura', label: 'Auras' },
+                { id: 'species', label: 'Form' }
+            ];
+
+            let itemsHtml = PET_SHOP[activeTab].map(item => {
+                const key = `${activeTab}:${item.id}`;
+                const isUnlocked = pet.unlocked.includes(key) || item.cost === 0;
+                const isEquipped = pet[activeTab] === item.id;
+
+                return `
+                    <div onclick="buyOrEquipPetItem('${activeTab}', '${item.id}')" class="glass-card p-4 rounded-[1.5rem] border ${isEquipped ? 'border-brand-main bg-brand-bg/30' : 'border-zinc-800/60'} flex flex-col items-center justify-between text-center cursor-pointer active:scale-95 transition-all">
+                        <p class="font-bold text-white text-xs mb-2">${item.name}</p>
+                        ${isEquipped 
+                            ? `<span class="text-[10px] font-bold bg-brand-main text-brand-contrast px-3 py-1 rounded-full">Equipped</span>`
+                            : isUnlocked 
+                                ? `<span class="text-[10px] font-bold bg-zinc-800 text-zinc-200 px-3 py-1 rounded-full">Equip</span>`
+                                : `<span class="text-[10px] font-bold bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 px-3 py-1 rounded-full flex items-center gap-1">🪙 ${item.cost}</span>`
+                        }
+                    </div>
+                `;
+            }).join('');
+
+            overlay.innerHTML = `
+                <div class="flex-1 flex flex-col bg-zinc-950 h-full">
+                    <div class="px-5 py-4 flex items-center justify-between glass-card sticky top-0 z-20 border-b border-zinc-800/50">
+                        <div class="flex items-center gap-2">
+                            <span class="bg-yellow-500/20 border border-yellow-500/40 text-yellow-300 px-3.5 py-1.5 rounded-full text-xs font-bold">🪙 ${store.data.coins || 0} Coins</span>
+                        </div>
+                        <button onclick="closePetStudio()" class="text-zinc-400 hover:text-white p-2 bg-zinc-900 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+                    </div>
+
+                    <div class="flex-1 overflow-y-auto p-6 pb-24">
+                        <!-- Pet Stage -->
+                        <div class="glass-card rounded-[2rem] p-6 mb-6 flex flex-col items-center relative overflow-hidden border border-brand-muted/40">
+                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--brand-bg)_0%,_transparent_70%)] opacity-50"></div>
+                            <div class="relative z-10 flex flex-col items-center w-full">
+                                ${renderPetSVG(140)}
+                                <div class="flex items-center gap-2 mt-2">
+                                    <h2 class="text-2xl font-bold text-white tracking-tight">${pet.name}</h2>
+                                    <button onclick="renamePet()" class="text-zinc-400 hover:text-brand-main p-1.5 bg-zinc-900 rounded-full"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button>
+                                </div>
+                                <p class="text-xs text-brand-main font-bold uppercase tracking-wider mt-1">Level ${lvl.level} • ${lvl.title}</p>
+                                <div class="w-full max-w-[200px] bg-zinc-900 h-2 rounded-full overflow-hidden mt-3 border border-zinc-800">
+                                    <div class="bg-brand-main h-full rounded-full" style="width: ${lvl.pct}%"></div>
+                                </div>
+                                <p class="text-[10px] text-zinc-500 mt-1">${lvl.currentLevelXp} / 250 XP to next level</p>
+                            </div>
+                        </div>
+
+                        <!-- Category Pills -->
+                        <div class="flex gap-2 overflow-x-auto hide-scrollbar mb-5 pb-1">
+                            ${categories.map(c => `
+                                <button onclick="openPetStudio('${c.id}')" class="px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${activeTab === c.id ? 'bg-brand-main text-brand-contrast shadow-md' : 'bg-zinc-900 text-zinc-400 border border-zinc-800'}">
+                                    ${c.label}
+                                </button>
+                            `).join('')}
+                        </div>
+
+                        <!-- Shop Grid -->
+                        <div class="grid grid-cols-2 gap-3">
+                            ${itemsHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closePetStudio() {
+            const overlay = document.getElementById('pet-modal');
+            overlay.classList.add('hidden');
+            overlay.classList.remove('flex');
+            renderView(router.current);
+        }
+
+        function renamePet() {
+            showPromptModal("Name Your Companion", "Choose a name for your streak pet:", store.data.pet.name, (newName) => {
+                if (newName && newName.trim() !== '') {
+                    store.data.pet.name = newName.trim();
+                    store.save();
+                    openPetStudio('hat');
+                    showNotification("Companion renamed!");
+                }
+            });
+        }
+
+        function buyOrEquipPetItem(category, itemId) {
+            const item = PET_SHOP[category].find(i => i.id === itemId);
+            if (!item) return;
+            const key = `${category}:${itemId}`;
+            const pet = store.data.pet;
+
+            if (pet.unlocked.includes(key) || item.cost === 0) {
+                pet[category] = itemId;
+                store.save();
+                checkAchievements();
+                openPetStudio(category);
+                showNotification(`Equipped ${item.name}!`);
+            } else {
+                if ((store.data.coins || 0) < item.cost) {
+                    showInfoModal("Not Enough FitCoins", `You need ${item.cost} FitCoins for ${item.name}. Complete workouts, 2-minute sparks, or unlock medals to earn more!`);
+                    return;
+                }
+                showConfirmModal("Unlock Style Item", `Spend ${item.cost} FitCoins to unlock ${item.name}?`, () => {
+                    store.data.coins -= item.cost;
+                    pet.unlocked.push(key);
+                    pet[category] = itemId;
+                    store.save();
+                    checkAchievements();
+                    openPetStudio(category);
+                    showNotification(`🎉 Unlocked & Equipped ${item.name}!`);
+                }, `Unlock (${item.cost} 🪙)`);
+            }
+        }
+
+        // --- ANTI-PROCRASTINATION: 5-SECOND RULE & 2-MIN MICRO SPARK ---
+        let fiveSecInterval = null;
+        function startFiveSecondLaunch() {
+            const overlay = document.getElementById('workout-session');
+            let count = 5;
+            overlay.innerHTML = `
+                <div class="flex-1 flex flex-col items-center justify-center p-6 text-center bg-zinc-950 h-full">
+                    <p class="text-xs font-bold text-brand-main uppercase tracking-widest mb-3">5-Second Anti-Procrastination Rule</p>
+                    <h2 class="text-2xl font-bold text-white mb-8">Don't think. Just move in...</h2>
+                    <div class="w-44 h-44 rounded-full border-8 border-brand-main flex items-center justify-center mb-10 shadow-[0_0_40px_var(--brand-bg)]">
+                        <span id="five-sec-num" class="text-7xl font-extrabold text-brand-main">${count}</span>
+                    </div>
+                    <button onclick="cancelFiveSecondLaunch()" class="text-xs text-zinc-500 underline">Cancel</button>
+                </div>
+            `;
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+
+            fiveSecInterval = setInterval(() => {
+                count--;
+                const el = document.getElementById('five-sec-num');
+                if (el) el.innerText = count > 0 ? count : 'GO!';
+                if (navigator.vibrate) navigator.vibrate(80);
+                if (count <= 0) {
+                    clearInterval(fiveSecInterval);
+                    startWorkout();
+                }
+            }, 1000);
+        }
+
+        function cancelFiveSecondLaunch() {
+            clearInterval(fiveSecInterval);
+            closeWorkoutSession();
+        }
+
+        let microTimer = null;
+        function startMicroWorkout() {
+            const overlay = document.getElementById('workout-session');
+            let secondsLeft = 120; // 2 minutes
+            overlay.innerHTML = `
+                <div class="flex-1 flex flex-col bg-zinc-950 h-full">
+                    <div class="px-5 py-4 border-b border-zinc-800/50 flex items-center justify-between glass-card">
+                        <button onclick="closeMicroWorkout()" class="text-zinc-400 p-2 bg-zinc-900 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+                        <span class="text-[10px] font-bold text-orange-400 uppercase tracking-widest">2-Min Anti-Procrastination Spark</span>
+                        <div class="w-9"></div>
+                    </div>
+                    <div class="flex-1 overflow-y-auto p-6 flex flex-col items-center text-center justify-center">
+                        <div class="bg-orange-500/15 border border-orange-500/30 text-orange-400 px-4 py-1.5 rounded-full text-xs font-bold mb-4">Saves Streak • +20 FitCoins</div>
+                        <h2 class="text-3xl font-bold text-white mb-2 tracking-tight">Minimum Viable Effort</h2>
+                        <p class="text-zinc-400 text-sm mb-6 max-w-xs">Starting is 90% of the battle. Do these 3 quick moves for 2 minutes to keep your chain alive!</p>
+                        
+                        <div class="w-36 h-36 rounded-full border-4 border-orange-400/60 flex items-center justify-center mb-6 bg-zinc-900/80 shadow-inner">
+                            <span id="micro-timer-display" class="text-4xl font-extrabold text-white">2:00</span>
+                        </div>
+
+                        <div class="glass-card rounded-[1.5rem] p-5 w-full text-left space-y-3 mb-6">
+                            <div class="flex items-center gap-3 text-sm text-zinc-200"><span class="text-orange-400 font-bold">1.</span> 10 Bodyweight Squats</div>
+                            <div class="flex items-center gap-3 text-sm text-zinc-200"><span class="text-orange-400 font-bold">2.</span> 6 Wall or Incline Push-ups</div>
+                            <div class="flex items-center gap-3 text-sm text-zinc-200"><span class="text-orange-400 font-bold">3.</span> 20s Deep Breath & Reach Stretch</div>
+                        </div>
+
+                        <button onclick="finishMicroWorkout()" class="w-full bg-brand-main text-brand-contrast rounded-full py-4 font-bold shadow-xl shadow-brand-main/20 active:scale-95 transition-transform text-sm">
+                            Done! Save My Streak ⚡
+                        </button>
+                    </div>
+                </div>
+            `;
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+            lucide.createIcons();
+
+            microTimer = setInterval(() => {
+                secondsLeft--;
+                const el = document.getElementById('micro-timer-display');
+                if (el && secondsLeft >= 0) {
+                    const m = Math.floor(secondsLeft / 60);
+                    const s = String(secondsLeft % 60).padStart(2, '0');
+                    el.innerText = `${m}:${s}`;
+                }
+                if (secondsLeft <= 0) clearInterval(microTimer);
+            }, 1000);
+        }
+
+        function closeMicroWorkout() {
+            clearInterval(microTimer);
+            closeWorkoutSession();
+        }
+
+        function finishMicroWorkout() {
+            clearInterval(microTimer);
+            const todayStr = store.getTodayStr();
+            const existingIdx = store.data.checkIns.findIndex(c => c.date.startsWith(todayStr));
+            if (existingIdx !== -1) {
+                store.data.checkIns[existingIdx].activity = true;
+            } else {
+                store.data.checkIns.push({
+                    date: todayStr,
+                    activity: true,
+                    water: false,
+                    sleep: false,
+                    energy: true,
+                    notes: 'Completed 2-Min Anti-Procrastination Spark!'
+                });
+            }
+            store.data.microWorkouts = (store.data.microWorkouts || 0) + 1;
+            store.data.coins = (store.data.coins || 0) + 20;
+            store.data.xp = (store.data.xp || 0) + 40;
+            store.save();
+            checkAchievements();
+            closeWorkoutSession();
+            router.navigate('home');
+            showNotification("⚡ Streak Saved! +20 FitCoins & +40 XP earned!");
+        }
+
+        // --- 3. ACHIEVEMENT LOGIC ---
+        function checkAchievements() {
+            const unlocked = store.data.achievements.map(a => a.id);
+            const today = store.getTodayStr();
+            let newUnlocks = [];
+
+            const grant = (id) => {
+                if (!unlocked.includes(id)) {
+                    const medal = MEDALS.find(m => m.id === id);
+                    store.data.achievements.push({ id, date: today });
+                    if (medal && medal.reward) {
+                        store.data.coins = (store.data.coins || 0) + medal.reward;
+                    }
+                    newUnlocks.push(id);
+                }
+            };
+
+            const wCount = store.data.workouts.length;
+            const uniqueCheckInDates = new Set(store.data.checkIns.map(c => c.date.split('T')[0]));
+            const cCount = uniqueCheckInDates.size;
+            const uniqueActivityDates = new Set([
+                ...store.data.workouts.map(w => w.date.split('T')[0]),
+                ...store.data.checkIns.filter(c => c.activity).map(c => c.date.split('T')[0])
+            ]);
+            const aCount = uniqueActivityDates.size;
+            const cardioCount = store.data.workouts.filter(w => w.type === 'cardio').length;
+            const waterCount = store.data.checkIns.filter(c => c.water).length;
+            const notesCount = store.data.checkIns.filter(c => c.notes && c.notes.trim().length > 5).length;
+            const hourNow = new Date().getHours();
+            const isEarly = hourNow < 9;
+            const isLate = hourNow >= 20;
+
+            if (wCount >= 1) grant('first_step');
+            if (wCount >= 3) grant('rhythm');
+            if (wCount >= 5) grant('momentum');
+            if (wCount >= 10) grant('double_digits');
+            if (wCount >= 20) grant('consistency_champ');
+            if (wCount >= 30) grant('strength_builder');
+            if (wCount >= 50) grant('half_century');
+            if (cCount >= 5) grant('showing_up');
+            if (aCount >= 14) grant('two_weeks');
+            if (cardioCount >= 3) grant('marathon_runner');
+            if (waterCount >= 7) grant('hydration_hero');
+            if (notesCount >= 5) grant('journal_master');
+            if (isEarly && (wCount >= 1 || cCount >= 1)) grant('early_bird');
+            if (isLate && (wCount >= 1 || cCount >= 1)) grant('night_owl');
+            if ((store.data.streakBridges || []).length > 0) grant('phoenix_rising');
+            if ((store.data.microWorkouts || 0) >= 1) grant('anti_procrastinator');
+            if ((store.data.battlesWon || 0) >= 1) grant('first_victory');
+            if ((store.data.battlesWon || 0) >= 5) grant('boss_slayer');
+
+            const pet = store.data.pet || {};
+            if (pet.hat !== 'none' || pet.glasses !== 'none' || pet.gear !== 'none' || pet.aura !== 'none') {
+                grant('fashionista');
+            }
+
+            const daysOfWeekActive = new Set([...uniqueActivityDates].map(dStr => {
+                const p = dStr.split('-').map(Number);
+                return new Date(Date.UTC(p[0], p[1] - 1, p[2])).getUTCDay();
+            }));
+            if (daysOfWeekActive.has(6) && daysOfWeekActive.has(0)) grant('weekend_warrior');
+
+            const todayCheck = store.getTodayCheckIn();
+            if (todayCheck && todayCheck.activity && todayCheck.water && todayCheck.sleep && todayCheck.energy && store.hasCompletedWorkoutToday()) {
+                grant('perfect_day');
+            }
+
+            if (!unlocked.includes('weekly_commitment')) {
+                const curr = new Date();
+                const first = curr.getDate() - curr.getDay() + (curr.getDay() === 0 ? -6 : 1);
+                const monday = new Date(curr.setDate(first));
+                monday.setHours(0,0,0,0);
                 
-                document.querySelectorAll('.nav-btn').forEach(btn => {
-                    if(btn.dataset.target === viewId) {
-                        btn.classList.remove('text-zinc-500');
-                        btn.classList.add('text-brand-main');
-                    } else {
-                        btn.classList.add('text-zinc-500');
-                        btn.classList.remove('text-brand-main');
+                let currentWeekWorkouts = 0;
+                store.data.workouts.forEach(w => {
+                    const wDate = new Date(w.date);
+                    if (wDate >= monday && w.type === 'strength') {
+                        currentWeekWorkouts++;
                     }
                 });
-                
-                this.current = viewId;
-                renderView(viewId);
-                window.scrollTo(0,0);
+                if (currentWeekWorkouts >= 3) grant('weekly_commitment');
             }
+
+            if (newUnlocks.length > 0) {
+                store.save();
+                const firstMedal = MEDALS.find(m => m.id === newUnlocks[0]);
+                showNotification(`🏆 Unlocked: ${firstMedal.title} (+${firstMedal.reward} Coins!)`);
+            }
+        }
+
+        // --- EVOLVING GENDER & BODY-TYPE FIGHTER AVATAR + BATTLE ARENA ---
+        const STAGE_TIERS = ['starter', 'easy', 'steady', 'hard', 'elite'];
+        const BODY_BUILD_SPECS = {
+            starter: { label: 'Starter • Lean Frame', shoulderW: 44, waistW: 26, armW: 7.5, legW: 10, muscleLines: false },
+            easy:    { label: 'Easy • Toned Build', shoulderW: 50, waistW: 28, armW: 9.5, legW: 11.5, muscleLines: false },
+            steady:  { label: 'Steady • Athletic Build', shoulderW: 58, waistW: 30, armW: 12, legW: 13.5, muscleLines: true },
+            hard:    { label: 'Hard • Muscular Build', shoulderW: 66, waistW: 32, armW: 14.5, legW: 15.5, muscleLines: true },
+            elite:   { label: 'Elite • Peak Sculpted', shoulderW: 74, waistW: 34, armW: 17, legW: 17.5, muscleLines: true }
         };
 
-        function renderView(viewId) {
-            const container = document.getElementById(`view-${viewId}`);
-            if (viewId === 'home') renderHome(container);
-            if (viewId === 'workouts') renderWorkouts(container);
-            if (viewId === 'progress') renderProgress(container);
-            if (viewId === 'achievements') renderAchievements(container);
-            if (viewId === 'settings') renderSettings(container);
+        const BATTLE_BOSSES = [
+            { id: 'couch_imp', name: 'Couch Potato Imp', tierIdx: 0, tierName: 'Starter', hp: 110, atk: 14, def: 4, coins: 35, xp: 60, color: '#94a3b8' },
+            { id: 'snooze_phantom', name: 'Snooze Phantom', tierIdx: 1, tierName: 'Easy', hp: 175, atk: 22, def: 8, coins: 55, xp: 90, color: '#38bdf8' },
+            { id: 'procrastination_shadow', name: 'Procrastination Shadow', tierIdx: 2, tierName: 'Steady', hp: 260, atk: 32, def: 13, coins: 85, xp: 130, color: '#a78bfa' },
+            { id: 'fatigue_golem', name: 'Fatigue Golem', tierIdx: 3, tierName: 'Hard', hp: 370, atk: 44, def: 19, coins: 125, xp: 180, color: '#fb923c' },
+            { id: 'excuse_overlord', name: 'Overlord of Excuses', tierIdx: 4, tierName: 'Elite', hp: 520, atk: 58, def: 26, coins: 200, xp: 300, color: '#f43f5e' }
+        ];
+
+        function getFighterCombatStats() {
+            const stage = store.data.difficulty || 'steady';
+            const stageIdx = Math.max(0, STAGE_TIERS.indexOf(stage));
+            const wCount = store.data.workouts.length;
+            const cCount = new Set(store.data.checkIns.map(c => c.date.split('T')[0])).size;
+            const streak = calculateStreak();
+            const pet = store.data.pet || defaultState.pet;
+
+            let gearAtk = 0;
+            let gearDef = 0;
+            if (pet.gear === 'dumbbell') gearAtk += 8;
+            if (pet.gear === 'chain') gearAtk += 5;
+            if (pet.gear === 'cape') gearDef += 8;
+            if (pet.hat !== 'none') gearDef += 4;
+            if (pet.aura !== 'none') gearAtk += 6;
+
+            const maxHp = 100 + (wCount * 12) + (stageIdx * 45);
+            const atk = 18 + (wCount * 3) + (stageIdx * 11) + gearAtk;
+            const def = 6 + (cCount * 2) + (stageIdx * 6) + gearDef;
+            const critChance = Math.min(10 + (streak * 4), 45);
+
+            return { stage, stageIdx, maxHp, atk, def, critChance, buildLabel: BODY_BUILD_SPECS[stage].label };
+        }
+
+        function getPetLevelInfo() {
+            const xp = store.data.xp || 0;
+            const level = Math.floor(xp / 250) + 1;
+            const currentLevelXp = xp % 250;
+            const pct = Math.round((currentLevelXp / 250) * 100);
+            const stageName = (store.data.difficulty || 'steady').toUpperCase();
+            return { level, xp, currentLevelXp, pct, title: `${stageName} PHYSIQUE` };
+        }
+
+        function renderPetSVG(size = 110, opts = {}) {
+            const pet = store.data.pet || defaultState.pet;
+            const gender = opts.gender || store.data.gender || 'male';
+            const stage = opts.stage || store.data.difficulty || 'steady';
+            const build = BODY_BUILD_SPECS[stage] || BODY_BUILD_SPECS.steady;
+            const specObj = PET_SHOP.species.find(s => s.id === pet.species) || PET_SHOP.species[0];
+            const accent = specObj.primary;
+            const accentDark = specObj.secondary;
+
+            const skin = gender === 'male' ? '#d99b72' : '#e4ab84';
+            const skinShadow = gender === 'male' ? '#b87a52' : '#c48862';
+
+            const sw = gender === 'male' ? build.shoulderW : Math.round(build.shoulderW * 0.86);
+            const ww = gender === 'male' ? build.waistW : Math.round(build.waistW * 0.82);
+            const aw = gender === 'male' ? build.armW : Math.max(6.5, build.armW * 0.82);
+            const lw = gender === 'male' ? build.legW : build.legW * 0.94;
+
+            let auraSvg = '';
+            if (pet.aura === 'flame') {
+                auraSvg = `<circle cx="100" cy="108" r="82" fill="none" stroke="#f97316" stroke-width="4" stroke-dasharray="14 8" opacity="0.75"/>
+                           <circle cx="100" cy="108" r="70" fill="#f97316" opacity="0.14"/>`;
+            } else if (pet.aura === 'lightning') {
+                auraSvg = `<circle cx="100" cy="108" r="82" fill="none" stroke="#22d3ee" stroke-width="3.5" stroke-dasharray="22 6 6 6" opacity="0.85"/>
+                           <path d="M28 55 L44 76 L32 82 L46 105" stroke="#22d3ee" stroke-width="3" fill="none" stroke-linecap="round"/>
+                           <path d="M172 55 L156 76 L168 82 L154 105" stroke="#22d3ee" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+            } else if (pet.aura === 'stars' || stage === 'elite') {
+                auraSvg = `<circle cx="100" cy="108" r="80" fill="${accent}" opacity="0.13"/>
+                           <circle cx="34" cy="48" r="3.5" fill="${accent}"/><circle cx="166" cy="44" r="4" fill="#a78bfa"/>
+                           <circle cx="28" cy="135" r="3" fill="#22d3ee"/><circle cx="172" cy="130" r="3.5" fill="${accent}"/>`;
+            }
+
+            // Hair based on gender
+            const hairSvg = gender === 'male'
+                ? `<path d="M78,34 Q82,16 100,16 Q118,16 122,34 Q112,25 100,26 Q88,25 78,34 Z" fill="#18181b"/>`
+                : `<path d="M116,24 Q138,22 142,46 Q130,42 122,34 Z" fill="#18181b"/>
+                   <path d="M77,36 Q80,15 100,15 Q120,15 123,36 Q112,24 100,24 Q88,24 77,36 Z" fill="#18181b"/>`;
+
+            // Headwear
+            let hatSvg = '';
+            if (pet.hat === 'sweatband') {
+                hatSvg = `<rect x="78" y="30" width="44" height="6" rx="3" fill="${accent}"/>`;
+            } else if (pet.hat === 'cap') {
+                hatSvg = `<path d="M78,30 C78,14 122,14 122,30 Z" fill="#27272a" stroke="${accent}" stroke-width="1.5"/>
+                          <rect x="68" y="27" width="26" height="5" rx="2.5" fill="#18181b"/>`;
+            } else if (pet.hat === 'crown') {
+                hatSvg = `<polygon points="82,22 86,6 94,16 100,4 106,16 114,6 118,22" fill="#facc15" stroke="#ca8a04" stroke-width="1.5"/>`;
+            } else if (pet.hat === 'halo') {
+                hatSvg = `<ellipse cx="100" cy="10" rx="22" ry="5" fill="none" stroke="#fde047" stroke-width="3.5"/>`;
+            }
+
+            // Eyewear
+            let glassesSvg = '';
+            if (pet.glasses === 'shades') {
+                glassesSvg = `<rect x="83" y="37" width="14" height="8" rx="2" fill="#09090b" stroke="#ffffff" stroke-width="1.2"/>
+                              <rect x="103" y="37" width="14" height="8" rx="2" fill="#09090b" stroke="#ffffff" stroke-width="1.2"/>
+                              <line x1="97" y1="40" x2="103" y2="40" stroke="#ffffff" stroke-width="1.5"/>`;
+            } else if (pet.glasses === 'visor') {
+                glassesSvg = `<rect x="80" y="36" width="40" height="9" rx="4.5" fill="#22d3ee" opacity="0.88" stroke="#ffffff" stroke-width="1.2"/>`;
+            } else if (pet.glasses === 'monocle') {
+                glassesSvg = `<circle cx="109" cy="41" r="7" fill="rgba(255,255,255,0.15)" stroke="#facc15" stroke-width="2"/>`;
+            }
+
+            // Gear
+            let gearSvg = '';
+            if (pet.gear === 'dumbbell') {
+                gearSvg = `<g transform="translate(${100 + sw/2 + 8}, 92) rotate(-20)">
+                             <rect x="6" y="8" width="20" height="5" rx="2" fill="#a1a1aa"/>
+                             <rect x="1" y="2" width="7" height="17" rx="2" fill="${accent}" stroke="#09090b" stroke-width="1"/>
+                             <rect x="24" y="2" width="7" height="17" rx="2" fill="${accent}" stroke="#09090b" stroke-width="1"/>
+                           </g>`;
+            } else if (pet.gear === 'chain') {
+                gearSvg = `<path d="M88,68 Q100,82 112,68" fill="none" stroke="#facc15" stroke-width="3.5" stroke-linecap="round"/>
+                           <circle cx="100" cy="77" r="4" fill="#facc15"/>`;
+            } else if (pet.gear === 'cape') {
+                gearSvg = `<path d="M${100 - sw/2},68 L54,158 L146,158 L${100 + sw/2},68 Z" fill="#ef4444" opacity="0.88"/>`;
+            }
+
+            // Torso & Athletic Gear
+            const torsoPath = `M${100 - sw/2},68 L${100 + sw/2},68 L${100 + ww/2},116 L${100 - ww/2},116 Z`;
+            const outfitSvg = gender === 'male'
+                ? `<path d="M${100 - sw/2 + 5},68 L${100 - sw/2 + 13},68 L${100 - ww/2 + 2},116 L${100 - ww/2},116 Z" fill="${accent}" opacity="0.9"/>
+                   <path d="M${100 + sw/2 - 5},68 L${100 + sw/2 - 13},68 L${100 + ww/2 - 2},116 L${100 + ww/2},116 Z" fill="${accent}" opacity="0.9"/>
+                   <rect x="${100 - ww/2 - 1}" y="114" width="${ww + 2}" height="24" rx="5" fill="#18181b" stroke="${accent}" stroke-width="1.5"/>`
+                : `<path d="M${100 - sw/2 + 4},68 L${100 + sw/2 - 4},68 L${100 + ww/2 + 2},92 L${100 - ww/2 - 2},92 Z" fill="${accent}"/>
+                   <rect x="${100 - ww/2 - 2}" y="112" width="${ww + 4}" height="24" rx="6" fill="#18181b" stroke="${accent}" stroke-width="1.5"/>`;
+
+            const muscleSvg = build.muscleLines ? `
+                <line x1="100" y1="74" x2="100" y2="110" stroke="${skinShadow}" stroke-width="1.6" opacity="0.65"/>
+                <path d="M${100 - sw/4},82 Q100,87 ${100 + sw/4},82" fill="none" stroke="${skinShadow}" stroke-width="1.6" opacity="0.65"/>
+                <line x1="${100 - ww/5}" y1="96" x2="${100 + ww/5}" y2="96" stroke="${skinShadow}" stroke-width="1.4" opacity="0.6"/>
+                <line x1="${100 - ww/5}" y1="104" x2="${100 + ww/5}" y2="104" stroke="${skinShadow}" stroke-width="1.4" opacity="0.6"/>
+            ` : '';
+
+            return `
+                <svg width="${size}" height="${size}" viewBox="0 0 200 200" class="pet-float overflow-visible">
+                    ${auraSvg}
+                    ${pet.gear === 'cape' ? gearSvg : ''}
+                    <!-- Legs -->
+                    <rect x="${100 - ww/2 + 1}" y="134" width="${lw}" height="46" rx="${lw/2}" fill="${skin}"/>
+                    <rect x="${100 + ww/2 - lw - 1}" y="134" width="${lw}" height="46" rx="${lw/2}" fill="${skin}"/>
+                    <!-- Sneakers -->
+                    <rect x="${100 - ww/2 - 2}" y="174" width="${lw + 5}" height="10" rx="5" fill="${accent}"/>
+                    <rect x="${100 + ww/2 - lw - 3}" y="174" width="${lw + 5}" height="10" rx="5" fill="${accent}"/>
+                    <!-- Arms (Flexing / Athletic Stance) -->
+                    <path d="M${100 - sw/2 + 2},72 Q${100 - sw/2 - 14},92 ${100 - sw/2 - 6},112" fill="none" stroke="${skin}" stroke-width="${aw}" stroke-linecap="round"/>
+                    <path d="M${100 + sw/2 - 2},72 Q${100 + sw/2 + 14},92 ${100 + sw/2 + 6},112" fill="none" stroke="${skin}" stroke-width="${aw}" stroke-linecap="round"/>
+                    <!-- Torso -->
+                    <path d="${torsoPath}" fill="${skin}"/>
+                    ${muscleSvg}
+                    ${outfitSvg}
+                    <!-- Neck & Head -->
+                    <rect x="93" y="56" width="14" height="14" rx="5" fill="${skinShadow}"/>
+                    <rect x="80" y="20" width="40" height="42" rx="20" fill="${skin}"/>
+                    ${hairSvg}
+                    <!-- Eyes & Confident Smile -->
+                    <circle cx="91" cy="41" r="3.2" fill="#09090b"/>
+                    <circle cx="109" cy="41" r="3.2" fill="#09090b"/>
+                    <path d="M94,50 Q100,55 106,50" fill="none" stroke="#09090b" stroke-width="2.4" stroke-linecap="round"/>
+                    ${glassesSvg}
+                    ${hatSvg}
+                    ${pet.gear !== 'cape' ? gearSvg : ''}
+                </svg>
+            `;
+        }
+
+        function renderBossSVG(boss, size = 110) {
+            return `
+                <svg width="${size}" height="${size}" viewBox="0 0 200 200" class="pet-float overflow-visible">
+                    <circle cx="100" cy="105" r="76" fill="${boss.color}" opacity="0.14"/>
+                    <!-- Horns -->
+                    <polygon points="62,62 42,26 82,50" fill="${boss.color}"/>
+                    <polygon points="138,62 158,26 118,50" fill="${boss.color}"/>
+                    <!-- Heavy Body -->
+                    <rect x="52" y="54" width="96" height="114" rx="34" fill="#18181b" stroke="${boss.color}" stroke-width="4"/>
+                    <!-- Glowing Eyes -->
+                    <polygon points="72,88 94,96 74,102" fill="${boss.color}"/>
+                    <polygon points="128,88 106,96 126,102" fill="${boss.color}"/>
+                    <!-- Jagged Mouth -->
+                    <path d="M74,126 L86,118 L100,128 L114,118 L126,126" fill="none" stroke="${boss.color}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            `;
+        }
+
+        let activeBattle = null;
+
+        function openBattleArena() {
+            const overlay = document.getElementById('pet-modal');
+            const fighter = getFighterCombatStats();
+            const pet = store.data.pet;
+            const today = store.getTodayStr();
+            const winsToday = (store.data.dailyBattleWins?.date === today) ? store.data.dailyBattleWins.count : 0;
+
+            let bossCardsHtml = BATTLE_BOSSES.map(boss => {
+                const isAboveTier = boss.tierIdx > fighter.stageIdx;
+                return `
+                    <div class="glass-card p-4 rounded-[1.75rem] border ${boss.tierIdx === fighter.stageIdx ? 'border-brand-main/60 bg-brand-bg/20' : 'border-zinc-800/70'} flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-14 h-14 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center flex-shrink-0">
+                                ${renderBossSVG(boss, 50)}
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <h4 class="font-bold text-white text-sm">${boss.name}</h4>
+                                    <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300">${boss.tierName}</span>
+                                </div>
+                                <p class="text-[11px] text-zinc-400 mt-0.5">HP ${boss.hp} • ATK ${boss.atk} • <span class="text-yellow-300 font-bold">+${boss.coins} 🪙</span></p>
+                                ${isAboveTier ? `<span class="text-[9px] text-orange-400 font-bold">⚠️ High Challenge (Giant Killer Medal!)</span>` : ''}
+                            </div>
+                        </div>
+                        <button onclick="startBattle('${boss.id}')" class="bg-brand-main text-brand-contrast px-4 py-2.5 rounded-full text-xs font-bold shadow-md active:scale-95 transition-transform flex-shrink-0">
+                            Fight ⚔️
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            overlay.innerHTML = `
+                <div class="flex-1 flex flex-col bg-zinc-950 h-full">
+                    <div class="px-5 py-4 flex items-center justify-between glass-card sticky top-0 z-20 border-b border-zinc-800/50">
+                        <button onclick="openPetStudio('hat')" class="text-zinc-300 hover:text-white px-3 py-1.5 bg-zinc-900 rounded-full text-xs font-bold flex items-center gap-1">
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i> Studio
+                        </button>
+                        <span class="text-xs font-bold text-brand-main uppercase tracking-widest">⚔️ Streak Battle Arena</span>
+                        <button onclick="closePetStudio()" class="text-zinc-400 hover:text-white p-2 bg-zinc-900 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+                    </div>
+
+                    <div class="flex-1 overflow-y-auto p-6 pb-24">
+                        <!-- Fighter Stats Banner -->
+                        <div class="glass-card rounded-[2rem] p-5 mb-6 border border-brand-muted/40 flex items-center gap-4">
+                            <div class="w-20 h-20 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center flex-shrink-0">
+                                ${renderPetSVG(76)}
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="font-bold text-white text-base">${pet.name}</h3>
+                                    <span class="text-[10px] font-bold bg-brand-bg text-brand-main px-2.5 py-0.5 rounded-full capitalize">${store.data.gender} • ${fighter.stage}</span>
+                                </div>
+                                <p class="text-[11px] text-zinc-400 mt-0.5">${fighter.buildLabel}</p>
+                                <div class="grid grid-cols-4 gap-1.5 mt-3 text-center">
+                                    <div class="bg-zinc-900/90 rounded-xl p-1.5 border border-zinc-800"><span class="block text-[9px] text-zinc-500">HP</span><span class="text-xs font-bold text-green-400">${fighter.maxHp}</span></div>
+                                    <div class="bg-zinc-900/90 rounded-xl p-1.5 border border-zinc-800"><span class="block text-[9px] text-zinc-500">ATK</span><span class="text-xs font-bold text-brand-main">${fighter.atk}</span></div>
+                                    <div class="bg-zinc-900/90 rounded-xl p-1.5 border border-zinc-800"><span class="block text-[9px] text-zinc-500">DEF</span><span class="text-xs font-bold text-cyan-400">${fighter.def}</span></div>
+                                    <div class="bg-zinc-900/90 rounded-xl p-1.5 border border-zinc-800"><span class="block text-[9px] text-zinc-500">CRIT</span><span class="text-xs font-bold text-orange-400">${fighter.critChance}%</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center mb-3 px-1">
+                            <h3 class="font-bold text-white text-sm">Choose Opponent</h3>
+                            <span class="text-[11px] text-zinc-400">Daily Coin Wins: <b class="text-yellow-300">${Math.min(winsToday, 3)}/3</b></span>
+                        </div>
+
+                        <div class="space-y-3">
+                            ${bossCardsHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function startBattle(bossId) {
+            const boss = BATTLE_BOSSES.find(b => b.id === bossId);
+            const fighter = getFighterCombatStats();
+            if (!boss) return;
+
+            activeBattle = {
+                boss: { ...boss, currentHp: boss.hp },
+                player: { ...fighter, currentHp: fighter.maxHp, guarding: false, charge: 0 },
+                log: `⚔️ ${store.data.pet.name} (${fighter.buildLabel}) enters the ring against ${boss.name}!`,
+                over: false,
+                won: false
+            };
+            renderBattleScreen();
+        }
+
+        function renderBattleScreen(shakeTarget = null) {
+            const overlay = document.getElementById('pet-modal');
+            const b = activeBattle.boss;
+            const p = activeBattle.player;
+            const pHpPct = Math.max(0, Math.round((p.currentHp / p.maxHp) * 100));
+            const bHpPct = Math.max(0, Math.round((b.currentHp / b.hp) * 100));
+            const finisherReady = p.charge >= 2;
+
+            overlay.innerHTML = `
+                <div class="flex-1 flex flex-col bg-zinc-950 h-full">
+                    <div class="px-5 py-4 flex items-center justify-between glass-card sticky top-0 z-20 border-b border-zinc-800/50">
+                        <span class="text-xs font-bold text-brand-main uppercase tracking-widest">⚔️ Live Arena Fight</span>
+                        <button onclick="openBattleArena()" class="text-zinc-400 hover:text-white px-3 py-1.5 bg-zinc-900 rounded-full text-xs font-bold">Forfeit</button>
+                    </div>
+
+                    <div class="flex-1 overflow-y-auto p-5 flex flex-col justify-between pb-10">
+                        <!-- Boss Stage -->
+                        <div class="glass-card rounded-[2rem] p-4 border border-zinc-800/80 ${shakeTarget === 'boss' ? 'hit-shake border-red-500/60' : ''}">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-bold text-white text-sm">${b.name} <span class="text-[10px] text-zinc-400">(${b.tierName})</span></span>
+                                <span class="text-xs font-bold text-red-400">${Math.max(0, b.currentHp)} / ${b.hp} HP</span>
+                            </div>
+                            <div class="w-full bg-zinc-900 h-2.5 rounded-full overflow-hidden mb-3 border border-zinc-800">
+                                <div class="bg-red-500 h-full rounded-full transition-all duration-300" style="width: ${bHpPct}%"></div>
+                            </div>
+                            <div class="flex justify-center py-1">
+                                ${renderBossSVG(b, 92)}
+                            </div>
+                        </div>
+
+                        <!-- Combat Log -->
+                        <div class="my-3 bg-zinc-900/90 border border-zinc-800 rounded-2xl p-3.5 text-center">
+                            <p class="text-xs text-zinc-200 leading-relaxed font-medium">${activeBattle.log}</p>
+                        </div>
+
+                        <!-- Player Fighter Stage -->
+                        <div class="glass-card rounded-[2rem] p-4 border border-brand-muted/50 ${shakeTarget === 'player' ? 'hit-shake border-orange-500/60' : ''}">
+                            <div class="flex justify-center py-1">
+                                ${renderPetSVG(96)}
+                            </div>
+                            <div class="flex justify-between items-center mt-2 mb-2">
+                                <span class="font-bold text-white text-sm">${store.data.pet.name} <span class="text-[10px] text-brand-main">(${p.stage})</span></span>
+                                <span class="text-xs font-bold text-green-400">${Math.max(0, p.currentHp)} / ${p.maxHp} HP</span>
+                            </div>
+                            <div class="w-full bg-zinc-900 h-2.5 rounded-full overflow-hidden border border-zinc-800">
+                                <div class="bg-brand-main h-full rounded-full transition-all duration-300" style="width: ${pHpPct}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Combat Moves or Victory/Defeat Footer -->
+                        ${activeBattle.over ? `
+                            <div class="mt-4 space-y-2.5">
+                                <button onclick="openBattleArena()" class="w-full bg-brand-main text-brand-contrast rounded-full py-4 font-bold text-sm shadow-xl active:scale-95 transition-transform">
+                                    ${activeBattle.won ? '🏆 Claim Victory & Return to Arena' : '🔄 Train & Try Again'}
+                                </button>
+                            </div>
+                        ` : `
+                            <div class="grid grid-cols-2 gap-2.5 mt-4">
+                                <button onclick="executeBattleMove('power')" class="bg-zinc-900 border border-zinc-700 text-white rounded-2xl p-3 text-left active:scale-95 transition-transform">
+                                    <span class="block text-xs font-bold text-brand-main">💪 Power Rep</span>
+                                    <span class="text-[10px] text-zinc-400">Heavy strike • +1 Charge</span>
+                                </button>
+                                <button onclick="executeBattleMove('cardio')" class="bg-zinc-900 border border-zinc-700 text-white rounded-2xl p-3 text-left active:scale-95 transition-transform">
+                                    <span class="block text-xs font-bold text-cyan-400">⚡ Cardio Blitz</span>
+                                    <span class="text-[10px] text-zinc-400">2x Combo • High Streak Crit</span>
+                                </button>
+                                <button onclick="executeBattleMove('guard')" class="bg-zinc-900 border border-zinc-700 text-white rounded-2xl p-3 text-left active:scale-95 transition-transform">
+                                    <span class="block text-xs font-bold text-green-400">🛡️ Iron Core Guard</span>
+                                    <span class="text-[10px] text-zinc-400">Block 65% DMG + Heal 15%</span>
+                                </button>
+                                <button onclick="executeBattleMove('finisher')" ${finisherReady ? '' : 'disabled'} class="rounded-2xl p-3 text-left transition-transform ${finisherReady ? 'bg-brand-main text-brand-contrast font-bold shadow-lg active:scale-95' : 'bg-zinc-900/40 border border-zinc-800/60 text-zinc-600'}">
+                                    <span class="block text-xs font-bold">🔥 Streak Finisher</span>
+                                    <span class="text-[10px] ${finisherReady ? 'text-brand-contrast/80' : 'text-zinc-600'}">${finisherReady ? 'READY! 2.2x Massive DMG' : `Charge (${p.charge}/2)`}</span>
+                                </button>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function executeBattleMove(moveType) {
+            if (!activeBattle || activeBattle.over) return;
+            const p = activeBattle.player;
+            const b = activeBattle.boss;
+            p.guarding = false;
+            let actionMsg = '';
+
+            const rollCrit = (bonus = 0) => (Math.random() * 100) < (p.critChance + bonus);
+
+            if (moveType === 'power') {
+                const crit = rollCrit(0);
+                const raw = Math.max(8, p.atk - Math.floor(b.def * 0.5));
+                const dmg = crit ? Math.round(raw * 1.5) : raw;
+                b.currentHp -= dmg;
+                p.charge = Math.min(2, p.charge + 1);
+                actionMsg = `💪 Power Rep deals <b>${dmg} DMG</b>${crit ? ' (CRITICAL!)' : ''}!`;
+            } else if (moveType === 'cardio') {
+                const crit = rollCrit(15);
+                const hit1 = Math.max(5, Math.round(p.atk * 0.6) - Math.floor(b.def * 0.3));
+                const hit2 = crit ? Math.round(hit1 * 1.6) : hit1;
+                const total = hit1 + hit2;
+                b.currentHp -= total;
+                p.charge = Math.min(2, p.charge + 1);
+                actionMsg = `⚡ Cardio Blitz hits twice for <b>${total} DMG</b>${crit ? ' (STREAK CRIT!)' : ''}!`;
+            } else if (moveType === 'guard') {
+                p.guarding = true;
+                const heal = Math.round(p.maxHp * 0.15);
+                p.currentHp = Math.min(p.maxHp, p.currentHp + heal);
+                p.charge = Math.min(2, p.charge + 1);
+                actionMsg = `🛡️ Iron Core Guard! Recovered <b>+${heal} HP</b> and braced for impact!`;
+            } else if (moveType === 'finisher' && p.charge >= 2) {
+                p.charge = 0;
+                const dmg = Math.max(15, Math.round(p.atk * 2.2) - Math.floor(b.def * 0.3));
+                b.currentHp -= dmg;
+                actionMsg = `🔥 STREAK FINISHER unleashes <b>${dmg} MASSIVE DMG</b>!`;
+            }
+
+            if (navigator.vibrate) navigator.vibrate(60);
+
+            // Check Boss Defeated
+            if (b.currentHp <= 0) {
+                b.currentHp = 0;
+                activeBattle.over = true;
+                activeBattle.won = true;
+                store.data.battlesWon = (store.data.battlesWon || 0) + 1;
+
+                const today = store.getTodayStr();
+                if (store.data.dailyBattleWins?.date !== today) {
+                    store.data.dailyBattleWins = { date: today, count: 0 };
+                }
+                let coinReward = 0;
+                if (store.data.dailyBattleWins.count < 3) {
+                    coinReward = b.coins;
+                    store.data.dailyBattleWins.count++;
+                    store.data.coins = (store.data.coins || 0) + coinReward;
+                }
+                store.data.xp = (store.data.xp || 0) + b.xp;
+
+                if (b.tierIdx > p.stageIdx) {
+                    const unlocked = store.data.achievements.map(a => a.id);
+                    if (!unlocked.includes('giant_killer')) {
+                        store.data.achievements.push({ id: 'giant_killer', date: today });
+                        store.data.coins += 200;
+                    }
+                }
+                store.save();
+                checkAchievements();
+
+                activeBattle.log = `${actionMsg}<br>🏆 <b>${b.name} DEFEATED!</b> ${coinReward > 0 ? `+${coinReward} FitCoins & ` : ''}+${b.xp} XP earned!`;
+                renderBattleScreen('boss');
+                return;
+            }
+
+            // Boss Counterattack
+            const rawBossDmg = Math.max(5, b.atk - Math.floor(p.def * 0.5));
+            const bossDmg = p.guarding ? Math.max(2, Math.round(rawBossDmg * 0.35)) : rawBossDmg;
+            p.currentHp -= bossDmg;
+
+            if (p.currentHp <= 0) {
+                p.currentHp = 0;
+                activeBattle.over = true;
+                activeBattle.won = false;
+                activeBattle.log = `${actionMsg}<br>💥 ${b.name} strikes for ${bossDmg} DMG! Complete more workouts to boost your HP & Strength!`;
+                renderBattleScreen('player');
+                return;
+            }
+
+            activeBattle.log = `${actionMsg}<br>👹 ${b.name} counters for <b>${bossDmg} DMG</b>${p.guarding ? ' (Blocked!)' : ''}!`;
+            renderBattleScreen('boss');
+        }
+
+        function openPetStudio(activeTab = 'hat') {
+            const overlay = document.getElementById('pet-modal');
+            const pet = store.data.pet;
+            const lvl = getPetLevelInfo();
+            const fighter = getFighterCombatStats();
+            const categories = [
+                { id: 'hat', label: 'Headwear' },
+                { id: 'glasses', label: 'Eyewear' },
+                { id: 'gear', label: 'Gear' },
+                { id: 'aura', label: 'Auras' },
+                { id: 'species', label: 'Energy Style' }
+            ];
+
+            let itemsHtml = PET_SHOP[activeTab].map(item => {
+                const key = `${activeTab}:${item.id}`;
+                const isUnlocked = pet.unlocked.includes(key) || item.cost === 0;
+                const isEquipped = pet[activeTab] === item.id;
+
+                return `
+                    <div onclick="buyOrEquipPetItem('${activeTab}', '${item.id}')" class="glass-card p-4 rounded-[1.5rem] border ${isEquipped ? 'border-brand-main bg-brand-bg/30' : 'border-zinc-800/60'} flex flex-col items-center justify-between text-center cursor-pointer active:scale-95 transition-all">
+                        <p class="font-bold text-white text-xs mb-2">${item.name}</p>
+                        ${isEquipped 
+                            ? `<span class="text-[10px] font-bold bg-brand-main text-brand-contrast px-3 py-1 rounded-full">Equipped</span>`
+                            : isUnlocked 
+                                ? `<span class="text-[10px] font-bold bg-zinc-800 text-zinc-200 px-3 py-1 rounded-full">Equip</span>`
+                                : `<span class="text-[10px] font-bold bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 px-3 py-1 rounded-full flex items-center gap-1">🪙 ${item.cost}</span>`
+                        }
+                    </div>
+                `;
+            }).join('');
+
+            overlay.innerHTML = `
+                <div class="flex-1 flex flex-col bg-zinc-950 h-full">
+                    <div class="px-5 py-4 flex items-center justify-between glass-card sticky top-0 z-20 border-b border-zinc-800/50">
+                        <div class="flex items-center gap-2">
+                            <span class="bg-yellow-500/20 border border-yellow-500/40 text-yellow-300 px-3.5 py-1.5 rounded-full text-xs font-bold">🪙 ${store.data.coins || 0} Coins</span>
+                        </div>
+                        <button onclick="closePetStudio()" class="text-zinc-400 hover:text-white p-2 bg-zinc-900 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+                    </div>
+
+                    <div class="flex-1 overflow-y-auto p-6 pb-24">
+                        <!-- Fighter Stage -->
+                        <div class="glass-card rounded-[2rem] p-6 mb-5 flex flex-col items-center relative overflow-hidden border border-brand-muted/40">
+                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--brand-bg)_0%,_transparent_70%)] opacity-50"></div>
+                            <div class="relative z-10 flex flex-col items-center w-full">
+                                ${renderPetSVG(145)}
+                                <div class="flex items-center gap-2 mt-2">
+                                    <h2 class="text-2xl font-bold text-white tracking-tight">${pet.name}</h2>
+                                    <button onclick="renamePet()" class="text-zinc-400 hover:text-brand-main p-1.5 bg-zinc-900 rounded-full"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button>
+                                </div>
+                                <p class="text-xs text-brand-main font-bold uppercase tracking-wider mt-1">Lv.${lvl.level} • ${fighter.buildLabel}</p>
+                                
+                                <!-- Gender Quick Switch -->
+                                <div class="flex gap-2 mt-3">
+                                    <button onclick="store.data.gender='male'; store.save(); openPetStudio('${activeTab}');" class="px-3.5 py-1 rounded-full text-[11px] font-bold ${store.data.gender === 'male' ? 'bg-brand-main text-brand-contrast' : 'bg-zinc-900 text-zinc-400 border border-zinc-800'}">Male Physique</button>
+                                    <button onclick="store.data.gender='female'; store.save(); openPetStudio('${activeTab}');" class="px-3.5 py-1 rounded-full text-[11px] font-bold ${store.data.gender === 'female' ? 'bg-brand-main text-brand-contrast' : 'bg-zinc-900 text-zinc-400 border border-zinc-800'}">Female Physique</button>
+                                </div>
+
+                                <div class="w-full max-w-[220px] bg-zinc-900 h-2 rounded-full overflow-hidden mt-3 border border-zinc-800">
+                                    <div class="bg-brand-main h-full rounded-full" style="width: ${lvl.pct}%"></div>
+                                </div>
+                                <p class="text-[10px] text-zinc-500 mt-1">${lvl.currentLevelXp} / 250 XP • HP ${fighter.maxHp} | ATK ${fighter.atk}</p>
+
+                                <button onclick="openBattleArena()" class="mt-4 w-full bg-brand-main text-brand-contrast rounded-full py-3.5 font-bold text-xs shadow-lg shadow-brand-main/20 active:scale-95 transition-transform flex items-center justify-center gap-2">
+                                    ⚔️ Enter Battle Arena (${store.data.battlesWon || 0} Wins)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Category Pills -->
+                        <div class="flex gap-2 overflow-x-auto hide-scrollbar mb-5 pb-1">
+                            ${categories.map(c => `
+                                <button onclick="openPetStudio('${c.id}')" class="px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${activeTab === c.id ? 'bg-brand-main text-brand-contrast shadow-md' : 'bg-zinc-900 text-zinc-400 border border-zinc-800'}">
+                                    ${c.label}
+                                </button>
+                            `).join('')}
+                        </div>
+
+                        <!-- Shop Grid -->
+                        <div class="grid grid-cols-2 gap-3">
+                            ${itemsHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
             lucide.createIcons();
         }
 
@@ -692,12 +1963,15 @@
             const isCompleted = store.hasCompletedWorkoutToday() || (store.getTodayCheckIn()?.activity);
             const todayCheckIn = store.getTodayCheckIn();
             const nextMedal = MEDALS.find(m => !store.data.achievements.find(a => a.id === m.id));
-            const streak = calculateStreak();
+            const streakStatus = getStreakStatus();
+            const streak = streakStatus.streak;
             const goal = getProgressionGoal();
+            const pet = store.data.pet || defaultState.pet;
+            const petLvl = getPetLevelInfo();
 
             container.innerHTML = `
                 <!-- Header with Avatar -->
-                <div class="mb-6 flex justify-between items-center">
+                <div class="mb-5 flex justify-between items-center">
                     <div>
                         <h1 class="text-3xl font-bold text-white tracking-tight">${greeting}</h1>
                         <p class="text-zinc-400 text-sm mt-1">Let's build strength one day at a time.</p>
@@ -714,15 +1988,68 @@
                     </label>
                 </div>
                 
-                <!-- Streak Pill & Intensity Goal Pill -->
-                <div class="flex items-center gap-2 mb-6 flex-wrap">
-                    <div class="glass-card px-4 py-1.5 rounded-full inline-flex items-center gap-2 border ${streak > 0 ? 'border-orange-500/30 bg-orange-950/20' : 'border-zinc-800'}">
+                <!-- Streak, Coins & Intensity Pills -->
+                <div class="flex items-center gap-2 mb-5 flex-wrap">
+                    <div class="glass-card px-3.5 py-1.5 rounded-full inline-flex items-center gap-1.5 border ${streak > 0 ? 'border-orange-500/40 bg-orange-950/25' : 'border-zinc-800'}">
                         <span class="text-sm">🔥</span>
-                        <span class="text-xs font-bold ${streak > 0 ? 'text-orange-400' : 'text-zinc-500'}">${streak > 0 ? `${streak} Day Streak!` : 'Start your streak today!'}</span>
+                        <span class="text-xs font-bold ${streak > 0 ? 'text-orange-400' : 'text-zinc-400'}">${streak}d Streak</span>
                     </div>
-                    <div class="glass-card px-4 py-1.5 rounded-full inline-flex items-center gap-2 border border-brand-muted/40 bg-brand-bg/20">
+                    <button onclick="openPetStudio('hat')" class="glass-card px-3.5 py-1.5 rounded-full inline-flex items-center gap-1.5 border border-yellow-500/30 bg-yellow-950/20 active:scale-95 transition-transform">
+                        <span class="text-sm">🪙</span>
+                        <span class="text-xs font-bold text-yellow-300">${store.data.coins || 0}</span>
+                    </button>
+                    <div class="glass-card px-3.5 py-1.5 rounded-full inline-flex items-center gap-1.5 border border-brand-muted/40 bg-brand-bg/20">
                         <span class="text-brand-main text-xs font-bold">⚡ ${goal.currentLevel}</span>
-                        <span class="text-[11px] text-zinc-400">${goal.ready ? 'Ready to Upgrade!' : `${goal.workoutsNeeded} workouts to ${goal.nextLevel}`}</span>
+                        <span class="text-[11px] text-zinc-400">${goal.ready ? 'Ready!' : `${goal.workoutsNeeded} left`}</span>
+                    </div>
+                </div>
+
+                <!-- 3X STREAK RESTORE BANNER (Shown whenever a past streak broke!) -->
+                ${streakStatus.canRestore ? `
+                <div class="glass-card rounded-[2rem] p-5 mb-6 border-2 border-cyan-400/50 bg-cyan-950/25 relative overflow-hidden shadow-[0_0_25px_rgba(34,211,238,0.15)]">
+                    <div class="flex items-start gap-4">
+                        <div class="bg-cyan-500/20 border border-cyan-400/40 p-3 rounded-full text-cyan-300 flex-shrink-0">
+                            <i data-lucide="snowflake" class="w-6 h-6"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[10px] font-bold uppercase tracking-widest text-cyan-300">Streak Freeze Available</span>
+                                <span class="text-[10px] font-bold bg-cyan-500/20 text-cyan-200 px-2.5 py-0.5 rounded-full">${streakStatus.restoresLeft} / 3 Left</span>
+                            </div>
+                            <h3 class="font-bold text-white text-base tracking-tight">Save your ${streakStatus.lostStreakCount}-Day Streak!</h3>
+                            <p class="text-xs text-zinc-300 mt-1 mb-4 leading-relaxed">Don't start over. Use 1 Streak Restore to bridge the missed days and keep your momentum alive.</p>
+                            <button onclick="restoreLostStreak()" class="w-full bg-cyan-400 text-zinc-950 rounded-full py-3 font-bold text-xs shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+                                <i data-lucide="refresh-cw" class="w-4 h-4"></i> Restore ${streakStatus.lostStreakCount}-Day Streak Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+
+                <!-- STREAK PET COMPANION CARD -->
+                <div class="glass-card rounded-[2rem] p-4 mb-6 border border-zinc-800/80">
+                    <div onclick="openPetStudio('hat')" class="flex items-center justify-between cursor-pointer active:scale-[0.99] transition-transform">
+                        <div class="flex items-center gap-3">
+                            <div class="w-16 h-16 rounded-full bg-zinc-900/90 border border-zinc-800 flex items-center justify-center overflow-visible flex-shrink-0">
+                                ${renderPetSVG(62)}
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="font-bold text-white text-sm tracking-tight">${pet.name}</h3>
+                                    <span class="text-[10px] font-bold bg-brand-bg text-brand-main px-2.5 py-0.5 rounded-full">Lv.${petLvl.level}</span>
+                                </div>
+                                <p class="text-[11px] text-zinc-400 mt-0.5">${BODY_BUILD_SPECS[store.data.difficulty || 'steady'].label}</p>
+                                <span class="text-[10px] font-bold text-brand-main mt-1 inline-block">Style Physique & Gear →</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-zinc-800/60 flex gap-2">
+                        <button onclick="openBattleArena()" class="flex-1 bg-zinc-900 hover:bg-zinc-800 border border-brand-main/40 text-brand-main rounded-full py-2.5 font-bold text-xs active:scale-95 transition-transform flex items-center justify-center gap-1.5">
+                            ⚔️ Battle Arena (${store.data.battlesWon || 0} Wins)
+                        </button>
+                        <button onclick="openPetStudio('hat')" class="px-4 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-full py-2.5 font-bold text-xs active:scale-95 transition-transform">
+                            Wardrobe
+                        </button>
                     </div>
                 </div>
                 
@@ -752,9 +2079,21 @@
                                 </div>
                             </div>
                         ` : `
-                            <button onclick="${todayPlan.exercises ? 'startWorkout()' : 'openCheckIn()'}" class="w-full bg-brand-main text-brand-contrast rounded-full py-4 font-bold shadow-xl shadow-brand-main/20 active:scale-95 transition-transform flex justify-center items-center gap-2 tracking-wide text-sm border-2 border-transparent hover:border-white/20">
-                                ${todayPlan.exercises ? '<i data-lucide="play" class="w-4 h-4 fill-brand-contrast"></i> Start Workout' : '<i data-lucide="check-square" class="w-4 h-4"></i> Log Check-in'}
-                            </button>
+                            <div class="space-y-2.5">
+                                <button onclick="${todayPlan.exercises ? 'startWorkout()' : 'openCheckIn()'}" class="w-full bg-brand-main text-brand-contrast rounded-full py-4 font-bold shadow-xl shadow-brand-main/20 active:scale-95 transition-transform flex justify-center items-center gap-2 tracking-wide text-sm border-2 border-transparent hover:border-white/20">
+                                    ${todayPlan.exercises ? '<i data-lucide="play" class="w-4 h-4 fill-brand-contrast"></i> Start Workout (+50 🪙)' : '<i data-lucide="check-square" class="w-4 h-4"></i> Log Check-in (+15 🪙)'}
+                                </button>
+                                ${todayPlan.exercises ? `
+                                    <div class="grid grid-cols-2 gap-2 pt-1">
+                                        <button onclick="startFiveSecondLaunch()" class="bg-zinc-900/90 border border-zinc-800 text-zinc-200 rounded-full py-2.5 px-3 font-bold text-[11px] active:scale-95 transition-transform flex items-center justify-center gap-1.5">
+                                            <i data-lucide="timer" class="w-3.5 h-3.5 text-brand-main"></i> 5-4-3-2-1 Launch
+                                        </button>
+                                        <button onclick="startMicroWorkout()" class="bg-orange-950/30 border border-orange-500/30 text-orange-300 rounded-full py-2.5 px-3 font-bold text-[11px] active:scale-95 transition-transform flex items-center justify-center gap-1.5">
+                                            <i data-lucide="zap" class="w-3.5 h-3.5 text-orange-400"></i> 2-Min Spark
+                                        </button>
+                                    </div>
+                                ` : ''}
+                            </div>
                         `}
                     </div>
                 </div>
@@ -763,120 +2102,151 @@
                 ${todayCheckIn ? (() => {
                     const feedbackData = generateReflectionFeedback(todayCheckIn);
                     return `
-                    <div class="glass-card rounded-[2rem] p-6 mb-6 border border-brand-muted/30 relative overflow-hidden">
-                        <div class="flex items-center justify-between mb-3">
-                            <div class="flex items-center gap-2">
-                                <div class="bg-brand-bg p-2 rounded-full text-brand-main"><i data-lucide="sparkles" class="w-4 h-4"></i></div>
-                                <span class="text-xs font-bold uppercase tracking-wider text-brand-main">Coach Feedback</span>
-                            </div>
-                            <button onclick="openCheckIn()" class="text-xs text-zinc-400 hover:text-white underline">Edit Reflection</button>
+                    <div class="glass-card rounded-[2rem] p-6 mb-6 border ${feedbackData.statusColor} relative overflow-hidden">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-bold uppercase tracking-widest opacity-80">Coach Reflection</span>
+                            <button onclick="openCheckIn()" class="text-xs underline opacity-80">Edit</button>
                         </div>
-                        <h3 class="font-bold text-white text-base mb-1 tracking-tight">${feedbackData.statusTitle}</h3>
+                        <h3 class="font-bold text-white text-base mb-2">${feedbackData.statusTitle}</h3>
                         <p class="text-xs text-zinc-300 leading-relaxed">${feedbackData.feedback}</p>
                     </div>
                     `;
                 })() : `
-                <div class="glass-card bg-blue-950/20 border-blue-900/40 p-4 rounded-[1.5rem] flex items-center justify-between mb-6 shadow-lg shadow-blue-900/10">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-blue-900/50 p-2 rounded-full"><i data-lucide="coffee" class="text-blue-400 w-4 h-4"></i></div>
-                        <span class="text-sm text-blue-300 font-medium">Log your daily reflection for AI feedback!</span>
+                    <div onclick="openCheckIn()" class="glass-card rounded-[2rem] p-5 mb-6 flex items-center justify-between cursor-pointer border border-zinc-800/70 active:scale-[0.99] transition-transform">
+                        <div class="flex items-center gap-3.5">
+                            <div class="bg-zinc-900 p-3 rounded-full text-brand-main"><i data-lucide="clipboard-check" class="w-5 h-5"></i></div>
+                            <div>
+                                <h3 class="font-bold text-white text-sm">Daily Reflection Check-in</h3>
+                                <p class="text-xs text-zinc-400">Log recovery, water & sleep (+15 🪙)</p>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-5 h-5 text-zinc-500"></i>
                     </div>
-                    <button onclick="openCheckIn()" class="text-xs font-bold text-blue-950 bg-blue-400 px-4 py-2 rounded-full shadow-sm active:scale-95 transition-transform">Do it now</button>
-                </div>
                 `}
 
-                <!-- Next Achievement -->
+                <!-- Next Medal Preview -->
                 ${nextMedal ? `
-                <div class="glass-card rounded-[1.5rem] p-5 text-white mb-4 shadow-sm">
-                    <div class="flex items-center gap-4">
-                        <div class="bg-zinc-800 p-3 rounded-full border border-zinc-700 text-zinc-500">
-                            <i data-lucide="lock" class="w-5 h-5"></i>
+                    <div onclick="router.navigate('achievements')" class="glass-card rounded-[2rem] p-5 flex items-center justify-between cursor-pointer border border-zinc-800/60">
+                        <div class="flex items-center gap-3.5">
+                            <div class="bg-zinc-900 p-3 rounded-full text-zinc-400"><i data-lucide="${nextMedal.icon || 'award'}" class="w-5 h-5"></i></div>
+                            <div>
+                                <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Next Medal (+${nextMedal.reward} 🪙)</p>
+                                <h4 class="font-bold text-white text-sm">${nextMedal.title}</h4>
+                                <p class="text-xs text-zinc-400">${nextMedal.desc}</p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-1">Next Milestone</p>
-                            <h3 class="font-bold text-base text-zinc-200 tracking-tight">${nextMedal.title}</h3>
-                            <p class="text-zinc-500 text-xs mt-1 leading-snug">${nextMedal.desc}</p>
-                        </div>
+                        <i data-lucide="chevron-right" class="w-5 h-5 text-zinc-500"></i>
                     </div>
-                </div>
                 ` : ''}
             `;
         }
 
         function renderWorkouts(container) {
-            let html = `
-                <div class="mb-6">
-                    <div class="flex justify-between items-end">
-                        <div>
-                            <h1 class="text-3xl font-bold text-white tracking-tight">Weekly Plan</h1>
-                            <p class="text-zinc-400 text-sm mt-1">Consistency over intensity.</p>
-                        </div>
-                        <div class="bg-brand-bg text-brand-main border border-brand-muted px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider mb-1 shadow-md shadow-brand-main/10">
-                            ${store.data.difficulty} Level
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Exercise Guide Tab Trigger Card -->
-                <div onclick="openExerciseGuide()" class="glass-card bg-brand-bg/20 border-brand-main/30 p-5 rounded-[2rem] mb-6 flex items-center justify-between cursor-pointer transition-all hover:bg-brand-bg/30 shadow-lg shadow-brand-main/5">
-                    <div class="flex items-center gap-4">
-                        <div class="bg-brand-main text-brand-contrast p-3.5 rounded-full shadow-md">
-                            <i data-lucide="book-open" class="w-5 h-5"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-white text-sm tracking-tight">Exercise Library & Guide</h3>
-                            <p class="text-xs text-zinc-400 mt-0.5">Learn proper form & muscle targets</p>
-                        </div>
-                    </div>
-                    <i data-lucide="chevron-right" class="w-5 h-5 text-brand-main"></i>
-                </div>
-
-                <div class="space-y-4 pb-4">
-            `;
-
-            const orderedDays = [1, 2, 3, 4, 5, 6, 0];
+            const daysOrder = [1, 2, 3, 4, 5, 6, 0];
             const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
             const todayNum = new Date().getDay();
+            const diff = store.data.difficulty || 'steady';
 
-            orderedDays.forEach(dayIndex => {
-                const plan = SCHEDULE.find(s => s.day === dayIndex);
-                const isToday = dayIndex === todayNum;
-                let icon = 'moon';
-                let iconColor = 'text-zinc-600';
-                let bg = 'glass-card';
-                let border = '';
-                
-                if (plan.type === 'strength') { icon = 'dumbbell'; iconColor = 'text-brand-main'; }
-                if (plan.type === 'cardio') { icon = 'activity'; iconColor = 'text-cyan-400'; }
-                if (plan.type === 'light' || plan.type === 'recovery') { icon = 'sparkles'; iconColor = 'text-purple-400'; }
-                if (isToday) { bg = 'bg-zinc-900/90 border-brand-muted backdrop-blur-xl'; border = 'shadow-[0_0_15px_rgba(var(--brand-main),0.1)]'; }
+            let html = `
+                <div class="mb-6 flex justify-between items-end">
+                    <div>
+                        <h1 class="text-3xl font-bold text-white tracking-tight">Weekly Plan</h1>
+                        <p class="text-zinc-400 text-sm mt-1 capitalize">${diff} Intensity • Equipment-Free</p>
+                    </div>
+                    <button onclick="openExerciseGuide()" class="bg-brand-bg border border-brand-muted text-brand-main px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 active:scale-95 transition-transform">
+                        <i data-lucide="book-open" class="w-3.5 h-3.5"></i> Guide
+                    </button>
+                </div>
+                <div class="space-y-4 pb-6">
+            `;
+
+            daysOrder.forEach(dNum => {
+                const plan = SCHEDULE.find(s => s.day === dNum);
+                const isToday = dNum === todayNum;
+                let exListHtml = '';
+
+                if (plan.exercises) {
+                    exListHtml = `<div class="mt-4 pt-4 border-t border-zinc-800/60 space-y-2.5">` + plan.exercises.map(exKey => {
+                        const ex = EXERCISE_DB[exKey];
+                        const p = ex.levels[diff] || ex.levels.steady;
+                        return `
+                            <div class="flex justify-between items-center text-xs bg-zinc-950/60 px-3.5 py-2.5 rounded-xl border border-zinc-800/40">
+                                <span class="font-medium text-zinc-200">${ex.name}</span>
+                                <span class="text-brand-main font-bold">${p.sets} × ${p.label}</span>
+                            </div>
+                        `;
+                    }).join('') + `</div>`;
+                }
 
                 html += `
-                    <div class="${bg} ${border} rounded-[2rem] p-5 relative overflow-hidden transition-all">
-                        ${isToday ? '<div class="absolute top-0 left-0 w-1.5 h-full bg-brand-main shadow-[0_0_10px_var(--brand-main)]"></div>' : ''}
-                        <div class="flex items-start gap-4">
-                            <div class="bg-zinc-950 p-3.5 rounded-full border border-zinc-800 shadow-inner">
-                                <i data-lucide="${icon}" class="w-5 h-5 ${iconColor}"></i>
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex justify-between items-center mb-1">
-                                    <h3 class="font-bold text-zinc-100 text-sm tracking-tight">${dayNames[dayIndex]}</h3>
-                                    ${isToday ? '<span class="text-[10px] font-bold text-brand-main bg-brand-bg px-3 py-1 rounded-full uppercase tracking-wider">Today</span>' : ''}
+                    <div class="glass-card p-5 rounded-[2rem] border ${isToday ? 'border-brand-main/70 bg-brand-bg/15' : 'border-zinc-800/50'}">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] font-bold uppercase tracking-wider ${isToday ? 'text-brand-main' : 'text-zinc-500'}">${dayNames[dNum]}</span>
+                                    ${isToday ? '<span class="text-[9px] font-bold bg-brand-main text-brand-contrast px-2 py-0.5 rounded-full">TODAY</span>' : ''}
                                 </div>
-                                <p class="font-medium text-zinc-300 mb-1 tracking-tight">${plan.title}</p>
-                                <p class="text-xs text-zinc-500 mb-4 leading-relaxed">${plan.desc}</p>
-                                
-                                ${plan.exercises ? `
-                                    <div class="bg-zinc-950/60 rounded-[1.5rem] p-5 text-xs text-zinc-400 border border-zinc-800/50">
-                                        <ul class="space-y-3.5">
-                                            ${plan.exercises.map(exKey => {
-                                                const ex = EXERCISE_DB[exKey];
-                                                const params = ex.levels[store.data.difficulty];
-                                                return `<li class="flex items-start gap-3 leading-tight"><div class="w-1.5 h-1.5 bg-brand-main rounded-full mt-1 flex-shrink-0 shadow-[0_0_5px_var(--brand-main)]"></div><span><b class="text-zinc-200">${params.sets}x</b> ${ex.name} <span class="opacity-60 block mt-1 text-[11px]">${params.label}</span></span></li>`;
-                                            }).join('')}
-                                        </ul>
-                                    </div>
-                                ` : ''}
+                                <h3 class="font-bold text-white text-base mt-1">${plan.title}</h3>
+                                <p class="text-xs text-zinc-400 mt-0.5">${plan.desc}</p>
+                            </div>
+                            <div class="bg-zinc-900 p-2.5 rounded-full text-brand-main">
+                                <i data-lucide="${plan.type === 'strength' ? 'dumbbell' : plan.type === 'cardio' ? 'activity' : plan.type === 'light' ? 'heart' : 'moon'}" class="w-4 h-4"></i>
+                            </div>
+                        </div>
+                        ${exListHtml}
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function giveKudos(workoutIndex) {
+            if (store.data.workouts[workoutIndex]) {
+                store.data.workouts[workoutIndex].kudos = (store.data.workouts[workoutIndex].kudos || 0) + 1;
+                store.save();
+                renderProgress(document.getElementById('view-progress'));
+                lucide.createIcons();
+                showNotification("👏 Kudos sent! Pride in every rep!");
+            }
+        }
+
+        function renderAchievements(container) {
+            const unlockedCount = store.data.achievements.length;
+            let html = `
+                <div class="mb-6 flex justify-between items-end">
+                    <div>
+                        <h1 class="text-3xl font-bold text-white tracking-tight">Medals</h1>
+                        <p class="text-zinc-400 text-sm mt-1">${unlockedCount} of ${MEDALS.length} unlocked</p>
+                    </div>
+                    <button onclick="openPetStudio('hat')" class="bg-yellow-500/20 border border-yellow-500/40 text-yellow-300 px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 active:scale-95 transition-transform">
+                        🪙 ${store.data.coins || 0} Spend
+                    </button>
+                </div>
+                <div class="grid grid-cols-2 gap-4 pb-4">
+            `;
+
+            MEDALS.forEach(medal => {
+                const unlockedData = store.data.achievements.find(a => a.id === medal.id);
+                const isUnlocked = !!unlockedData;
+                
+                html += `
+                    <div class="glass-card p-5 rounded-[2rem] border ${isUnlocked ? 'border-brand-muted/50' : 'border-zinc-800/50'} flex flex-col items-center text-center relative overflow-hidden transition-all shadow-sm">
+                        ${isUnlocked ? '<div class="absolute inset-0 bg-gradient-to-b from-brand-bg/60 to-transparent opacity-80 pointer-events-none"></div>' : ''}
+                        <div class="relative z-10 flex flex-col items-center w-full h-full justify-between">
+                            <div class="flex flex-col items-center">
+                                <div class="w-16 h-16 rounded-full flex items-center justify-center mb-3 ${isUnlocked ? 'bg-brand-bg text-brand-main shadow-[0_0_20px_var(--brand-bg)] border border-brand-main/20' : 'bg-zinc-800/50 text-zinc-600 border border-zinc-700/50'}">
+                                    <i data-lucide="${medal.icon || 'award'}" class="w-7 h-7"></i>
+                                </div>
+                                <h3 class="font-bold text-sm ${isUnlocked ? 'text-white' : 'text-zinc-500'} mb-1 tracking-tight">${medal.title}</h3>
+                                <p class="text-[10px] ${isUnlocked ? 'text-zinc-400' : 'text-zinc-600'} leading-snug mb-3">${medal.desc}</p>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold ${isUnlocked ? 'text-yellow-300 bg-yellow-500/15 border-yellow-500/30' : 'text-zinc-500 bg-zinc-900 border-zinc-800'} px-2.5 py-0.5 rounded-full border inline-block">
+                                    +${medal.reward || 50} 🪙
+                                </span>
+                                ${isUnlocked ? `<span class="block mt-2 text-[9px] font-bold text-brand-main">${new Date(unlockedData.date).toLocaleDateString()}</span>` : ''}
                             </div>
                         </div>
                     </div>
@@ -1095,6 +2465,18 @@
                             </div>
                             <button onclick="updateUserNameFromSettings()" class="text-xs font-bold text-brand-main bg-brand-bg px-4 py-1.5 rounded-full shadow-sm active:scale-95 transition-transform">Edit</button>
                         </div>
+
+                        <!-- Gender Update Row -->
+                        <div class="flex items-center justify-between border-t border-zinc-800 pt-4 mt-4">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="user-check" class="w-4 h-4 text-zinc-500"></i>
+                                <span class="text-sm font-medium text-zinc-300">Fighter Gender</span>
+                            </div>
+                            <div class="flex gap-1.5 bg-zinc-950 p-1 rounded-full border border-zinc-800">
+                                <button onclick="setUserGender('male')" class="px-3 py-1 rounded-full text-xs font-bold ${store.data.gender === 'male' ? 'bg-brand-main text-brand-contrast' : 'text-zinc-400'}">Male</button>
+                                <button onclick="setUserGender('female')" class="px-3 py-1 rounded-full text-xs font-bold ${store.data.gender === 'female' ? 'bg-brand-main text-brand-contrast' : 'text-zinc-400'}">Female</button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Themes -->
@@ -1165,11 +2547,11 @@
         }
 
         function removeProfilePic() {
-            if(confirm("Remove profile picture?")) {
+            showConfirmModal("Remove Photo", "Remove your profile picture?", () => {
                 store.data.profilePic = null;
                 store.save();
                 renderView(router.current);
-            }
+            }, "Remove", true);
         }
 
         function changeTheme(themeId) {
@@ -1190,13 +2572,24 @@
             };
 
             if (recommendations[level] && wCount < recommendations[level]) {
-                if (!confirm(`You haven't reached the recommended ${recommendations[level]} workouts yet. Are you sure you want to skip straight to ${level.charAt(0).toUpperCase() + level.slice(1)}?`)) {
-                    return;
-                }
+                showConfirmModal(
+                    "Jump Ahead?",
+                    `You haven't reached the recommended ${recommendations[level]} workouts yet. Are you sure you want to skip straight to ${level.charAt(0).toUpperCase() + level.slice(1)}?`,
+                    () => {
+                        store.data.difficulty = level;
+                        store.save();
+                        renderSettings(document.getElementById('view-settings'));
+                        lucide.createIcons();
+                        showNotification(`Difficulty set to ${level.charAt(0).toUpperCase() + level.slice(1)}`);
+                    },
+                    "Yes, Switch"
+                );
+                return;
             }
             store.data.difficulty = level;
             store.save();
             renderSettings(document.getElementById('view-settings'));
+            lucide.createIcons();
             showNotification(`Difficulty set to ${level.charAt(0).toUpperCase() + level.slice(1)}`);
         }
 
@@ -1208,25 +2601,34 @@
             const todayNum = new Date().getDay();
             const plan = SCHEDULE.find(s => s.day === todayNum);
             
-            if (store.hasCompletedWorkoutToday()) {
-                if(!confirm("You've already completed a workout today. Do you want to do it again? (It won't duplicate in history)")) {
-                    return;
-                }
-            }
+            const launchSession = () => {
+                activeWorkout = {
+                    plan: plan,
+                    exIndex: 0,
+                    exercises: plan.exercises.map(exKey => {
+                        const ex = EXERCISE_DB[exKey];
+                        const params = ex.levels[store.data.difficulty];
+                        return { id: exKey, name: ex.name, sets: params.sets, reps: params.label, completedSets: 0 };
+                    })
+                };
 
-            activeWorkout = {
-                plan: plan,
-                exIndex: 0,
-                exercises: plan.exercises.map(exKey => {
-                    const ex = EXERCISE_DB[exKey];
-                    const params = ex.levels[store.data.difficulty];
-                    return { id: exKey, name: ex.name, sets: params.sets, reps: params.label, completedSets: 0 };
-                })
+                const overlay = document.getElementById('workout-session');
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+                renderWarmup();
             };
 
-            const overlay = document.getElementById('workout-session');
-            overlay.classList.remove('hidden');
-            renderWarmup();
+            if (store.hasCompletedWorkoutToday()) {
+                showConfirmModal(
+                    "Already Logged Today",
+                    "You've already completed a workout today. Do you want to run through it again for extra practice?",
+                    launchSession,
+                    "Start Again"
+                );
+                return;
+            }
+
+            launchSession();
         }
 
         function renderWarmup() {
@@ -1421,12 +2823,15 @@
                     type: activeWorkout.plan.type,
                     title: activeWorkout.plan.title,
                     difficulty: store.data.difficulty,
+                    kudos: 1,
                     exercises: activeWorkout.exercises.map(ex => ({
                         name: ex.name,
                         sets: ex.completedSets,
                         reps: ex.reps
                     }))
                 });
+                store.data.coins = (store.data.coins || 0) + 50;
+                store.data.xp = (store.data.xp || 0) + 100;
                 store.save();
                 checkAchievements();
             }
@@ -1436,15 +2841,20 @@
         }
 
         function confirmExitWorkout() {
-            if (confirm("Are you sure you want to end this workout early? Progress won't be saved.")) {
-                closeWorkoutSession();
-            }
+            showConfirmModal(
+                "End Workout Early?",
+                "Are you sure you want to exit? Your current sets won't be saved.",
+                () => closeWorkoutSession(),
+                "End Workout",
+                true
+            );
         }
 
         function closeWorkoutSession() {
             clearInterval(restInterval);
             const overlay = document.getElementById('workout-session');
             overlay.classList.add('hidden');
+            overlay.classList.remove('flex');
             const completeOverlay = document.getElementById('workout-complete');
             completeOverlay.classList.add('hidden');
         }
@@ -1459,11 +2869,15 @@
                     <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--brand-bg)_0%,_transparent_70%)] opacity-40"></div>
                     
                     <div class="relative z-10 w-full flex flex-col items-center">
-                        <div class="w-32 h-32 bg-brand-bg/50 rounded-full flex items-center justify-center mb-8 border-4 border-brand-muted shadow-[0_0_40px_var(--brand-bg)] backdrop-blur-md">
+                        <div class="w-32 h-32 bg-brand-bg/50 rounded-full flex items-center justify-center mb-6 border-4 border-brand-muted shadow-[0_0_40px_var(--brand-bg)] backdrop-blur-md">
                             <i data-lucide="check" class="w-16 h-16 text-brand-main"></i>
                         </div>
                         <h2 class="text-3xl font-bold text-white mb-2 tracking-tight">Workout Complete!</h2>
-                        <p class="text-zinc-400 text-sm mb-8">${activeWorkout.plan.title} successfully logged.</p>
+                        <p class="text-zinc-400 text-sm mb-4">${activeWorkout.plan.title} successfully logged.</p>
+                        <div class="flex gap-2 mb-6">
+                            <span class="bg-yellow-500/20 border border-yellow-500/40 text-yellow-300 px-4 py-1.5 rounded-full text-xs font-bold">+50 FitCoins 🪙</span>
+                            <span class="bg-brand-bg border border-brand-muted text-brand-main px-4 py-1.5 rounded-full text-xs font-bold">+100 XP ⚡</span>
+                        </div>
                         
                         <div class="glass-card rounded-[2rem] p-6 w-full max-w-sm mb-8 space-y-4 text-left">
                             <div class="flex justify-between items-center"><span class="text-zinc-400 text-sm">Exercises finished</span><span class="font-bold text-white text-sm">${exCount}</span></div>
@@ -1621,13 +3035,15 @@
             if (index !== -1) {
                 store.data.checkIns[index] = newRecord; 
             } else {
-                store.data.checkIns.push(newRecord); 
+                store.data.checkIns.push(newRecord);
+                store.data.coins = (store.data.coins || 0) + 15;
+                store.data.xp = (store.data.xp || 0) + 30;
             }
             
             store.save();
             checkAchievements();
             closeWorkoutSession();
-            showNotification("Reflection saved & analyzed!");
+            showNotification(index !== -1 ? "Reflection updated!" : "Reflection saved! +15 FitCoins 🪙");
             if(router.current === 'progress') { renderProgress(document.getElementById('view-progress')); }
             else { router.navigate('home'); }
         }
@@ -1650,22 +3066,23 @@
                         }).then(() => {
                             showNotification("Backup saved successfully!");
                         }).catch((error) => {
-                            // User cancelled share, do nothing
                             console.log("Share cancelled", error);
                         });
                         return;
                     }
                 }
 
-                // iOS Fallback: Copy to Clipboard since downloads are blocked in Standalone mode
-                navigator.clipboard.writeText(dataStr).then(() => {
-                    alert("Backup text copied to your clipboard!\n\nPlease open your Apple Notes app and paste it there to save your progress safely.");
-                }).catch(err => {
-                    alert("Failed to export. Please try on a desktop computer.");
-                });
+                // Fallback copy via textarea for maximum iOS compatibility
+                const textArea = document.createElement("textarea");
+                textArea.value = dataStr;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showInfoModal("Backup Copied!", "Your backup data has been copied to your clipboard.\n\nOpen your Apple Notes app and paste it there to keep your progress safe.");
 
             } catch(e) {
-                alert("Export failed: " + e.message);
+                showInfoModal("Export Error", "Export failed: " + e.message);
             }
         }
 
@@ -1677,23 +3094,19 @@
                 try {
                     const imported = JSON.parse(e.target.result);
                     if (imported && Array.isArray(imported.workouts) && Array.isArray(imported.checkIns)) {
-                        if(confirm("Importing will overwrite your current progress. Continue?")) {
+                        showConfirmModal("Import Backup?", "Importing will overwrite your current progress with the backup file. Continue?", () => {
                             store.data = imported;
-                            if(!store.data.achievements) store.data.achievements = [];
-                            if(!store.data.theme) store.data.theme = 'lemon';
-                            if(store.data.profilePic === undefined) store.data.profilePic = null;
-                            if(store.data.userName === undefined) store.data.userName = null;
                             store.save();
-                            document.documentElement.className = `theme-${store.data.theme}`;
+                            store.load();
                             checkAchievements(); 
                             showNotification("Data imported successfully!");
                             router.navigate('home');
-                        }
+                        }, "Import");
                     } else {
-                        alert("Invalid backup file format. Progress was not changed.");
+                        showInfoModal("Invalid File", "Invalid backup file format. Your current progress was not changed.");
                     }
                 } catch (err) {
-                    alert("Error reading file. Make sure it's a valid JSON backup.");
+                    showInfoModal("Read Error", "Error reading file. Make sure it's a valid JSON backup.");
                 }
                 event.target.value = ''; 
             };
@@ -1701,12 +3114,18 @@
         }
 
         function resetData() {
-            if (confirm("Are you absolutely sure you want to delete ALL progress? This cannot be undone.")) {
-                localStorage.removeItem('mfj_data');
-                store.load();
-                router.navigate('home');
-                showNotification("All data has been reset.");
-            }
+            showConfirmModal(
+                "Reset All Progress?",
+                "Are you absolutely sure you want to delete ALL workouts, streaks, coins, and pet items? This cannot be undone.",
+                () => {
+                    localStorage.removeItem('mfj_data');
+                    store.load();
+                    router.navigate('home');
+                    showNotification("All data has been reset.");
+                },
+                "Delete Everything",
+                true
+            );
         }
 
         function downloadICS() {
@@ -1743,7 +3162,10 @@ END:VCALENDAR`;
             URL.revokeObjectURL(url);
             
             setTimeout(() => {
-                alert("iPhone Installation:\n\n1. Safari will prompt you to download the file.\n2. Tap 'Download'.\n3. Tap the Downloads icon (↓) in the Safari address bar, open the file, and tap 'Add All' to save the recurring reminder with an alarm.");
+                showInfoModal(
+                    "iPhone Calendar Setup",
+                    "1. Safari will prompt you to download the file.\n2. Tap 'Download'.\n3. Tap the Downloads icon (↓) in the Safari address bar, open the file, and tap 'Add All' to save the recurring 7:00 AM alarm."
+                );
             }, 600);
         }
 
