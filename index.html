@@ -177,6 +177,7 @@
         <div id="checkin-modal" class="fixed inset-0 bg-zinc-950 z-[80] hidden flex-col w-full max-w-md mx-auto slide-up-modal ios-safe-modal"></div>
         <div id="guide-modal" class="fixed inset-0 bg-zinc-950 z-[85] hidden flex-col w-full max-w-md mx-auto slide-up-modal ios-safe-modal"></div>
         <div id="custom-dialog" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[110] hidden items-center justify-center p-6 w-full max-w-md mx-auto"></div>
+        <div id="toast-banner" class="fixed top-[calc(env(safe-area-inset-top)+0.75rem)] left-1/2 -translate-x-1/2 z-[120] hidden max-w-[360px] w-[calc(100%-2.5rem)] glass-card border border-brand-main/50 rounded-full px-5 py-3 text-xs font-bold text-white shadow-2xl items-center gap-2.5 pop-in"></div>
         
         <!-- Name & Fighter Gender Prompt Modal (Shown on first load) -->
         <div id="name-prompt-modal" class="fixed inset-0 bg-zinc-950/95 backdrop-blur-xl z-[100] hidden flex-col items-center justify-center p-6 text-center w-full max-w-md mx-auto fade-in">
@@ -717,7 +718,6 @@
             const skin = skinObj.base;
             const skinShade = skinObj.shade;
 
-            // Body proportions scale visibly across the 5 workout stages
             const builds = {
                 starter: { shoulderW: 44, chestW: 36, waistW: 28, armW: 9, legW: 11, muscleLines: false },
                 easy:    { shoulderW: 50, chestW: 40, waistW: 28, armW: 11, legW: 13, muscleLines: false },
@@ -728,7 +728,6 @@
             const b = builds[stage] || builds.steady;
             const cx = 100;
 
-            // Aura Layer
             let auraSvg = '';
             if (pet.aura === 'flame') {
                 auraSvg = `<circle cx="100" cy="106" r="82" fill="none" stroke="#fb923c" stroke-width="3" stroke-dasharray="10 6" opacity="0.75"/>
@@ -742,45 +741,35 @@
                            <circle cx="34" cy="136" r="2.5" fill="#a78bfa"/><circle cx="166" cy="132" r="3" fill="#a78bfa"/>`;
             }
 
-            // Hero Cape (behind body)
             const capeSvg = pet.gear === 'cape'
                 ? `<path d="M${cx - b.shoulderW/2 - 2} 88 L${cx - b.shoulderW/2 - 20} 174 L${cx + b.shoulderW/2 + 20} 174 L${cx + b.shoulderW/2 + 2} 88 Z" fill="${secondary}" opacity="0.8"/>`
                 : '';
 
-            // Back Hair Layer (Female high bouncy ponytail)
             const backHairSvg = gender === 'female'
                 ? `<path d="M120 38 Q148 30 144 68 Q134 62 123 50 Z" fill="#18181b"/>
                    <path d="M124 41 Q141 37 139 61" stroke="#3f3f46" stroke-width="2" fill="none" stroke-linecap="round"/>
                    <rect x="118" y="37" width="6" height="9" rx="3" fill="${primary}"/>`
                 : '';
 
-            // Torso & Athletic Apparel (Bitmoji-style fitted sportswear)
             const torsoPath = `M${cx - b.shoulderW/2} 86 Q${cx} 82 ${cx + b.shoulderW/2} 86 L${cx + b.waistW/2} 134 L${cx - b.waistW/2} 134 Z`;
             const outfitSvg = gender === 'female'
-                ? `<!-- Racerback Sports Top -->
-                   <path d="M${cx - b.chestW/2 + 1} 86 L${cx - 10} 86 L${cx} 93 L${cx + 10} 86 L${cx + b.chestW/2 - 1} 86 L${cx + b.chestW/2 - 4} 110 L${cx - b.chestW/2 + 4} 110 Z" fill="${primary}"/>
+                ? `<path d="M${cx - b.chestW/2 + 1} 86 L${cx - 10} 86 L${cx} 93 L${cx + 10} 86 L${cx + b.chestW/2 - 1} 86 L${cx + b.chestW/2 - 4} 110 L${cx - b.chestW/2 + 4} 110 Z" fill="${primary}"/>
                    <path d="M${cx - b.chestW/2 + 4} 107 L${cx + b.chestW/2 - 4} 107 L${cx + b.chestW/2 - 4} 111 L${cx - b.chestW/2 + 4} 111 Z" fill="#18181b" opacity="0.35"/>
-                   <!-- Athletic Shorts -->
                    <path d="M${cx - b.waistW/2 - 2} 127 L${cx + b.waistW/2 + 2} 127 L${cx + b.waistW/2 + 5} 147 L${cx + 2} 147 L${cx} 141 L${cx - 2} 147 L${cx - b.waistW/2 - 5} 147 Z" fill="#18181b"/>
                    <line x1="${cx - b.waistW/2 - 2}" y1="130" x2="${cx + b.waistW/2 + 2}" y2="130" stroke="${primary}" stroke-width="2"/>`
-                : `<!-- Fitted Compression Tank / Tee -->
-                   <path d="M${cx - b.shoulderW/2 + 2} 86 L${cx - 11} 86 Q${cx} 95 ${cx + 11} 86 L${cx + b.shoulderW/2 - 2} 86 L${cx + b.waistW/2} 128 L${cx - b.waistW/2} 128 Z" fill="#18181b"/>
+                : `<path d="M${cx - b.shoulderW/2 + 2} 86 L${cx - 11} 86 Q${cx} 95 ${cx + 11} 86 L${cx + b.shoulderW/2 - 2} 86 L${cx + b.waistW/2} 128 L${cx - b.waistW/2} 128 Z" fill="#18181b"/>
                    <path d="M${cx - b.chestW/3} 96 L${cx + b.chestW/3} 96" stroke="${primary}" stroke-width="2.5" stroke-linecap="round" opacity="0.85"/>
-                   <!-- Athletic Training Shorts -->
                    <path d="M${cx - b.waistW/2 - 2} 126 L${cx + b.waistW/2 + 2} 126 L${cx + b.waistW/2 + 5} 150 L${cx + 2} 150 L${cx} 143 L${cx - 2} 150 L${cx - b.waistW/2 - 5} 150 Z" fill="${primary}"/>`;
 
-            // Subtle Muscle Definition Lines for Steady/Hard/Elite
             const muscleSvg = b.muscleLines
                 ? `<line x1="100" y1="101" x2="100" y2="124" stroke="${skinShade}" stroke-width="1.5" opacity="0.55"/>
                    <path d="M${cx - b.waistW/4} 115 L${cx + b.waistW/4} 115" stroke="${skinShade}" stroke-width="1.3" opacity="0.45"/>`
                 : '';
 
-            // Gold Chain
             const chainSvg = pet.gear === 'chain'
                 ? `<path d="M${cx - 12} 85 Q100 101 ${cx + 12} 85" stroke="#facc15" stroke-width="3.2" fill="none" stroke-linecap="round"/>`
                 : '';
 
-            // Held Dumbbell
             const dumbbellSvg = pet.gear === 'dumbbell'
                 ? `<g transform="translate(${cx + b.shoulderW/2 + b.armW - 1}, 130)">
                      <rect x="-13" y="-3" width="26" height="6" rx="2" fill="#71717a"/>
@@ -789,14 +778,12 @@
                    </g>`
                 : '';
 
-            // Front Hair Layer (Bitmoji-style sculpted hair)
             const frontHairSvg = gender === 'female'
                 ? `<path d="M74 48 Q75 22 100 22 Q125 22 126 48 Q121 34 106 32 Q95 36 74 48 Z" fill="#18181b"/>
                    <path d="M84 29 Q98 25 113 30" stroke="#3f3f46" stroke-width="2" fill="none" stroke-linecap="round"/>`
                 : `<path d="M74 48 Q73 23 100 21 Q127 23 126 48 Q122 36 114 34 Q100 31 86 34 Q78 36 74 48 Z" fill="#18181b"/>
                    <path d="M84 28 Q100 24 116 28" stroke="#3f3f46" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
 
-            // Eyewear (scaled for Bitmoji face)
             let glassesSvg = '';
             if (pet.glasses === 'shades') {
                 glassesSvg = `<rect x="80" y="47" width="17" height="10" rx="3" fill="#09090b" stroke="#27272a" stroke-width="1.2"/>
@@ -811,7 +798,6 @@
                               <path d="M118 54 Q123 64 119 72" stroke="#facc15" stroke-width="1.2" fill="none"/>`;
             }
 
-            // Headwear (scaled for Bitmoji head)
             let hatSvg = '';
             if (pet.hat === 'sweatband') {
                 hatSvg = `<rect x="75" y="36" width="50" height="7" rx="3" fill="${primary}"/>
@@ -1147,11 +1133,13 @@
             } else {
                 store.data.checkIns.push({
                     date: todayStr,
+                    timestamp: new Date().toISOString(),
                     activity: true,
                     water: false,
                     sleep: false,
                     energy: true,
-                    notes: 'Completed 2-Min Anti-Procrastination Spark.'
+                    notes: 'Completed 2-Min Anti-Procrastination Spark.',
+                    feedback: 'Solid Check-In — Showing up for 2 minutes protected your streak!'
                 });
             }
             store.data.microWorkouts = (store.data.microWorkouts || 0) + 1;
@@ -2168,147 +2156,145 @@
                 </div>
             ` : '';
 
+            const catchUpBanner = (store.data.workouts.length === 0 && store.data.checkIns.length === 0) ? `
+                <div class="glass-card rounded-[2rem] p-4 mb-5 border border-brand-main/40 bg-brand-bg/30 flex items-center justify-between gap-3">
+                    <div>
+                        <p class="text-xs font-bold text-brand-main">Recovering Lost Progress?</p>
+                        <p class="text-[11px] text-zinc-300 mt-0.5">Tap to restore your past workouts &amp; active streak.</p>
+                    </div>
+                    <button onclick="openCatchUpModal()" class="px-4 py-2.5 rounded-full bg-brand-main text-brand-contrast text-xs font-extrabold shrink-0 active:scale-95 transition-transform">
+                        Catch Up
+                    </button>
+                </div>
+            ` : '';
+
             const nextMedal = MEDALS.find(m => !store.data.achievements.some(a => a.id === m.id));
-            const nextMedalProg = nextMedal ? Math.min(nextMedal.target, getMedalProgress(nextMedal)) : 0;
-            const nextMedalPct = nextMedal ? Math.round((nextMedalProg / nextMedal.target) * 100) : 100;
+            const nextMedalVal = nextMedal ? Math.min(nextMedal.target, getMedalProgress(nextMedal)) : 0;
+            const nextMedalPct = nextMedal ? Math.round((nextMedalVal / nextMedal.target) * 100) : 100;
+
+            const stageGoalTarget = nextStage ? nextStage.minWorkouts : stageObj.nextWorkouts;
+            const stageGoalPct = Math.min(100, Math.round((store.data.workouts.length / Math.max(1, stageGoalTarget)) * 100));
 
             container.innerHTML = `
                 <!-- Header -->
-                <div class="flex items-center justify-between mb-5">
+                <div class="flex justify-between items-start mb-4">
                     <div>
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="text-[11px] font-extrabold uppercase tracking-widest text-brand-main">Fits</span>
-                            <span class="text-zinc-600">•</span>
-                            <span class="text-[11px] text-zinc-400">${dateDisplay}</span>
-                        </div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-brand-main mb-0.5">Fits • ${dateDisplay}</p>
                         <h1 class="text-2xl font-extrabold text-white tracking-tight">${greeting}, ${userName}</h1>
                         <p class="text-xs text-zinc-400 mt-1">${quote}</p>
                     </div>
-                    <label class="cursor-pointer relative shrink-0" title="Tap to change photo">
+                    <button onclick="router.navigate('settings')" class="shrink-0 active:scale-95 transition-transform">
                         ${avatarHtml}
-                        <input type="file" accept="image/*" class="hidden" onchange="handleProfilePicUpload(event)">
-                    </label>
+                    </button>
                 </div>
 
-                <!-- Top Gamification Pills -->
-                <div class="grid grid-cols-3 gap-2.5 mb-5">
-                    <div class="glass-card rounded-[1.5rem] p-3 text-center">
-                        <p class="text-[10px] text-zinc-400 uppercase font-bold">Streak</p>
-                        <p class="text-base font-extrabold text-white mt-0.5 inline-flex items-center justify-center gap-1"><i data-lucide="flame" class="w-4 h-4 text-brand-main"></i>${streakInfo.current}d</p>
-                    </div>
-                    <div class="glass-card rounded-[1.5rem] p-3 text-center">
-                        <p class="text-[10px] text-zinc-400 uppercase font-bold">FitCoins</p>
-                        <p class="text-base font-extrabold text-brand-main mt-0.5 inline-flex items-center justify-center gap-1"><i data-lucide="coins" class="w-4 h-4"></i>${store.data.coins || 0}</p>
-                    </div>
-                    <div class="glass-card rounded-[1.5rem] p-3 text-center">
-                        <p class="text-[10px] text-zinc-400 uppercase font-bold">Restores</p>
-                        <p class="text-base font-extrabold text-white mt-0.5 inline-flex items-center justify-center gap-1"><i data-lucide="shield" class="w-4 h-4 text-brand-main"></i>${store.data.streakRestores ?? 3}/3</p>
-                    </div>
+                <!-- Status Pills -->
+                <div class="flex items-center gap-2 mb-5 overflow-x-auto hide-scrollbar">
+                    <span class="px-3.5 py-1.5 rounded-full glass-card text-xs font-bold text-white inline-flex items-center gap-1.5 shrink-0">
+                        <i data-lucide="flame" class="w-3.5 h-3.5 text-brand-main"></i>
+                        <span>${streakInfo.current}d Streak</span>
+                    </span>
+                    <span class="px-3.5 py-1.5 rounded-full glass-card text-xs font-bold text-brand-main inline-flex items-center gap-1.5 shrink-0">
+                        <i data-lucide="coins" class="w-3.5 h-3.5"></i>
+                        <span>${store.data.coins || 0}</span>
+                    </span>
+                    <button onclick="router.navigate('settings')" class="px-3.5 py-1.5 rounded-full glass-card text-xs font-bold text-zinc-300 inline-flex items-center gap-1.5 shrink-0">
+                        <i data-lucide="shield" class="w-3.5 h-3.5 text-brand-main"></i>
+                        <span>${stageObj.name}</span>
+                    </button>
                 </div>
 
                 ${restoreBanner}
+                ${catchUpBanner}
 
                 <!-- Weekly Strip -->
                 ${getWeeklyStripHtml()}
 
-                <!-- Evolving Bitmoji Fighter Companion & Battle Arena Card -->
-                <div class="glass-card rounded-[2rem] p-5 mb-5 relative overflow-hidden">
-                    <div class="flex items-center justify-between gap-3">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="text-[11px] font-bold uppercase tracking-wider text-brand-main">${store.data.pet.name}</span>
-                                <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-zinc-900 border border-zinc-700 text-zinc-300 font-bold">${stageObj.name} Build</span>
-                            </div>
-                            <p class="text-xs text-zinc-400 mb-4">Your Bitmoji fighter's physique evolves as you advance from Starter to Elite.</p>
-                            <div class="flex flex-wrap gap-2">
-                                <button onclick="openPetStudio('hat')" class="px-4 py-2.5 rounded-full bg-zinc-900 border border-zinc-700 text-white text-xs font-bold active:scale-95 transition-transform inline-flex items-center gap-1.5">
-                                    <i data-lucide="shirt" class="w-3.5 h-3.5 text-brand-main"></i>
-                                    <span>Style</span>
-                                </button>
-                                <button onclick="openBattleArena()" class="px-4 py-2.5 rounded-full bg-brand-main text-brand-contrast text-xs font-bold shadow-md shadow-brand-main/20 active:scale-95 transition-transform inline-flex items-center gap-1.5">
-                                    <i data-lucide="swords" class="w-3.5 h-3.5"></i>
-                                    <span>Battle Arena</span>
-                                </button>
-                            </div>
+                <!-- Bitmoji Streak Fighter Card -->
+                <div class="glass-card rounded-[2rem] p-5 mb-5 flex items-center gap-4">
+                    <div class="shrink-0">${renderFighterSvg(110)}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <span class="text-sm font-extrabold text-white truncate">${store.data.pet.name}</span>
+                            <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-brand-bg text-brand-main shrink-0">${stageObj.name} Build</span>
                         </div>
-                        <div class="shrink-0">${renderFighterSvg(124)}</div>
+                        <p class="text-[11px] text-zinc-400 mb-2">
+                            ${nextStage ? `${store.data.workouts.length}/${nextStage.minWorkouts} workouts to ${nextStage.name} physique` : 'Peak Elite physique unlocked'}
+                        </p>
+                        <div class="w-full h-2 bg-zinc-900 rounded-full overflow-hidden mb-3">
+                            <div class="h-full bg-brand-main transition-all duration-300" style="width: ${stageGoalPct}%"></div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="openPetStudio('hat')" class="flex-1 py-2 px-3 rounded-full bg-zinc-900 border border-zinc-700 text-white text-xs font-bold active:scale-95 transition-transform flex items-center justify-center gap-1">
+                                <i data-lucide="shirt" class="w-3.5 h-3.5 text-brand-main"></i>
+                                <span>Studio</span>
+                            </button>
+                            <button onclick="openBattleArena()" class="flex-1 py-2 px-3 rounded-full bg-brand-main text-brand-contrast text-xs font-bold active:scale-95 transition-transform flex items-center justify-center gap-1">
+                                <i data-lucide="swords" class="w-3.5 h-3.5"></i>
+                                <span>Arena</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Today's Scheduled Plan -->
-                <div class="glass-card rounded-[2rem] p-5 mb-5">
+                <!-- Today's Scheduled Activity Card -->
+                <div class="glass-card rounded-[2rem] p-5 mb-5 border border-brand-main/25">
                     <div class="flex justify-between items-start mb-2">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-brand-main">Today's Plan • ${todayPlan.name}</span>
-                        <span class="text-xs font-bold text-zinc-400">${todayPlan.duration}</span>
+                        <div>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-brand-main">Today • ${todayPlan.name}</span>
+                            <h2 class="text-xl font-extrabold text-white mt-0.5">${todayPlan.title}</h2>
+                        </div>
+                        <span class="px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300">${todayPlan.duration}</span>
                     </div>
-                    <h2 class="text-xl font-extrabold text-white mb-1">${todayPlan.title}</h2>
-                    <p class="text-xs text-zinc-400 mb-4">${todayPlan.desc}</p>
+                    <p class="text-xs text-zinc-400 leading-relaxed mb-4">${todayPlan.desc}</p>
 
                     ${todayPlan.exercises ? `
-                        <div class="flex flex-wrap gap-1.5 mb-5">
-                            ${todayPlan.exercises.map(k => `<span class="text-[11px] px-3 py-1 rounded-full bg-zinc-900/90 border border-zinc-800 text-zinc-300">${EXERCISE_DB[k].name}</span>`).join('')}
-                        </div>
-                        <button onclick="startWorkoutSession(${todayPlan.day})" class="w-full py-4 rounded-full bg-brand-main text-brand-contrast font-bold text-sm shadow-lg shadow-brand-main/20 active:scale-95 transition-transform flex items-center justify-center gap-2">
-                            <i data-lucide="play" class="w-4 h-4 fill-current"></i>
-                            <span>${workoutDoneToday ? 'Workout Completed (Train Again)' : 'Start Workout'}</span>
+                        <button onclick="startWorkoutSession(${todayPlan.day})" class="w-full py-4 rounded-full bg-brand-main text-brand-contrast font-extrabold text-sm shadow-lg shadow-brand-main/20 active:scale-95 transition-transform flex items-center justify-center gap-2 mb-2.5">
+                            <i data-lucide="${workoutDoneToday ? 'check-circle' : 'play'}" class="w-4 h-4"></i>
+                            <span>${workoutDoneToday ? 'Completed Today • Train Again' : 'Start Workout'}</span>
                         </button>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="startFiveSecondLaunch()" class="py-2.5 px-3 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs font-bold active:scale-95 transition-transform">
+                                5-4-3-2-1 Launch
+                            </button>
+                            <button onclick="startMicroWorkout()" class="py-2.5 px-3 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs font-bold active:scale-95 transition-transform">
+                                2-Min Spark
+                            </button>
+                        </div>
                     ` : `
-                        <button onclick="openCheckIn('${store.getTodayStr()}')" class="w-full py-4 rounded-full bg-brand-main text-brand-contrast font-bold text-sm shadow-lg shadow-brand-main/20 active:scale-95 transition-transform">
-                            ${todayCheckIn && todayCheckIn.activity ? 'Recovery Logged' : 'Log Recovery & Activity'}
+                        <button onclick="openCheckIn('${store.getTodayStr()}')" class="w-full py-4 rounded-full bg-brand-main text-brand-contrast font-extrabold text-sm shadow-lg shadow-brand-main/20 active:scale-95 transition-transform flex items-center justify-center gap-2 mb-2.5">
+                            <i data-lucide="check-square" class="w-4 h-4"></i>
+                            <span>${todayCheckIn && todayCheckIn.activity ? 'Recovery Logged • Edit Reflection' : 'Log Recovery & Activity'}</span>
+                        </button>
+                        <button onclick="startMicroWorkout()" class="w-full py-2.5 px-3 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs font-bold active:scale-95 transition-transform">
+                            Optional 2-Min Momentum Spark
                         </button>
                     `}
                 </div>
 
-                <!-- Anti-Procrastination Toolkit -->
-                <div class="grid grid-cols-2 gap-3 mb-5">
-                    <button onclick="startFiveSecondLaunch()" class="glass-card p-4 rounded-[1.75rem] text-left active:scale-95 transition-transform border border-brand-main/25">
-                        <span class="inline-flex items-center gap-1.5 text-xs font-extrabold text-brand-main mb-1"><i data-lucide="zap" class="w-3.5 h-3.5"></i>5-4-3-2-1 Launch</span>
-                        <span class="text-[11px] text-zinc-400 block">Beat hesitation & start immediately</span>
+                <!-- Daily Reflection & Next Medal -->
+                <div class="grid grid-cols-1 gap-3">
+                    <button onclick="openCheckIn('${store.getTodayStr()}')" class="glass-card rounded-[1.75rem] p-4 text-left flex items-center justify-between gap-3 active:scale-[0.99] transition-transform">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-bold text-white">Daily Reflection &amp; AI Coach</p>
+                            <p class="text-[11px] text-zinc-400 truncate mt-0.5">
+                                ${todayCheckIn ? (todayCheckIn.feedback || 'Reflection logged for today.') : 'Check in on recovery, hydration, sleep & energy.'}
+                            </p>
+                        </div>
+                        <span class="px-3 py-1.5 rounded-full ${todayCheckIn ? 'bg-brand-bg text-brand-main' : 'bg-zinc-900 text-zinc-300'} text-[11px] font-bold shrink-0">
+                            ${todayCheckIn ? 'Edit' : 'Check In'}
+                        </span>
                     </button>
-                    <button onclick="startMicroWorkout()" class="glass-card p-4 rounded-[1.75rem] text-left active:scale-95 transition-transform border border-zinc-800">
-                        <span class="inline-flex items-center gap-1.5 text-xs font-extrabold text-white mb-1"><i data-lucide="battery-charging" class="w-3.5 h-3.5 text-brand-main"></i>2-Min Spark</span>
-                        <span class="text-[11px] text-zinc-400 block">Save your streak on low-energy days</span>
+
+                    <button onclick="router.navigate('achievements')" class="glass-card rounded-[1.75rem] p-4 text-left active:scale-[0.99] transition-transform">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="text-xs font-bold text-white">${nextMedal ? `Next Medal: ${nextMedal.title}` : 'All Medals Unlocked!'}</span>
+                            <span class="text-[11px] font-bold text-brand-main">${nextMedal ? `${nextMedalVal}/${nextMedal.target}` : `${MEDALS.length}/${MEDALS.length}`}</span>
+                        </div>
+                        <div class="w-full h-2 bg-zinc-900 rounded-full overflow-hidden">
+                            <div class="h-full bg-brand-main" style="width: ${nextMedalPct}%"></div>
+                        </div>
                     </button>
-                </div>
-
-                <!-- Daily Reflection Quick Card -->
-                <div onclick="openCheckIn('${store.getTodayStr()}')" class="glass-card rounded-[2rem] p-4 mb-5 flex items-center justify-between cursor-pointer active:scale-[0.99] transition-transform">
-                    <div class="flex items-center gap-3.5">
-                        <div class="w-11 h-11 rounded-full bg-brand-bg text-brand-main flex items-center justify-center">
-                            <i data-lucide="sparkles" class="w-5 h-5"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-bold text-white">${todayCheckIn ? 'Edit Today\'s Reflection' : 'Daily Fitness Reflection'}</p>
-                            <p class="text-xs text-zinc-400">${todayCheckIn ? 'AI Coach feedback ready' : 'Check in & get personalized AI Coach feedback'}</p>
-                        </div>
-                    </div>
-                    <i data-lucide="chevron-right" class="w-5 h-5 text-zinc-500"></i>
-                </div>
-
-                <!-- Next Stage Readiness & Next Medal -->
-                <div class="glass-card rounded-[2rem] p-5">
-                    ${nextStage ? `
-                        <div class="mb-4">
-                            <div class="flex justify-between text-xs font-bold mb-1.5">
-                                <span class="text-zinc-300">Goal: Unlock ${nextStage.name} Stage</span>
-                                <span class="text-brand-main">${Math.min(nextStage.minWorkouts, store.data.workouts.length)} / ${nextStage.minWorkouts} workouts</span>
-                            </div>
-                            <div class="w-full h-2.5 bg-zinc-900 rounded-full overflow-hidden">
-                                <div class="h-full bg-brand-main transition-all" style="width: ${Math.min(100, Math.round((store.data.workouts.length / nextStage.minWorkouts) * 100))}%"></div>
-                            </div>
-                        </div>
-                    ` : ''}
-                    ${nextMedal ? `
-                        <div>
-                            <div class="flex justify-between text-xs font-bold mb-1.5">
-                                <span class="text-zinc-300">Next Medal: ${nextMedal.title}</span>
-                                <span class="text-zinc-400">${nextMedalProg} / ${nextMedal.target}</span>
-                            </div>
-                            <div class="w-full h-2 bg-zinc-900 rounded-full overflow-hidden">
-                                <div class="h-full bg-zinc-400 transition-all" style="width: ${nextMedalPct}%"></div>
-                            </div>
-                        </div>
-                    ` : ''}
                 </div>
             `;
         }
@@ -2317,350 +2303,432 @@
             const diff = store.data.difficulty || 'steady';
             const stageObj = STAGES.find(s => s.id === diff) || STAGES[2];
             const orderedDays = [1, 2, 3, 4, 5, 6, 0];
+            const todayNum = new Date().getDay();
 
-            let html = `
+            container.innerHTML = `
                 <div class="flex justify-between items-center mb-5">
                     <div>
-                        <h1 class="text-2xl font-extrabold text-white tracking-tight">Weekly Plan</h1>
-                        <p class="text-xs text-zinc-400 mt-0.5">${stageObj.name} Stage • Rest: ${stageObj.restSec}s</p>
+                        <p class="text-xs font-bold uppercase tracking-wider text-brand-main">Weekly Blueprint</p>
+                        <h1 class="text-2xl font-extrabold text-white">Training Plan</h1>
                     </div>
-                    <button onclick="openExerciseGuide()" class="px-4 py-2.5 rounded-full bg-brand-bg border border-brand-main/30 text-brand-main text-xs font-bold active:scale-95 transition-transform inline-flex items-center gap-1.5">
+                    <button onclick="openExerciseGuide()" class="px-4 py-2.5 rounded-full bg-brand-bg border border-brand-main/40 text-brand-main text-xs font-bold active:scale-95 transition-transform flex items-center gap-1.5">
                         <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
                         <span>Exercise Guide</span>
                     </button>
                 </div>
-                <div class="space-y-4">
-            `;
 
-            orderedDays.forEach(dayNum => {
-                const plan = SCHEDULE.find(s => s.day === dayNum);
-                const isToday = new Date().getDay() === dayNum;
-                const badgeColor = plan.type === 'strength'
-                    ? 'bg-brand-bg text-brand-main'
-                    : plan.type === 'cardio'
-                    ? 'bg-cyan-950/70 text-cyan-300'
-                    : 'bg-zinc-900 text-zinc-400';
-
-                html += `
-                    <div class="glass-card rounded-[2rem] p-5 ${isToday ? 'border border-brand-main/60' : ''}">
-                        <div class="flex justify-between items-center mb-2">
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs font-extrabold uppercase tracking-wider text-zinc-400">${plan.name}</span>
-                                ${isToday ? '<span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-brand-main text-brand-contrast">Today</span>' : ''}
-                            </div>
-                            <span class="text-[11px] font-bold px-3 py-1 rounded-full ${badgeColor}">${plan.duration}</span>
-                        </div>
-                        <h3 class="text-lg font-bold text-white mb-1">${plan.title}</h3>
-                        <p class="text-xs text-zinc-400 mb-3">${plan.desc}</p>
-
-                        ${plan.exercises ? `
-                            <div class="space-y-2 mb-4">
-                                ${plan.exercises.map(exKey => {
-                                    const ex = EXERCISE_DB[exKey];
-                                    const lvl = ex.levels[diff] || ex.levels.steady;
-                                    return `
-                                        <div class="flex justify-between items-center bg-zinc-900/80 px-3.5 py-2.5 rounded-2xl text-xs">
-                                            <span class="text-zinc-200 font-medium">${ex.name}</span>
-                                            <span class="text-brand-main font-bold">${lvl.sets} × ${lvl.label}</span>
-                                        </div>
-                                    `;
-                                }).join('')}
-                            </div>
-                            <button onclick="startWorkoutSession(${plan.day})" class="w-full py-3.5 rounded-full bg-brand-main text-brand-contrast font-bold text-xs shadow-md active:scale-95 transition-transform">
-                                Start ${plan.title}
-                            </button>
-                        ` : `
-                            <button onclick="openCheckIn('${store.getTodayStr()}')" class="w-full py-3 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold text-xs active:scale-95 transition-transform">
-                                Log Recovery Check-In
-                            </button>
-                        `}
+                <!-- Stage Selector Bar -->
+                <div class="glass-card rounded-[1.75rem] p-4 mb-5">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-zinc-300">Active Intensity Stage</span>
+                        <span class="text-xs font-extrabold text-brand-main">${stageObj.name} (${stageObj.restSec}s rest)</span>
                     </div>
-                `;
-            });
+                    <div class="flex gap-1.5 overflow-x-auto hide-scrollbar">
+                        ${STAGES.map(s => `
+                            <button onclick="setDifficulty('${s.id}')" class="px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${s.id === diff ? 'bg-brand-main text-brand-contrast' : 'bg-zinc-900 text-zinc-400 border border-zinc-800'}">
+                                ${s.name}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
 
-            html += `</div>`;
-            container.innerHTML = html;
+                <!-- Anti-Procrastination Quick Launch -->
+                <div class="glass-card rounded-[1.75rem] p-4 mb-5 flex items-center justify-between gap-3">
+                    <div>
+                        <p class="text-xs font-bold text-white">Low Energy or Procrastinating?</p>
+                        <p class="text-[11px] text-zinc-400 mt-0.5">Run a 2-minute micro-routine to keep your streak alive.</p>
+                    </div>
+                    <button onclick="startMicroWorkout()" class="px-4 py-2.5 rounded-full bg-zinc-900 border border-brand-main/40 text-brand-main text-xs font-bold shrink-0 active:scale-95 transition-transform">
+                        2-Min Spark
+                    </button>
+                </div>
+
+                <!-- Monday - Sunday Cards -->
+                <div class="space-y-3">
+                    ${orderedDays.map(dayNum => {
+                        const plan = SCHEDULE.find(s => s.day === dayNum);
+                        const isToday = dayNum === todayNum;
+                        const badgeMap = {
+                            strength: 'Strength',
+                            cardio: 'Cardio & Core',
+                            light: 'Weekend Play',
+                            rest: 'Rest Day'
+                        };
+
+                        const exPreview = plan.exercises
+                            ? plan.exercises.map(k => {
+                                const ex = EXERCISE_DB[k];
+                                const lvl = ex.levels[diff] || ex.levels.steady;
+                                return `<span class="inline-block px-2.5 py-1 rounded-full bg-zinc-900/90 border border-zinc-800 text-[11px] text-zinc-300">${ex.name} • ${lvl.sets}×${lvl.label}</span>`;
+                            }).join(' ')
+                            : '';
+
+                        return `
+                            <div class="glass-card rounded-[1.75rem] p-4 ${isToday ? 'border border-brand-main/60' : ''}">
+                                <div class="flex justify-between items-start mb-1.5">
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-xs font-extrabold uppercase tracking-wider ${isToday ? 'text-brand-main' : 'text-zinc-400'}">${plan.name}</span>
+                                            ${isToday ? '<span class="px-2 py-0.5 rounded-full bg-brand-main text-brand-contrast text-[10px] font-extrabold">Today</span>' : ''}
+                                        </div>
+                                        <h3 class="text-base font-bold text-white mt-0.5">${plan.title}</h3>
+                                    </div>
+                                    <span class="text-[11px] font-bold px-3 py-1 rounded-full bg-zinc-900 text-zinc-300">${badgeMap[plan.type]} • ${plan.duration}</span>
+                                </div>
+                                <p class="text-xs text-zinc-400 mb-3">${plan.desc}</p>
+                                ${exPreview ? `<div class="flex flex-wrap gap-1.5 mb-3">${exPreview}</div>` : ''}
+                                ${plan.exercises ? `
+                                    <button onclick="startWorkoutSession(${plan.day})" class="w-full py-3 rounded-full ${isToday ? 'bg-brand-main text-brand-contrast' : 'bg-zinc-900 border border-zinc-700 text-white'} font-bold text-xs active:scale-95 transition-transform">
+                                        Start ${plan.title}
+                                    </button>
+                                ` : `
+                                    <button onclick="openCheckIn('${store.getTodayStr()}')" class="w-full py-3 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold text-xs active:scale-95 transition-transform">
+                                        Log Recovery Check-In
+                                    </button>
+                                `}
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
         }
 
-        function giveKudos(wIndex) {
-            if (store.data.workouts[wIndex]) {
-                store.data.workouts[wIndex].kudos = (store.data.workouts[wIndex].kudos || 1) + 1;
+        function toggleWorkoutKudos(realIdx) {
+            if (store.data.workouts[realIdx]) {
+                store.data.workouts[realIdx].kudos = (store.data.workouts[realIdx].kudos || 1) + 1;
                 store.save();
                 renderView('progress');
-                showNotification("Kudos added.");
+                showNotification("Kudos given!");
             }
         }
 
         function renderProgress(container) {
             const workouts = store.data.workouts;
             const checkIns = store.data.checkIns;
+            const streakInfo = getStreakInfo();
+            const activeDaysCount = getAllActiveDatesSet().size;
+
+            const stageIdx = Math.max(0, STAGES.findIndex(s => s.id === store.data.difficulty));
+            const stageObj = STAGES[stageIdx];
+            const nextStage = STAGES[stageIdx + 1] || null;
+            const targetWorkouts = nextStage ? nextStage.minWorkouts : stageObj.nextWorkouts;
+            const readinessPct = Math.min(100, Math.round((workouts.length / Math.max(1, targetWorkouts)) * 100));
+            const readyToLevelUp = nextStage && workouts.length >= nextStage.minWorkouts;
+
+            // Last 28 days heatmap
             const activeSet = getAllActiveDatesSet();
-
-            const now = new Date();
-            const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1));
-            const weekWorkouts = workouts.filter(w => new Date(w.date) >= monday).length;
-            const monthWorkouts = workouts.filter(w => {
-                const d = new Date(w.date);
-                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-            }).length;
-
-            let heatmapHtml = '<div class="heatmap-grid">';
+            const workoutDateSet = new Set(workouts.map(w => w.date.slice(0, 10)));
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            let heatmapCells = '';
             for (let i = 27; i >= 0; i--) {
-                const d = new Date();
-                d.setDate(d.getDate() - i);
+                const d = new Date(today);
+                d.setDate(today.getDate() - i);
                 const dStr = store.getDateStr(d);
-                const active = activeSet.has(dStr);
-                heatmapHtml += `<div title="${dStr}" class="heatmap-cell ${active ? 'bg-brand-main shadow-[0_0_8px_var(--brand-bg)]' : 'bg-zinc-900 border border-zinc-800'}"></div>`;
+                const hasW = workoutDateSet.has(dStr);
+                const hasA = activeSet.has(dStr);
+                const cellClass = hasW
+                    ? 'bg-brand-main shadow-sm shadow-brand-main/30'
+                    : hasA
+                        ? 'bg-brand-muted/70 border border-brand-main/40'
+                        : 'bg-zinc-900 border border-zinc-800/80';
+                heatmapCells += `<div title="${dStr}" class="heatmap-cell ${cellClass}"></div>`;
             }
-            heatmapHtml += '</div>';
 
-            let html = `
-                <h1 class="text-2xl font-extrabold text-white tracking-tight mb-1">Progress & Feed</h1>
-                <p class="text-xs text-zinc-400 mb-5">Consistency builds strength, posture, and energy.</p>
+            // Recent history feed (workouts + reflections)
+            const recentWorkouts = workouts.map((w, idx) => ({ kind: 'workout', date: w.date, data: w, idx })).reverse().slice(0, 15);
+            const recentCheckIns = [...checkIns].reverse().slice(0, 10);
 
+            container.innerHTML = `
+                <div class="mb-5">
+                    <p class="text-xs font-bold uppercase tracking-wider text-brand-main">Analytics &amp; History</p>
+                    <h1 class="text-2xl font-extrabold text-white">Your Progress</h1>
+                </div>
+
+                <!-- 4 Key Metrics -->
                 <div class="grid grid-cols-2 gap-3 mb-5">
                     <div class="glass-card rounded-[1.75rem] p-4">
-                        <p class="text-[11px] text-zinc-400 font-bold uppercase">Total Workouts</p>
+                        <p class="text-[11px] font-bold uppercase text-zinc-400">Total Workouts</p>
                         <p class="text-2xl font-extrabold text-white mt-1">${workouts.length}</p>
-                        <p class="text-[11px] text-brand-main mt-0.5">${weekWorkouts} this week • ${monthWorkouts} this month</p>
                     </div>
                     <div class="glass-card rounded-[1.75rem] p-4">
-                        <p class="text-[11px] text-zinc-400 font-bold uppercase">Active Days</p>
-                        <p class="text-2xl font-extrabold text-white mt-1">${activeSet.size}</p>
-                        <p class="text-[11px] text-zinc-400 mt-0.5">${checkIns.length} reflections logged</p>
+                        <p class="text-[11px] font-bold uppercase text-zinc-400">Active Streak</p>
+                        <p class="text-2xl font-extrabold text-brand-main mt-1">${streakInfo.current} Days</p>
                     </div>
+                    <div class="glass-card rounded-[1.75rem] p-4">
+                        <p class="text-[11px] font-bold uppercase text-zinc-400">Active Days</p>
+                        <p class="text-2xl font-extrabold text-white mt-1">${activeDaysCount}</p>
+                    </div>
+                    <div class="glass-card rounded-[1.75rem] p-4">
+                        <p class="text-[11px] font-bold uppercase text-zinc-400">Arena Wins</p>
+                        <p class="text-2xl font-extrabold text-white mt-1">${store.data.battlesWon || 0}</p>
+                    </div>
+                </div>
+
+                <!-- Intensity Readiness Goal -->
+                <div class="glass-card rounded-[2rem] p-5 mb-5">
+                    <div class="flex justify-between items-center mb-1.5">
+                        <span class="text-xs font-bold uppercase tracking-wider text-zinc-400">Intensity Progression Goal</span>
+                        <span class="text-xs font-extrabold text-brand-main">${stageObj.name}</span>
+                    </div>
+                    <p class="text-xs text-zinc-300 mb-3">
+                        ${nextStage
+                            ? `${workouts.length} of ${nextStage.minWorkouts} workouts completed toward <b>${nextStage.name}</b> intensity.`
+                            : `You have reached the highest <b>Elite</b> intensity tier!`}
+                    </p>
+                    <div class="w-full h-2.5 bg-zinc-900 rounded-full overflow-hidden mb-3">
+                        <div class="h-full bg-brand-main transition-all duration-300" style="width: ${readinessPct}%"></div>
+                    </div>
+                    ${readyToLevelUp ? `
+                        <button onclick="setDifficulty('${nextStage.id}')" class="w-full py-3 rounded-full bg-brand-main text-brand-contrast font-bold text-xs active:scale-95 transition-transform">
+                            Ready! Upgrade to ${nextStage.name} Stage
+                        </button>
+                    ` : ''}
                 </div>
 
                 <!-- 28-Day Consistency Heatmap -->
-                <div class="glass-card rounded-[2rem] p-5 mb-6">
+                <div class="glass-card rounded-[2rem] p-5 mb-5">
                     <div class="flex justify-between items-center mb-3">
-                        <span class="text-xs font-bold uppercase tracking-wider text-zinc-300">Last 28 Days Activity</span>
-                        <span class="text-[11px] text-brand-main font-bold">${activeSet.size} total days</span>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400">Last 28 Days Consistency</h3>
+                        <div class="flex items-center gap-2 text-[10px] text-zinc-400">
+                            <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-brand-main inline-block"></span>Workout</span>
+                            <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-brand-muted/70 inline-block"></span>Recovery</span>
+                        </div>
                     </div>
-                    ${heatmapHtml}
+                    <div class="heatmap-grid">${heatmapCells}</div>
                 </div>
 
-                <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">Activity & Reflection History</h3>
-                <div class="space-y-3">
-            `;
-
-            const history = [
-                ...workouts.map((w, idx) => ({ ...w, wIndex: idx, hType: 'workout' })),
-                ...checkIns.map(c => ({ ...c, hType: 'checkin' }))
-            ].sort((a, b) => new Date(b.date) - new Date(a.date));
-
-            if (history.length === 0) {
-                html += `<p class="text-zinc-500 text-sm text-center py-10 glass-card rounded-[2rem]">No history yet. Start today!</p>`;
-            } else {
-                history.forEach(item => {
-                    const dateStr = new Date(item.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-                    if (item.hType === 'workout') {
-                        const stageLabel = item.difficulty ? item.difficulty.charAt(0).toUpperCase() + item.difficulty.slice(1) : 'Logged';
-                        const exSummary = Array.isArray(item.exercises)
-                            ? item.exercises.map(e => `${e.name} (${e.sets}×${e.reps})`).join(' • ')
-                            : '';
-                        html += `
-                            <div class="glass-card p-4 rounded-[1.75rem]">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3.5">
-                                        <div class="bg-brand-bg p-3 rounded-full text-brand-main">
-                                            <i data-lucide="${item.type === 'cardio' ? 'activity' : 'dumbbell'}" class="w-5 h-5"></i>
-                                        </div>
+                <!-- Activity Feed -->
+                <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">Completed Workouts</h3>
+                <div class="space-y-3 mb-6">
+                    ${recentWorkouts.length === 0
+                        ? `<div class="glass-card rounded-[1.75rem] p-5 text-center text-xs text-zinc-400">No workouts logged yet. Complete your first session to build your feed!</div>`
+                        : recentWorkouts.map(item => {
+                            const w = item.data;
+                            const dLabel = new Date(w.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                            const exList = (w.exercises || []).map(e => `${e.name} (${e.sets}×${e.reps})`).join(' • ');
+                            return `
+                                <div class="glass-card rounded-[1.75rem] p-4">
+                                    <div class="flex justify-between items-start mb-1.5">
                                         <div>
-                                            <p class="font-bold text-white text-sm">${item.title}</p>
-                                            <p class="text-xs text-zinc-400 mt-0.5">${dateStr} • ${stageLabel} Stage</p>
+                                            <span class="text-[11px] text-zinc-400">${dLabel}</span>
+                                            <h4 class="text-sm font-bold text-white">${w.title}</h4>
                                         </div>
+                                        <span class="px-2.5 py-0.5 rounded-full bg-brand-bg text-brand-main text-[10px] font-bold uppercase">${w.difficulty || 'steady'}</span>
                                     </div>
-                                    <button onclick="giveKudos(${item.wIndex})" class="bg-zinc-900 border border-zinc-800 hover:border-brand-main/50 text-xs font-bold text-zinc-300 px-3 py-1.5 rounded-full active:scale-95 transition-transform inline-flex items-center gap-1">
-                                        <i data-lucide="thumbs-up" class="w-3.5 h-3.5 text-brand-main"></i>
-                                        <span>${item.kudos || 1}</span>
-                                    </button>
-                                </div>
-                                ${exSummary ? `<p class="text-[11px] text-zinc-400 mt-2.5 pt-2.5 border-t border-zinc-800/80">${exSummary}</p>` : ''}
-                            </div>
-                        `;
-                    } else {
-                        html += `
-                            <div class="glass-card p-4 rounded-[1.75rem] cursor-pointer active:scale-[0.99] transition-transform" onclick="openCheckIn('${item.date.slice(0, 10)}')">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3.5">
-                                        <div class="bg-emerald-950/60 border border-emerald-800/40 p-3 rounded-full text-emerald-400">
-                                            <i data-lucide="check-square" class="w-5 h-5"></i>
-                                        </div>
-                                        <div>
-                                            <p class="font-bold text-white text-sm">Daily Reflection</p>
-                                            <p class="text-xs text-zinc-400 mt-0.5">${dateStr} ${item.notes ? '• Tap to view notes' : ''}</p>
-                                        </div>
+                                    ${exList ? `<p class="text-[11px] text-zinc-400 mb-3 leading-relaxed">${exList}</p>` : ''}
+                                    <div class="flex justify-between items-center pt-2 border-t border-zinc-800/80">
+                                        <span class="text-[11px] text-zinc-500">Logged &amp; Verified</span>
+                                        <button onclick="toggleWorkoutKudos(${item.idx})" class="px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-bold text-brand-main inline-flex items-center gap-1 active:scale-95 transition-transform">
+                                            <i data-lucide="thumbs-up" class="w-3 h-3"></i>
+                                            <span>Kudos (${w.kudos || 1})</span>
+                                        </button>
                                     </div>
-                                    <i data-lucide="chevron-right" class="w-5 h-5 text-zinc-600"></i>
                                 </div>
-                            </div>
-                        `;
+                            `;
+                        }).join('')
                     }
-                });
-            }
+                </div>
 
-            html += `</div>`;
-            container.innerHTML = html;
+                <!-- Past Reflections -->
+                <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">Reflection History</h3>
+                <div class="space-y-3">
+                    ${recentCheckIns.length === 0
+                        ? `<div class="glass-card rounded-[1.75rem] p-5 text-center text-xs text-zinc-400">No reflections saved yet.</div>`
+                        : recentCheckIns.map(ci => {
+                            const dStr = ci.date.slice(0, 10);
+                            const dLabel = new Date(dStr + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                            const score = (ci.activity ? 1 : 0) + (ci.water ? 1 : 0) + (ci.sleep ? 1 : 0) + (ci.energy ? 1 : 0);
+                            return `
+                                <div class="glass-card rounded-[1.75rem] p-4">
+                                    <div class="flex justify-between items-center mb-1.5">
+                                        <span class="text-xs font-bold text-white">${dLabel}</span>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-[11px] font-bold text-brand-main">${score}/4 Pillars</span>
+                                            <button onclick="openCheckIn('${dStr}')" class="text-[11px] font-bold text-zinc-400 underline">Edit</button>
+                                        </div>
+                                    </div>
+                                    ${ci.notes ? `<p class="text-xs text-zinc-300 mb-2">"${ci.notes}"</p>` : ''}
+                                    ${ci.feedback ? `<p class="text-[11px] text-zinc-400 bg-zinc-900/80 p-2.5 rounded-xl">${ci.feedback}</p>` : ''}
+                                </div>
+                            `;
+                        }).join('')
+                    }
+                </div>
+            `;
         }
 
         function renderAchievements(container) {
             const unlockedCount = store.data.achievements.length;
 
-            let html = `
+            container.innerHTML = `
                 <div class="flex justify-between items-center mb-5">
                     <div>
-                        <h1 class="text-2xl font-extrabold text-white tracking-tight">Trophy Room</h1>
-                        <p class="text-xs text-zinc-400 mt-0.5">${unlockedCount} of ${MEDALS.length} Medals Unlocked</p>
+                        <p class="text-xs font-bold uppercase tracking-wider text-brand-main">Trophy Room</p>
+                        <h1 class="text-2xl font-extrabold text-white">Medals (${unlockedCount}/${MEDALS.length})</h1>
                     </div>
-                    <span class="px-3.5 py-1.5 rounded-full bg-brand-bg border border-brand-main/30 text-brand-main text-xs font-extrabold inline-flex items-center gap-1"><i data-lucide="coins" class="w-3.5 h-3.5"></i>${store.data.coins || 0}</span>
+                    <button onclick="openPetStudio('hat')" class="px-3.5 py-2 rounded-full glass-card text-xs font-bold text-brand-main inline-flex items-center gap-1.5">
+                        <i data-lucide="coins" class="w-3.5 h-3.5"></i>
+                        <span>${store.data.coins || 0}</span>
+                    </button>
                 </div>
+
                 <div class="space-y-3">
-            `;
+                    ${MEDALS.map(medal => {
+                        const unlockedRecord = store.data.achievements.find(a => a.id === medal.id);
+                        const isUnlocked = Boolean(unlockedRecord);
+                        const currentVal = Math.min(medal.target, getMedalProgress(medal));
+                        const pct = Math.round((currentVal / medal.target) * 100);
+                        const earnedDate = isUnlocked
+                            ? new Date(unlockedRecord.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                            : '';
 
-            MEDALS.forEach(medal => {
-                const record = store.data.achievements.find(a => a.id === medal.id);
-                const isUnlocked = !!record;
-                const prog = Math.min(medal.target, getMedalProgress(medal));
-                const pct = Math.round((prog / medal.target) * 100);
-
-                html += `
-                    <div class="glass-card rounded-[1.75rem] p-4 flex items-center gap-4 ${isUnlocked ? 'border border-brand-main/50' : 'opacity-75'}">
-                        <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${isUnlocked ? 'bg-brand-main text-brand-contrast shadow-md shadow-brand-main/20' : 'bg-zinc-900 text-zinc-500 border border-zinc-800'}">
-                            <i data-lucide="${isUnlocked ? medal.icon : 'lock'}" class="w-5 h-5"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex justify-between items-center gap-2">
-                                <h4 class="text-sm font-bold text-white truncate">${medal.title}</h4>
-                                <span class="text-[11px] font-bold text-brand-main shrink-0">+${medal.reward} Coins</span>
-                            </div>
-                            <p class="text-xs text-zinc-400 mt-0.5">${medal.desc}</p>
-                            ${isUnlocked ? `
-                                <p class="text-[10px] text-emerald-400 font-bold mt-1.5">Earned ${new Date(record.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                            ` : `
-                                <div class="mt-2">
-                                    <div class="flex justify-between text-[10px] text-zinc-500 font-bold mb-1">
-                                        <span>Progress</span>
-                                        <span>${prog} / ${medal.target}</span>
-                                    </div>
-                                    <div class="w-full h-1.5 bg-zinc-900 rounded-full overflow-hidden">
-                                        <div class="h-full bg-zinc-500" style="width: ${pct}%"></div>
-                                    </div>
+                        return `
+                            <div class="glass-card rounded-[1.75rem] p-4 flex items-center gap-3.5 ${isUnlocked ? 'border border-brand-main/50' : 'opacity-75'}">
+                                <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${isUnlocked ? 'bg-brand-main text-brand-contrast shadow-md shadow-brand-main/25' : 'bg-zinc-900 text-zinc-500 border border-zinc-800'}">
+                                    <i data-lucide="${isUnlocked ? medal.icon : 'lock'}" class="w-5 h-5"></i>
                                 </div>
-                            `}
-                        </div>
-                    </div>
-                `;
-            });
-
-            html += `</div>`;
-            container.innerHTML = html;
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex justify-between items-center gap-2 mb-0.5">
+                                        <h4 class="text-sm font-bold text-white truncate">${medal.title}</h4>
+                                        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full ${isUnlocked ? 'bg-brand-bg text-brand-main' : 'bg-zinc-900 text-zinc-400'} shrink-0">+${medal.reward} Coins</span>
+                                    </div>
+                                    <p class="text-xs text-zinc-400 mb-2">${medal.desc}</p>
+                                    ${isUnlocked ? `
+                                        <p class="text-[11px] font-semibold text-brand-main">Earned on ${earnedDate}</p>
+                                    ` : `
+                                        <div class="flex items-center gap-2">
+                                            <div class="flex-1 h-1.5 bg-zinc-900 rounded-full overflow-hidden">
+                                                <div class="h-full bg-brand-main" style="width: ${pct}%"></div>
+                                            </div>
+                                            <span class="text-[10px] font-bold text-zinc-400">${currentVal}/${medal.target}</span>
+                                        </div>
+                                    `}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
         }
 
         function renderSettings(container) {
+            const userName = store.data.userName || 'King';
+            const currentTheme = store.data.theme || 'lemon';
             const currentDiff = store.data.difficulty || 'steady';
-            const themes = [
-                { id: 'lemon', label: 'Lemon', color: '#e0ff33' },
-                { id: 'purple', label: 'Purple', color: '#a78bfa' },
-                { id: 'cyan', label: 'Cyan', color: '#22d3ee' },
-                { id: 'rose', label: 'Rose', color: '#fb7185' }
-            ];
+
+            const avatarPreview = store.data.profilePic
+                ? `<img src="${store.data.profilePic}" alt="Profile" class="w-16 h-16 rounded-full object-cover border-2 border-brand-main">`
+                : `<div class="w-16 h-16 rounded-full bg-brand-bg border border-brand-main/40 flex items-center justify-center text-brand-main font-extrabold text-xl">${userName.charAt(0).toUpperCase()}</div>`;
 
             container.innerHTML = `
-                <h1 class="text-2xl font-extrabold text-white tracking-tight mb-5">Settings & Profile</h1>
+                <div class="mb-5">
+                    <p class="text-xs font-bold uppercase tracking-wider text-brand-main">Preferences &amp; Safety</p>
+                    <h1 class="text-2xl font-extrabold text-white">Menu</h1>
+                </div>
 
-                <!-- Profile & Fighter Identity -->
+                <!-- Profile & Fighter Customization -->
                 <div class="glass-card rounded-[2rem] p-5 mb-5">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">Identity & Fighter</h3>
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <p class="text-xs text-zinc-400">Display Name</p>
-                            <p class="text-base font-bold text-white">${store.data.userName || 'King'}</p>
+                    <div class="flex items-center gap-4 mb-4">
+                        ${avatarPreview}
+                        <div class="flex-1">
+                            <h3 class="text-lg font-extrabold text-white">${userName}</h3>
+                            <div class="flex gap-2 mt-1.5">
+                                <button onclick="updateUserNameFromSettings()" class="px-3.5 py-1.5 rounded-full bg-zinc-900 border border-zinc-700 text-xs font-bold text-white">Edit Name</button>
+                                <label class="px-3.5 py-1.5 rounded-full bg-brand-bg border border-brand-main/40 text-xs font-bold text-brand-main cursor-pointer">
+                                    Photo
+                                    <input type="file" accept="image/*" class="hidden" onchange="handleProfilePicUpload(event)">
+                                </label>
+                            </div>
                         </div>
-                        <button onclick="updateUserNameFromSettings()" class="px-4 py-2 rounded-full bg-zinc-900 border border-zinc-700 text-xs font-bold text-brand-main">Edit Name</button>
                     </div>
 
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <p class="text-xs text-zinc-400">Fighter Physique</p>
-                            <p class="text-sm font-bold text-white">${store.data.gender === 'male' ? 'Male Build' : 'Female Build'}</p>
-                        </div>
+                    <div class="pt-3 border-t border-zinc-800/80 flex items-center justify-between">
+                        <span class="text-xs font-bold text-zinc-400">Fighter Physique</span>
                         <div class="flex bg-zinc-900 p-1 rounded-full border border-zinc-800">
-                            <button onclick="setUserGender('male')" class="px-3.5 py-1.5 rounded-full text-xs font-bold ${store.data.gender === 'male' ? 'bg-brand-main text-brand-contrast' : 'text-zinc-400'}">Male</button>
-                            <button onclick="setUserGender('female')" class="px-3.5 py-1.5 rounded-full text-xs font-bold ${store.data.gender === 'female' ? 'bg-brand-main text-brand-contrast' : 'text-zinc-400'}">Female</button>
+                            <button onclick="setUserGender('male')" class="px-3.5 py-1 rounded-full text-xs font-bold ${store.data.gender === 'male' ? 'bg-brand-main text-brand-contrast' : 'text-zinc-400'}">Male</button>
+                            <button onclick="setUserGender('female')" class="px-3.5 py-1 rounded-full text-xs font-bold ${store.data.gender === 'female' ? 'bg-brand-main text-brand-contrast' : 'text-zinc-400'}">Female</button>
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between mb-4">
-                        <p class="text-xs text-zinc-400">Fighter Skin Tone</p>
+                    <div class="pt-3 mt-3 border-t border-zinc-800/80 flex items-center justify-between">
+                        <span class="text-xs font-bold text-zinc-400">Fighter Skin Tone</span>
                         <div class="flex items-center gap-2">
                             ${SKIN_TONES.map(st => `
-                                <button onclick="setUserSkinTone('${st.id}')" title="${st.label}" class="w-6 h-6 rounded-full border-2 transition-transform ${store.data.skinTone === st.id ? 'border-brand-main scale-110' : 'border-zinc-700'}" style="background:${st.base}"></button>
+                                <button onclick="setUserSkinTone('${st.id}')" title="${st.label}" class="w-6 h-6 rounded-full border-2 ${store.data.skinTone === st.id ? 'border-brand-main scale-110' : 'border-zinc-700'}" style="background:${st.base}"></button>
                             `).join('')}
                         </div>
                     </div>
-
-                    <label class="w-full py-3 rounded-full bg-zinc-900 border border-zinc-700 text-xs font-bold text-white flex items-center justify-center gap-2 cursor-pointer">
-                        <i data-lucide="camera" class="w-4 h-4 text-brand-main"></i>
-                        <span>Change Profile Picture</span>
-                        <input type="file" accept="image/*" class="hidden" onchange="handleProfilePicUpload(event)">
-                    </label>
                 </div>
 
-                <!-- Accent Color Switcher -->
+                <!-- Accent Color Theme -->
                 <div class="glass-card rounded-[2rem] p-5 mb-5">
                     <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">Accent Color</h3>
-                    <div class="grid grid-cols-4 gap-2.5">
-                        ${themes.map(t => `
-                            <button onclick="setTheme('${t.id}')" class="py-3 rounded-full border text-xs font-bold flex flex-col items-center gap-1.5 ${store.data.theme === t.id ? 'border-white bg-zinc-900 text-white' : 'border-zinc-800 bg-zinc-950 text-zinc-400'}">
-                                <span class="w-4 h-4 rounded-full" style="background:${t.color}"></span>
+                    <div class="grid grid-cols-4 gap-2">
+                        ${[
+                            { id: 'lemon', label: 'Lemon', dot: '#e0ff33' },
+                            { id: 'purple', label: 'Purple', dot: '#a78bfa' },
+                            { id: 'cyan', label: 'Cyan', dot: '#22d3ee' },
+                            { id: 'rose', label: 'Rose', dot: '#fb7185' }
+                        ].map(t => `
+                            <button onclick="setTheme('${t.id}')" class="py-2.5 px-2 rounded-full border text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${currentTheme === t.id ? 'bg-brand-bg border-brand-main text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-400'}">
+                                <span class="w-2.5 h-2.5 rounded-full" style="background:${t.dot}"></span>
                                 <span>${t.label}</span>
                             </button>
                         `).join('')}
                     </div>
                 </div>
 
-                <!-- 5 Workout Intensity Stages -->
+                <!-- 5-Stage Intensity Level -->
                 <div class="glass-card rounded-[2rem] p-5 mb-5">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Workout Intensity Stage (5 Levels)</h3>
-                    <p class="text-[11px] text-zinc-400 mb-3">Only advance when your current stage feels manageable with clean form. Past workout records remain untouched.</p>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Intensity Stage</h3>
+                    <p class="text-[11px] text-zinc-400 mb-3">Only move up when your current stage feels manageable with clean form. Historical workout records are preserved.</p>
                     <div class="space-y-2">
-                        ${STAGES.map(st => `
-                            <button onclick="setDifficulty('${st.id}')" class="w-full p-3.5 rounded-[1.5rem] border text-left flex items-center justify-between transition-all ${currentDiff === st.id ? 'bg-brand-bg border-brand-main' : 'bg-zinc-900/70 border-zinc-800'}">
+                        ${STAGES.map(s => `
+                            <button onclick="setDifficulty('${s.id}')" class="w-full p-3.5 rounded-[1.5rem] border text-left flex items-center justify-between transition-all ${currentDiff === s.id ? 'bg-brand-bg border-brand-main' : 'bg-zinc-900/70 border-zinc-800'}">
                                 <div>
-                                    <p class="text-sm font-bold text-white">${st.name} <span class="text-[11px] font-normal text-zinc-400">(${st.minWorkouts}+ workouts)</span></p>
-                                    <p class="text-[11px] text-zinc-400">${st.desc}</p>
+                                    <p class="text-xs font-bold text-white">${s.name} <span class="text-zinc-400 font-normal">• ${s.restSec}s rest</span></p>
+                                    <p class="text-[11px] text-zinc-400 mt-0.5">${s.desc}</p>
                                 </div>
-                                ${currentDiff === st.id ? '<span class="text-[11px] font-bold px-3 py-1 rounded-full bg-brand-main text-brand-contrast">Active</span>' : ''}
+                                ${currentDiff === s.id ? '<span class="px-2.5 py-0.5 rounded-full bg-brand-main text-brand-contrast text-[10px] font-extrabold">Active</span>' : ''}
                             </button>
                         `).join('')}
                     </div>
                 </div>
 
-                <!-- Daily 7:00 AM Reminder (iOS Calendar VALARM Sync) -->
+                <!-- 7:00 AM Daily Reminder -->
                 <div class="glass-card rounded-[2rem] p-5 mb-5">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Daily 7:00 AM Reminder</h3>
-                    <p class="text-xs text-zinc-400 mb-3">iOS PWAs cannot send background alarms while closed. Add a recurring 7:00 AM Apple Calendar event with a built-in alert, or set a daily Apple Reminder titled <b>Morning Fitness Check-in</b>.</p>
-                    <button onclick="downloadICS()" class="w-full py-3.5 rounded-full bg-brand-main text-brand-contrast font-bold text-xs shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2">
-                        <i data-lucide="calendar" class="w-4 h-4"></i>
-                        <span>Sync 7:00 AM Alarm to Apple Calendar</span>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">7:00 AM Daily Reminder</h3>
+                    <p class="text-xs text-zinc-300 leading-relaxed mb-3">
+                        Because iOS Safari web apps cannot send reliable background push alerts while closed, download the recurring <b>7:00 AM Calendar Alert (.ics)</b> or add a daily 7:00 AM reminder in Apple Reminders.
+                    </p>
+                    <button onclick="downloadICS()" class="w-full py-3.5 rounded-full bg-brand-main text-brand-contrast font-bold text-xs active:scale-95 transition-transform flex items-center justify-center gap-2">
+                        <i data-lucide="bell" class="w-4 h-4"></i>
+                        <span>Add 7:00 AM Daily Alarm (.ics)</span>
                     </button>
                 </div>
 
                 <!-- Backup & Data Management -->
                 <div class="glass-card rounded-[2rem] p-5 mb-6">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">Backup & Progress Safety</h3>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">Backup &amp; Progress Safety</h3>
                     <div class="space-y-2.5">
+                        <button onclick="openCatchUpModal()" class="w-full py-3.5 rounded-full bg-brand-bg border border-brand-main/40 text-brand-main font-bold text-xs active:scale-95 transition-transform flex items-center justify-center gap-2">
+                            <i data-lucide="history" class="w-4 h-4"></i>
+                            <span>Restore Past Progress (Catch-Up)</span>
+                        </button>
                         <button onclick="exportData()" class="w-full py-3.5 rounded-full bg-zinc-900 border border-zinc-700 text-white font-bold text-xs active:scale-95 transition-transform flex items-center justify-center gap-2">
                             <i data-lucide="upload" class="w-4 h-4 text-brand-main"></i>
                             <span>Export Progress Backup (JSON)</span>
                         </button>
-                        <label class="w-full py-3.5 rounded-full bg-zinc-900 border border-zinc-700 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-transform">
+                        <label class="w-full py-3.5 rounded-full bg-zinc-900 border border-zinc-700 text-white font-bold text-xs active:scale-95 transition-transform flex items-center justify-center gap-2 cursor-pointer">
                             <i data-lucide="download" class="w-4 h-4 text-brand-main"></i>
-                            <span>Import Progress Backup</span>
-                            <input type="file" accept=".json,application/json" class="hidden" onchange="importData(event)">
+                            <span>Import Backup File (.json)</span>
+                            <input type="file" accept=".json,application/json" class="hidden" onchange="importDataFromFile(event)">
                         </label>
-                        <button onclick="resetProgress()" class="w-full py-3.5 rounded-full bg-rose-950/50 border border-rose-900/60 text-rose-400 font-bold text-xs active:scale-95 transition-transform">
+                        <button onclick="openPasteImportModal()" class="w-full py-3 rounded-full bg-zinc-900/60 border border-zinc-800 text-zinc-300 font-bold text-xs active:scale-95 transition-transform">
+                            Paste Backup Text from Notes
+                        </button>
+                        <button onclick="resetProgress()" class="w-full py-3 rounded-full bg-rose-950/40 border border-rose-500/30 text-rose-400 font-bold text-xs active:scale-95 transition-transform mt-2">
                             Reset All Progress
                         </button>
                     </div>
@@ -2668,7 +2736,7 @@
             `;
         }
 
-        // --- 15. REMINDER ICS, EXPORT/IMPORT & CUSTOM MODALS ---
+        // --- 15. REMINDER (.ICS), BACKUP EXPORT/IMPORT & CATCH-UP ---
         function downloadICS() {
             const now = new Date();
             const yyyy = now.getFullYear();
@@ -2679,112 +2747,143 @@
             const icsContent = [
                 'BEGIN:VCALENDAR',
                 'VERSION:2.0',
-                'PRODID:-//Fits//Personal Fitness PWA//EN',
+                'PRODID:-//Fits Personal Fitness//EN',
                 'BEGIN:VEVENT',
                 `UID:fits-daily-7am-${Date.now()}@fits.app`,
-                `DTSTAMP:${yyyy}${mm}${dd}T060000Z`,
+                `DTSTAMP:${yyyy}${mm}${dd}T070000Z`,
                 `DTSTART:${dtStart}`,
                 'DURATION:PT15M',
                 'RRULE:FREQ=DAILY',
-                'SUMMARY:Fits — Morning Fitness Check-in',
+                'SUMMARY:Morning Fitness Check-in (Fits)',
                 'DESCRIPTION:Good morning! It is time to show up for yourself. Let us build strength one day at a time.',
                 'BEGIN:VALARM',
                 'TRIGGER:-PT0M',
                 'ACTION:DISPLAY',
-                'DESCRIPTION:Fits Daily Workout & Reflection Reminder',
+                'DESCRIPTION:Good morning! Time for your Fits workout or recovery check-in.',
                 'END:VALARM',
                 'END:VEVENT',
                 'END:VCALENDAR'
             ].join('\r\n');
 
             const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-            const file = new File([blob], 'fits-7am-reminder.ics', { type: 'text/calendar' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'fits-7am-reminder.ics';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 2000);
 
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                navigator.share({ files: [file], title: 'Fits 7:00 AM Reminder' }).catch(() => {});
-            } else {
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'fits-7am-reminder.ics';
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                URL.revokeObjectURL(url);
-            }
             showInfoModal(
-                "Add to iPhone Calendar",
-                "Open the downloaded 'fits-7am-reminder.ics' file and tap 'Add All' in Apple Calendar to enable your daily 7:00 AM alert."
+                "7:00 AM Calendar Alert Ready",
+                "If iOS prompts you to open the calendar file, tap 'Add All' to save the recurring 7:00 AM alert. Alternatively, open Apple Reminders and create a daily 7:00 AM reminder titled 'Morning Fitness Check-in'."
             );
         }
 
         async function exportData() {
             const jsonStr = JSON.stringify(store.data, null, 2);
             const fileName = `fits-backup-${store.getTodayStr()}.json`;
-            const file = new File([jsonStr], fileName, { type: 'application/json' });
 
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                try {
+            try {
+                const file = new File([jsonStr], fileName, { type: 'application/json' });
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     await navigator.share({
-                        files: [file],
-                        title: 'Fits Progress Backup'
+                        title: 'Fits Progress Backup',
+                        files: [file]
                     });
                     showNotification("Backup shared/saved.");
                     return;
-                } catch (err) {
-                    // User cancelled or share unsupported, fall through to clipboard/download
                 }
+            } catch (e) {
+                if (e && e.name === 'AbortError') return;
             }
 
             try {
-                await navigator.clipboard.writeText(jsonStr);
-                showInfoModal(
-                    "Backup Copied to Clipboard",
-                    "Your complete JSON progress backup has been copied to your clipboard. Paste it into Apple Notes or a file to keep it safe."
-                );
+                if (navigator.share) {
+                    await navigator.share({
+                        title: 'Fits Progress Backup',
+                        text: jsonStr
+                    });
+                    showNotification("Backup text shared.");
+                    return;
+                }
             } catch (e) {
-                const blob = new Blob([jsonStr], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                URL.revokeObjectURL(url);
-                showNotification("Backup file downloaded.");
+                if (e && e.name === 'AbortError') return;
+            }
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(jsonStr).catch(() => {});
+            }
+
+            const dialog = document.getElementById('custom-dialog');
+            dialog.classList.remove('hidden');
+            dialog.classList.add('flex');
+            dialog.innerHTML = `
+                <div class="glass-card bg-zinc-900 border border-zinc-700 rounded-[2rem] p-6 w-full max-w-sm text-left pop-in">
+                    <h3 class="text-lg font-extrabold text-white mb-1">Backup Data (JSON)</h3>
+                    <p class="text-xs text-zinc-400 mb-3">Copied to your clipboard! Paste this into Apple Notes or iCloud Drive so your progress is always safe.</p>
+                    <textarea id="export-json-box" readonly rows="6" class="w-full bg-zinc-950 border border-zinc-800 rounded-2xl p-3 text-[11px] font-mono text-zinc-300 mb-4">${jsonStr}</textarea>
+                    <div class="flex gap-2.5">
+                        <button onclick="copyExportBox()" class="flex-1 py-3 rounded-full bg-brand-main text-brand-contrast font-bold text-xs">Copy Again</button>
+                        <button onclick="closeCustomDialog()" class="flex-1 py-3 rounded-full bg-zinc-800 text-zinc-300 font-bold text-xs">Done</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function copyExportBox() {
+            const box = document.getElementById('export-json-box');
+            if (!box) return;
+            box.select();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(box.value).catch(() => {});
+            }
+            showNotification("Backup copied to clipboard.");
+        }
+
+        function applyImportedJson(rawText) {
+            try {
+                const parsed = JSON.parse(rawText);
+                if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.workouts) || !Array.isArray(parsed.checkIns)) {
+                    showInfoModal("Invalid Backup File", "The selected backup is missing required workout or check-in records. Your existing progress was not changed.");
+                    return;
+                }
+                store.data = Object.assign(JSON.parse(JSON.stringify(defaultState)), parsed);
+                store.save();
+                document.documentElement.className = `theme-${store.data.theme || 'lemon'}`;
+                checkAchievements();
+                closeCustomDialog();
+                router.navigate('home');
+                showNotification("Backup restored successfully!");
+            } catch (err) {
+                showInfoModal("Import Failed", "Could not read that JSON backup. Make sure you pasted the complete backup text without extra characters.");
             }
         }
 
-        function importData(event) {
+        function importDataFromFile(event) {
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const parsed = JSON.parse(e.target.result);
-                    if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.workouts) || !Array.isArray(parsed.checkIns)) {
-                        showInfoModal("Invalid Backup File", "This file does not contain valid Fits progress data. Your existing progress was not touched.");
-                        return;
-                    }
-                    showConfirmModal(
-                        "Restore Backup?",
-                        `Load backup with ${parsed.workouts.length} workout(s) and ${parsed.checkIns.length} reflection(s)?`,
-                        () => {
-                            localStorage.setItem('mfj_data', JSON.stringify(parsed));
-                            store.load();
-                            checkAchievements();
-                            router.navigate('home');
-                            showNotification("Progress backup restored successfully.");
-                        },
-                        "Restore Data"
-                    );
-                } catch (err) {
-                    showInfoModal("Import Failed", "Could not read JSON file. Please make sure you selected a valid backup file.");
-                }
-            };
+            reader.onload = (e) => applyImportedJson(e.target.result);
             reader.readAsText(file);
-            event.target.value = '';
+        }
+
+        function openPasteImportModal() {
+            const dialog = document.getElementById('custom-dialog');
+            dialog.classList.remove('hidden');
+            dialog.classList.add('flex');
+            dialog.innerHTML = `
+                <div class="glass-card bg-zinc-900 border border-zinc-700 rounded-[2rem] p-6 w-full max-w-sm text-left pop-in">
+                    <h3 class="text-lg font-extrabold text-white mb-1">Paste Backup JSON</h3>
+                    <p class="text-xs text-zinc-400 mb-3">Paste the backup text you previously saved in Apple Notes.</p>
+                    <textarea id="import-paste-box" rows="6" placeholder='{"userName":"King", ...}' class="w-full bg-zinc-950 border border-zinc-800 rounded-2xl p-3 text-[11px] font-mono text-white mb-4 outline-none focus:border-brand-main"></textarea>
+                    <div class="flex gap-2.5">
+                        <button onclick="closeCustomDialog()" class="flex-1 py-3 rounded-full bg-zinc-800 text-zinc-300 font-bold text-xs">Cancel</button>
+                        <button onclick="applyImportedJson(document.getElementById('import-paste-box').value)" class="flex-1 py-3 rounded-full bg-brand-main text-brand-contrast font-bold text-xs">Restore</button>
+                    </div>
+                </div>
+            `;
         }
 
         function resetProgress() {
@@ -2801,6 +2900,109 @@
             );
         }
 
+        function openCatchUpModal() {
+            const dialog = document.getElementById('custom-dialog');
+            dialog.classList.remove('hidden');
+            dialog.classList.add('flex');
+            const currentStage = store.data.difficulty || 'easy';
+
+            dialog.innerHTML = `
+                <div class="glass-card bg-zinc-900 border border-zinc-700 rounded-[2rem] p-6 w-full max-w-sm text-left pop-in">
+                    <h3 class="text-lg font-extrabold text-white mb-1 text-center">Restore Past Progress</h3>
+                    <p class="text-xs text-zinc-400 mb-4 text-center">Enter your previous stats up through yesterday so you can pick up right where you left off.</p>
+
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1">Completed Workouts</label>
+                    <input type="number" id="catchup-workouts" value="10" min="0" max="500" class="w-full bg-zinc-950 border border-zinc-700 rounded-full py-2.5 px-4 text-white text-sm font-bold mb-3 focus:border-brand-main outline-none">
+
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1">Consecutive Streak Days (Before Today)</label>
+                    <input type="number" id="catchup-streak" value="13" min="0" max="365" class="w-full bg-zinc-950 border border-zinc-700 rounded-full py-2.5 px-4 text-white text-sm font-bold mb-3 focus:border-brand-main outline-none">
+
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1">Intensity Stage</label>
+                    <select id="catchup-stage" class="w-full bg-zinc-950 border border-zinc-700 rounded-full py-2.5 px-4 text-white text-sm font-bold mb-5 focus:border-brand-main outline-none">
+                        ${STAGES.map(s => `<option value="${s.id}" ${s.id === currentStage ? 'selected' : ''}>${s.name} (${s.minWorkouts}+ workouts)</option>`).join('')}
+                    </select>
+
+                    <div class="flex gap-2.5">
+                        <button onclick="closeCustomDialog()" class="flex-1 py-3.5 rounded-full bg-zinc-800 text-zinc-300 font-bold text-xs">Cancel</button>
+                        <button onclick="applyCatchUpProgress()" class="flex-1 py-3.5 rounded-full bg-brand-main text-brand-contrast font-bold text-xs">Restore Now</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function applyCatchUpProgress() {
+            const workoutsCount = Math.max(0, Math.min(500, parseInt(document.getElementById('catchup-workouts').value, 10) || 0));
+            const streakDays = Math.max(0, Math.min(365, parseInt(document.getElementById('catchup-streak').value, 10) || 0));
+            const stageId = document.getElementById('catchup-stage').value || 'easy';
+
+            const today = new Date();
+            today.setHours(12, 0, 0, 0);
+
+            const restoredCheckIns = [];
+            for (let i = streakDays; i >= 1; i--) {
+                const d = new Date(today);
+                d.setDate(today.getDate() - i);
+                const dateStr = store.getDateStr(d);
+                restoredCheckIns.push({
+                    date: dateStr,
+                    timestamp: d.toISOString(),
+                    activity: true,
+                    water: true,
+                    sleep: true,
+                    energy: true,
+                    notes: 'Restored 2-week journey progress.',
+                    feedback: 'Strong Showing — Progress restored and streak momentum intact.'
+                });
+            }
+
+            const sessionTemplates = [
+                { title: 'Full Body A', type: 'strength', keys: ['squats', 'pushups_incline', 'superman', 'plank'] },
+                { title: 'Cardio & Core', type: 'cardio', keys: ['jogging', 'mountain_climbers'] },
+                { title: 'Full Body B', type: 'strength', keys: ['step_ups', 'pushups_wall', 'bird_dog', 'calf_raises'] },
+                { title: 'Cardio & Recovery', type: 'cardio', keys: ['jogging', 'wall_sit'] },
+                { title: 'Full Body C', type: 'strength', keys: ['squats', 'pushups_standard', 'step_ups', 'plank'] }
+            ];
+
+            const restoredWorkouts = [];
+            const spanDays = Math.max(streakDays, workoutsCount);
+            for (let w = 0; w < workoutsCount; w++) {
+                const daysAgo = Math.max(1, Math.round(((workoutsCount - w) / Math.max(1, workoutsCount)) * spanDays));
+                const d = new Date(today);
+                d.setDate(today.getDate() - daysAgo);
+                const tpl = sessionTemplates[w % sessionTemplates.length];
+
+                restoredWorkouts.push({
+                    date: d.toISOString(),
+                    title: tpl.title,
+                    type: tpl.type,
+                    difficulty: stageId,
+                    exercises: tpl.keys.map(k => {
+                        const ex = EXERCISE_DB[k];
+                        const lvl = ex.levels[stageId] || ex.levels.steady;
+                        return { name: ex.name, sets: lvl.sets, reps: lvl.label };
+                    }),
+                    kudos: 1
+                });
+            }
+
+            store.data.difficulty = stageId;
+            store.data.workouts = restoredWorkouts;
+            store.data.checkIns = restoredCheckIns;
+            store.data.achievements = [];
+            store.data.coins = 150 + (workoutsCount * 50) + (streakDays * 15);
+            store.data.xp = (workoutsCount * 100) + (streakDays * 30);
+
+            store.save();
+            checkAchievements();
+            closeCustomDialog();
+            router.navigate('home');
+            showNotification(`Restored ${workoutsCount} workouts &amp; ${streakDays}-day streak! Log today for Day ${streakDays + 1}.`);
+        }
+
+        // --- 16. CUSTOM DIALOGS & TOAST NOTIFICATIONS ---
+        let dialogConfirmCallback = null;
+        let dialogPromptCallback = null;
+
         function showInfoModal(title, message) {
             const dialog = document.getElementById('custom-dialog');
             dialog.classList.remove('hidden');
@@ -2815,6 +3017,7 @@
         }
 
         function showConfirmModal(title, message, onConfirm, confirmLabel = "Confirm") {
+            dialogConfirmCallback = onConfirm;
             const dialog = document.getElementById('custom-dialog');
             dialog.classList.remove('hidden');
             dialog.classList.add('flex');
@@ -2824,17 +3027,20 @@
                     <p class="text-xs text-zinc-300 leading-relaxed mb-6">${message}</p>
                     <div class="flex gap-2.5">
                         <button onclick="closeCustomDialog()" class="flex-1 py-3.5 rounded-full bg-zinc-800 text-zinc-300 font-bold text-xs">Cancel</button>
-                        <button id="dialog-confirm-btn" class="flex-1 py-3.5 rounded-full bg-brand-main text-brand-contrast font-bold text-xs">${confirmLabel}</button>
+                        <button onclick="executeConfirmCallback()" class="flex-1 py-3.5 rounded-full bg-brand-main text-brand-contrast font-bold text-xs">${confirmLabel}</button>
                     </div>
                 </div>
             `;
-            document.getElementById('dialog-confirm-btn').onclick = () => {
-                closeCustomDialog();
-                onConfirm();
-            };
+        }
+
+        function executeConfirmCallback() {
+            const cb = dialogConfirmCallback;
+            closeCustomDialog();
+            if (typeof cb === 'function') cb();
         }
 
         function showPromptModal(title, message, defaultValue, onSubmit) {
+            dialogPromptCallback = onSubmit;
             const dialog = document.getElementById('custom-dialog');
             dialog.classList.remove('hidden');
             dialog.classList.add('flex');
@@ -2842,18 +3048,21 @@
                 <div class="glass-card bg-zinc-900 border border-zinc-700 rounded-[2rem] p-6 w-full max-w-sm text-center pop-in">
                     <h3 class="text-lg font-extrabold text-white mb-1">${title}</h3>
                     <p class="text-xs text-zinc-400 mb-4">${message}</p>
-                    <input type="text" id="dialog-prompt-input" value="${defaultValue || ''}" class="w-full bg-zinc-950 border border-zinc-700 rounded-full py-3 px-5 text-white text-center text-sm font-bold mb-5 focus:border-brand-main outline-none">
+                    <input type="text" id="custom-prompt-input" value="${defaultValue || ''}" class="w-full bg-zinc-950 border border-zinc-700 rounded-full py-3 px-5 text-white text-center text-sm font-bold mb-5 focus:border-brand-main outline-none">
                     <div class="flex gap-2.5">
                         <button onclick="closeCustomDialog()" class="flex-1 py-3.5 rounded-full bg-zinc-800 text-zinc-300 font-bold text-xs">Cancel</button>
-                        <button id="dialog-prompt-btn" class="flex-1 py-3.5 rounded-full bg-brand-main text-brand-contrast font-bold text-xs">Save</button>
+                        <button onclick="executePromptCallback()" class="flex-1 py-3.5 rounded-full bg-brand-main text-brand-contrast font-bold text-xs">Save</button>
                     </div>
                 </div>
             `;
-            document.getElementById('dialog-prompt-btn').onclick = () => {
-                const val = document.getElementById('dialog-prompt-input').value;
-                closeCustomDialog();
-                onSubmit(val);
-            };
+        }
+
+        function executePromptCallback() {
+            const input = document.getElementById('custom-prompt-input');
+            const val = input ? input.value : '';
+            const cb = dialogPromptCallback;
+            closeCustomDialog();
+            if (typeof cb === 'function') cb(val);
         }
 
         function closeCustomDialog() {
@@ -2862,17 +3071,23 @@
             dialog.classList.remove('flex');
         }
 
-        function showNotification(msg) {
-            const toast = document.createElement('div');
-            toast.className = 'fixed top-12 left-1/2 -translate-x-1/2 bg-brand-main text-brand-contrast px-6 py-3 rounded-full shadow-xl shadow-brand-main/20 z-[120] fade-in font-bold text-xs flex items-center gap-2 max-w-[90%] w-max text-center';
-            toast.innerHTML = msg;
-            document.body.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translate(-50%, -10px)';
-                toast.style.transition = 'all 0.3s';
-                setTimeout(() => toast.remove(), 300);
-            }, 3200);
+        let toastTimeout = null;
+        function showNotification(htmlMessage) {
+            const toast = document.getElementById('toast-banner');
+            if (!toast) return;
+            toast.innerHTML = `
+                <i data-lucide="sparkles" class="w-4 h-4 text-brand-main shrink-0"></i>
+                <span class="truncate">${htmlMessage}</span>
+            `;
+            toast.classList.remove('hidden');
+            toast.classList.add('flex');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('hidden');
+                toast.classList.remove('flex');
+            }, 3400);
         }
     </script>
 </body>
