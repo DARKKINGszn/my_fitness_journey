@@ -110,12 +110,12 @@
             padding-top: calc(env(safe-area-inset-top) + 0.75rem);
         }
         
-        /* Glassmorphism Card Style */
+        /* Clean Native Surface Style */
         .glass-card {
-            background: rgba(24, 24, 27, 0.68);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 1px solid rgba(63, 63, 70, 0.45);
+            background: rgba(24, 24, 27, 0.72);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
         }
 
         /* Floating Pill Liquid Glass Navigation Bar */
@@ -413,29 +413,65 @@
         ];
 
         const MEDALS = [
-            { id: 'first_step', title: 'First Blood', desc: 'Complete your first workout.', reward: 50, icon: 'sword', target: 1, stat: 'workouts' },
-            { id: 'rhythm', title: 'Hat Trick', desc: 'Complete 3 workouts.', reward: 75, icon: 'flame', target: 3, stat: 'workouts' },
-            { id: 'momentum', title: 'Unstoppable Force', desc: 'Complete 5 workouts.', reward: 100, icon: 'zap', target: 5, stat: 'workouts' },
-            { id: 'double_digits', title: 'Double Digits', desc: 'Complete 10 workouts.', reward: 150, icon: 'award', target: 10, stat: 'workouts' },
-            { id: 'consistency_champ', title: 'Iron Will', desc: 'Complete 20 workouts.', reward: 250, icon: 'shield', target: 20, stat: 'workouts' },
-            { id: 'strength_builder', title: 'Spartan 30', desc: 'Complete 30 workouts.', reward: 400, icon: 'crown', target: 30, stat: 'workouts' },
-            { id: 'half_century', title: 'Titan 50', desc: 'Complete 50 workouts.', reward: 600, icon: 'trophy', target: 50, stat: 'workouts' },
-            { id: 'showing_up', title: 'Self-Aware', desc: 'Complete check-ins on 5 different days.', reward: 75, icon: 'eye', target: 5, stat: 'checkins' },
-            { id: 'weekly_commitment', title: 'Clean Sweep', desc: 'Log 3 strength workouts in one Mon–Sun week.', reward: 150, icon: 'calendar-check', target: 3, stat: 'weekly_strength' },
-            { id: 'two_weeks', title: 'Fortnight Warrior', desc: 'Record activity across 14 different days.', reward: 200, icon: 'compass', target: 14, stat: 'active_days' },
-            { id: 'marathon_runner', title: 'Roadrunner', desc: 'Log 3 cardio or jogging sessions.', reward: 100, icon: 'wind', target: 3, stat: 'cardio' },
-            { id: 'hydration_hero', title: 'Hydro Homie', desc: 'Check off water intake on 7 different days.', reward: 100, icon: 'droplets', target: 7, stat: 'water' },
-            { id: 'early_bird', title: 'Morning Discipline', desc: 'Complete a workout or reflection before 9 AM.', reward: 100, icon: 'sunrise', target: 1, stat: 'early' },
-            { id: 'night_owl', title: 'Evening Grinder', desc: 'Log a workout or reflection after 8 PM.', reward: 100, icon: 'moon', target: 1, stat: 'night' },
-            { id: 'weekend_warrior', title: 'Weekend Flow', desc: 'Stay active on both Saturday and Sunday.', reward: 150, icon: 'sun', target: 2, stat: 'weekend' },
-            { id: 'phoenix_rising', title: 'Phoenix Rising', desc: 'Use a Streak Restore to save a lost streak.', reward: 100, icon: 'refresh-cw', target: 1, stat: 'restores_used' },
-            { id: 'anti_procrastinator', title: 'Beat Resistance', desc: 'Complete a 2-Minute Anti-Procrastination Spark.', reward: 75, icon: 'battery-charging', target: 1, stat: 'micro' },
-            { id: 'fashionista', title: 'Drip Check', desc: 'Equip your first accessory on your Fighter.', reward: 50, icon: 'sparkles', target: 1, stat: 'cosmetic' },
-            { id: 'journal_master', title: 'Mindful Athlete', desc: 'Write personal notes in 5 daily reflections.', reward: 100, icon: 'book-open', target: 5, stat: 'notes' },
-            { id: 'perfect_day', title: 'Quadruple Threat', desc: 'Hit all 4 reflection boxes + a workout in one day.', reward: 150, icon: 'star', target: 1, stat: 'perfect' },
-            { id: 'first_victory', title: 'Arena Rookie', desc: 'Win your first Streak Battle in the Arena.', reward: 75, icon: 'swords', target: 1, stat: 'battles' },
-            { id: 'boss_slayer', title: 'Boss Slayer', desc: 'Win 5 Streak Battles in the Arena.', reward: 150, icon: 'skull', target: 5, stat: 'battles' },
-            { id: 'giant_killer', title: 'Giant Killer', desc: 'Defeat a boss tier higher than your current stage.', reward: 200, icon: 'trophy', target: 1, stat: 'giant' }
+            // Workout Milestones
+            { id: 'first_step', cat: 'workouts', title: 'First Blood', desc: 'Complete your first workout.', reward: 50, icon: 'sword', target: 1, stat: 'workouts' },
+            { id: 'rhythm', cat: 'workouts', title: 'Hat Trick', desc: 'Complete 3 workouts.', reward: 75, icon: 'flame', target: 3, stat: 'workouts' },
+            { id: 'momentum', cat: 'workouts', title: 'Unstoppable Force', desc: 'Complete 5 workouts.', reward: 100, icon: 'zap', target: 5, stat: 'workouts' },
+            { id: 'double_digits', cat: 'workouts', title: 'Double Digits', desc: 'Complete 10 workouts.', reward: 150, icon: 'award', target: 10, stat: 'workouts' },
+            { id: 'consistency_champ', cat: 'workouts', title: 'Iron Will', desc: 'Complete 20 workouts.', reward: 250, icon: 'shield', target: 20, stat: 'workouts' },
+            { id: 'strength_builder', cat: 'workouts', title: 'Spartan 30', desc: 'Complete 30 workouts.', reward: 400, icon: 'crown', target: 30, stat: 'workouts' },
+            { id: 'half_century', cat: 'workouts', title: 'Titan 50', desc: 'Complete 50 workouts.', reward: 600, icon: 'trophy', target: 50, stat: 'workouts' },
+            { id: 'workout_75', cat: 'workouts', title: 'Relentless 75', desc: 'Complete 75 workouts.', reward: 850, icon: 'star', target: 75, stat: 'workouts' },
+            { id: 'workout_100', cat: 'workouts', title: 'The Centurion', desc: 'Complete 100 workouts.', reward: 1200, icon: 'crown', target: 100, stat: 'workouts' },
+            { id: 'sets_100', cat: 'workouts', title: 'Century Sets', desc: 'Log 100+ total sets across workouts.', reward: 125, icon: 'layers', target: 100, stat: 'total_sets' },
+            { id: 'sets_500', cat: 'workouts', title: 'Volume King', desc: 'Log 500+ total sets across workouts.', reward: 350, icon: 'bar-chart-2', target: 500, stat: 'total_sets' },
+            { id: 'kudos_10', cat: 'workouts', title: 'Crowd Favorite', desc: 'Collect 10+ total kudos on sessions.', reward: 90, icon: 'thumbs-up', target: 10, stat: 'total_kudos' },
+
+            // Streak Milestones
+            { id: 'streak_3', cat: 'streaks', title: '3-Day Spark', desc: 'Reach a 3-day active streak.', reward: 60, icon: 'flame', target: 3, stat: 'best_streak' },
+            { id: 'streak_7', cat: 'streaks', title: 'Full Week Streak', desc: 'Maintain a 7-day active streak.', reward: 120, icon: 'flame', target: 7, stat: 'best_streak' },
+            { id: 'streak_14', cat: 'streaks', title: 'Two Weeks Locked In', desc: 'Maintain a 14-day active streak.', reward: 220, icon: 'flame', target: 14, stat: 'best_streak' },
+            { id: 'streak_21', cat: 'streaks', title: 'Habit Forged', desc: 'Maintain a 21-day active streak.', reward: 320, icon: 'zap', target: 21, stat: 'best_streak' },
+            { id: 'streak_30', cat: 'streaks', title: '30-Day Unbreakable', desc: 'Maintain a 30-day active streak.', reward: 500, icon: 'shield', target: 30, stat: 'best_streak' },
+            { id: 'streak_60', cat: 'streaks', title: '60-Day Machine', desc: 'Maintain a 60-day active streak.', reward: 800, icon: 'crown', target: 60, stat: 'best_streak' },
+            { id: 'streak_100', cat: 'streaks', title: '100-Day Legend', desc: 'Maintain a 100-day active streak.', reward: 1500, icon: 'trophy', target: 100, stat: 'best_streak' },
+            { id: 'phoenix_rising', cat: 'streaks', title: 'Phoenix Rising', desc: 'Use a Streak Restore to save a lost streak.', reward: 100, icon: 'refresh-cw', target: 1, stat: 'restores_used' },
+            { id: 'anti_procrastinator', cat: 'streaks', title: 'Beat Resistance', desc: 'Complete a 2-Minute Spark.', reward: 75, icon: 'battery-charging', target: 1, stat: 'micro' },
+            { id: 'micro_5', cat: 'streaks', title: 'Momentum Hacker', desc: 'Complete 5 Two-Minute Sparks.', reward: 180, icon: 'zap', target: 5, stat: 'micro' },
+
+            // Cardio, Habits & Recovery
+            { id: 'marathon_runner', cat: 'habits', title: 'Roadrunner', desc: 'Log 3 cardio or jogging sessions.', reward: 100, icon: 'wind', target: 3, stat: 'cardio' },
+            { id: 'roadrunner_10', cat: 'habits', title: 'Endurance Engine', desc: 'Log 10 cardio or jogging sessions.', reward: 240, icon: 'activity', target: 10, stat: 'cardio' },
+            { id: 'km_10', cat: 'habits', title: '10K Club', desc: 'Cover 10+ km of outdoor jogging.', reward: 140, icon: 'map-pin', target: 10, stat: 'total_km' },
+            { id: 'km_25', cat: 'habits', title: 'Half-Marathon+ Distance', desc: 'Cover 25+ km of outdoor jogging.', reward: 300, icon: 'compass', target: 25, stat: 'total_km' },
+            { id: 'showing_up', cat: 'habits', title: 'Self-Aware', desc: 'Complete check-ins on 5 different days.', reward: 75, icon: 'eye', target: 5, stat: 'checkins' },
+            { id: 'checkins_15', cat: 'habits', title: 'Consistent Tracker', desc: 'Complete check-ins on 15 different days.', reward: 180, icon: 'check-circle', target: 15, stat: 'checkins' },
+            { id: 'checkins_30', cat: 'habits', title: 'Monthly Reflector', desc: 'Complete check-ins on 30 different days.', reward: 350, icon: 'calendar', target: 30, stat: 'checkins' },
+            { id: 'weekly_commitment', cat: 'habits', title: 'Clean Sweep', desc: 'Log 3 strength workouts in one Mon–Sun week.', reward: 150, icon: 'calendar-check', target: 3, stat: 'weekly_strength' },
+            { id: 'two_weeks', cat: 'habits', title: 'Fortnight Active', desc: 'Record activity across 14 total days.', reward: 200, icon: 'compass', target: 14, stat: 'active_days' },
+            { id: 'hydration_hero', cat: 'habits', title: 'Hydro Homie', desc: 'Check off hydration on 7 different days.', reward: 100, icon: 'droplets', target: 7, stat: 'water' },
+            { id: 'hydration_21', cat: 'habits', title: 'Oceanic Discipline', desc: 'Check off hydration on 21 different days.', reward: 240, icon: 'droplets', target: 21, stat: 'water' },
+            { id: 'sleep_7', cat: 'habits', title: 'Recovery Architect', desc: 'Log solid sleep & rest on 7 days.', reward: 100, icon: 'moon', target: 7, stat: 'sleep' },
+            { id: 'sleep_20', cat: 'habits', title: 'Deep Rest Master', desc: 'Log solid sleep & rest on 20 days.', reward: 240, icon: 'moon', target: 20, stat: 'sleep' },
+            { id: 'energy_10', cat: 'habits', title: 'Body Tuner', desc: 'Log energy & soreness checks on 10 days.', reward: 130, icon: 'heart-pulse', target: 10, stat: 'energy' },
+            { id: 'early_bird', cat: 'habits', title: 'Morning Discipline', desc: 'Log a workout or reflection before 9 AM.', reward: 100, icon: 'sunrise', target: 1, stat: 'early' },
+            { id: 'night_owl', cat: 'habits', title: 'Evening Grinder', desc: 'Log a workout or reflection after 8 PM.', reward: 100, icon: 'moon', target: 1, stat: 'night' },
+            { id: 'weekend_warrior', cat: 'habits', title: 'Weekend Flow', desc: 'Stay active on both Saturday and Sunday.', reward: 150, icon: 'sun', target: 2, stat: 'weekend' },
+            { id: 'journal_master', cat: 'habits', title: 'Mindful Athlete', desc: 'Write notes in 5 daily reflections.', reward: 100, icon: 'book-open', target: 5, stat: 'notes' },
+            { id: 'perfect_day', cat: 'habits', title: 'Quadruple Threat', desc: 'Hit all 4 reflection boxes + a workout in one day.', reward: 150, icon: 'star', target: 1, stat: 'perfect' },
+
+            // Progression, Arena & Style
+            { id: 'stage_steady', cat: 'arena', title: 'Steady Contender', desc: 'Advance to Steady stage or higher.', reward: 120, icon: 'trending-up', target: 2, stat: 'stage_idx' },
+            { id: 'stage_hard', cat: 'arena', title: 'Hardcore Athlete', desc: 'Advance to Hard stage or higher.', reward: 250, icon: 'trending-up', target: 3, stat: 'stage_idx' },
+            { id: 'stage_elite', cat: 'arena', title: 'Apex Tier: Elite', desc: 'Reach the Elite intensity stage.', reward: 500, icon: 'crown', target: 4, stat: 'stage_idx' },
+            { id: 'fashionista', cat: 'arena', title: 'Drip Check', desc: 'Equip your first accessory on your Fighter.', reward: 50, icon: 'sparkles', target: 1, stat: 'cosmetic' },
+            { id: 'wardrobe_4', cat: 'arena', title: 'Style Collector', desc: 'Unlock 4+ wardrobe items in the Studio.', reward: 140, icon: 'shopping-bag', target: 4, stat: 'unlocked_items' },
+            { id: 'wardrobe_10', cat: 'arena', title: 'Iconic Wardrobe', desc: 'Unlock 10+ wardrobe items in the Studio.', reward: 320, icon: 'gem', target: 10, stat: 'unlocked_items' },
+            { id: 'rich_500', cat: 'arena', title: 'Coin Vault', desc: 'Hold 500+ FitCoins in your balance.', reward: 150, icon: 'coins', target: 500, stat: 'coins' },
+            { id: 'first_victory', cat: 'arena', title: 'Arena Rookie', desc: 'Win your first Streak Battle in the Arena.', reward: 75, icon: 'swords', target: 1, stat: 'battles' },
+            { id: 'boss_slayer', cat: 'arena', title: 'Boss Slayer', desc: 'Win 5 Streak Battles in the Arena.', reward: 180, icon: 'skull', target: 5, stat: 'battles' },
+            { id: 'arena_15', cat: 'arena', title: 'Arena Legend', desc: 'Win 15 Streak Battles in the Arena.', reward: 400, icon: 'trophy', target: 15, stat: 'battles' },
+            { id: 'giant_killer', cat: 'arena', title: 'Giant Killer', desc: 'Defeat a boss tier higher than your current stage.', reward: 200, icon: 'trophy', target: 1, stat: 'giant' }
         ];
 
         const PET_SHOP = {
@@ -706,10 +742,12 @@
         }
 
         // --- 4. EXPRESSIVE BITMOJI-STYLE FIGHTER AVATAR RENDERER ---
-        function renderFighterSvg(size = 136) {
+        function renderFighterSvg(size = 136, previewOverrides = null) {
             const gender = store.data.gender || 'male';
             const stage = store.data.difficulty || 'steady';
-            const pet = store.data.pet || defaultState.pet;
+            const basePet = store.data.pet || defaultState.pet;
+            const pet = previewOverrides ? Object.assign({}, basePet, previewOverrides) : basePet;
+
             const speciesObj = PET_SHOP.species.find(s => s.id === pet.species) || PET_SHOP.species[0];
             const skinObj = SKIN_TONES.find(s => s.id === store.data.skinTone) || SKIN_TONES[2];
 
@@ -717,157 +755,227 @@
             const secondary = speciesObj.secondary;
             const skin = skinObj.base;
             const skinShade = skinObj.shade;
+            const uid = `${size}_${Math.random().toString(36).slice(2, 7)}`;
 
             const builds = {
-                starter: { shoulderW: 44, chestW: 36, waistW: 28, armW: 9, legW: 11, muscleLines: false },
-                easy:    { shoulderW: 50, chestW: 40, waistW: 28, armW: 11, legW: 13, muscleLines: false },
-                steady:  { shoulderW: 56, chestW: 45, waistW: 27, armW: 13, legW: 15, muscleLines: true },
-                hard:    { shoulderW: 62, chestW: 50, waistW: 27, armW: 15, legW: 17, muscleLines: true },
-                elite:   { shoulderW: 68, chestW: 55, waistW: 28, armW: 17, legW: 19, muscleLines: true }
+                starter: { shoulderW: 48, chestW: 38, waistW: 30, armTop: 10, armBot: 8, legTop: 13, legBot: 10, muscleLines: false },
+                easy:    { shoulderW: 54, chestW: 43, waistW: 30, armTop: 12, armBot: 9.5, legTop: 14.5, legBot: 11, muscleLines: false },
+                steady:  { shoulderW: 60, chestW: 48, waistW: 29, armTop: 14, armBot: 11, legTop: 16, legBot: 12, muscleLines: true },
+                hard:    { shoulderW: 66, chestW: 53, waistW: 29, armTop: 16, armBot: 12.5, legTop: 17.5, legBot: 13, muscleLines: true },
+                elite:   { shoulderW: 72, chestW: 58, waistW: 30, armTop: 18, armBot: 14, legTop: 19, legBot: 14, muscleLines: true }
             };
             const b = builds[stage] || builds.steady;
             const cx = 100;
 
+            const eyeColors = { fair: '#4b6b88', light: '#5c4033', medium: '#4a2e1b', tan: '#362011', deep: '#241409' };
+            const irisColor = eyeColors[skinObj.id] || '#4a2e1b';
+
             let auraSvg = '';
             if (pet.aura === 'flame') {
-                auraSvg = `<circle cx="100" cy="106" r="82" fill="none" stroke="#fb923c" stroke-width="3" stroke-dasharray="10 6" opacity="0.75"/>
-                           <circle cx="100" cy="106" r="72" fill="#fb923c" opacity="0.09"/>`;
+                auraSvg = `<circle cx="100" cy="106" r="84" fill="url(#auraFlame_${uid})"/>
+                           <circle cx="100" cy="106" r="82" fill="none" stroke="#fb923c" stroke-width="2.5" stroke-dasharray="12 6" opacity="0.75"/>`;
             } else if (pet.aura === 'lightning') {
-                auraSvg = `<circle cx="100" cy="106" r="82" fill="none" stroke="#22d3ee" stroke-width="3" stroke-dasharray="6 4" opacity="0.85"/>
-                           <path d="M32 62 L46 78 L36 84 L50 104 M168 62 L154 78 L164 84 L150 104" stroke="#22d3ee" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+                auraSvg = `<circle cx="100" cy="106" r="84" fill="url(#auraVolt_${uid})"/>
+                           <path d="M28 64 L44 80 L34 86 L48 106 M172 64 L156 80 L166 86 L152 106" stroke="#22d3ee" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
             } else if (pet.aura === 'stars') {
-                auraSvg = `<circle cx="100" cy="106" r="82" fill="none" stroke="#a78bfa" stroke-width="2.5" opacity="0.8"/>
-                           <circle cx="38" cy="50" r="3" fill="#e0ff33"/><circle cx="162" cy="54" r="3.5" fill="#e0ff33"/>
-                           <circle cx="34" cy="136" r="2.5" fill="#a78bfa"/><circle cx="166" cy="132" r="3" fill="#a78bfa"/>`;
+                auraSvg = `<circle cx="100" cy="106" r="84" fill="url(#auraCosmic_${uid})"/>
+                           <circle cx="36" cy="48" r="3" fill="#e0ff33"/><circle cx="164" cy="52" r="3.5" fill="#e0ff33"/>
+                           <circle cx="33" cy="138" r="2.5" fill="#a78bfa"/><circle cx="167" cy="134" r="3" fill="#a78bfa"/>`;
             }
 
             const capeSvg = pet.gear === 'cape'
-                ? `<path d="M${cx - b.shoulderW/2 - 2} 88 L${cx - b.shoulderW/2 - 20} 174 L${cx + b.shoulderW/2 + 20} 174 L${cx + b.shoulderW/2 + 2} 88 Z" fill="${secondary}" opacity="0.8"/>`
+                ? `<path d="M${cx - b.shoulderW/2 - 2} 92 Q${cx - b.shoulderW/2 - 16} 135 ${cx - b.shoulderW/2 - 22} 178 L${cx + b.shoulderW/2 + 22} 178 Q${cx + b.shoulderW/2 + 16} 135 ${cx + b.shoulderW/2 + 2} 92 Z" fill="url(#outfitGrad_${uid})" opacity="0.88"/>`
                 : '';
 
+            // Natural layered Bitmoji hairstyle (back volume)
             const backHairSvg = gender === 'female'
-                ? `<path d="M120 38 Q148 30 144 68 Q134 62 123 50 Z" fill="#18181b"/>
-                   <path d="M124 41 Q141 37 139 61" stroke="#3f3f46" stroke-width="2" fill="none" stroke-linecap="round"/>
-                   <rect x="118" y="37" width="6" height="9" rx="3" fill="${primary}"/>`
-                : '';
+                ? `<path d="M70 50 C66 64, 70 84, 78 90 C76 74, 76 62, 78 52 Z" fill="url(#hairGrad_${uid})"/>
+                   <path d="M130 50 C134 64, 130 84, 122 90 C124 74, 124 62, 122 52 Z" fill="url(#hairGrad_${uid})"/>
+                   <path d="M123 36 C149 28, 152 58, 141 72 C133 63, 127 53, 123 45 Z" fill="url(#hairGrad_${uid})"/>
+                   <rect x="120" y="36" width="6" height="9" rx="3" fill="${primary}"/>`
+                : `<path d="M71 45 C70 35, 75 29, 79 27 L77 52 L72 52 Z" fill="url(#hairGrad_${uid})"/>
+                   <path d="M129 45 C130 35, 125 29, 121 27 L123 52 L128 52 Z" fill="url(#hairGrad_${uid})"/>`;
 
-            const torsoPath = `M${cx - b.shoulderW/2} 86 Q${cx} 82 ${cx + b.shoulderW/2} 86 L${cx + b.waistW/2} 134 L${cx - b.waistW/2} 134 Z`;
+            // Sculpted Torso & Sportswear
+            const torsoPath = `M${cx - b.shoulderW/2} 91 Q${cx} 86 ${cx + b.shoulderW/2} 91 L${cx + b.waistW/2 + 2} 136 L${cx - b.waistW/2 - 2} 136 Z`;
             const outfitSvg = gender === 'female'
-                ? `<path d="M${cx - b.chestW/2 + 1} 86 L${cx - 10} 86 L${cx} 93 L${cx + 10} 86 L${cx + b.chestW/2 - 1} 86 L${cx + b.chestW/2 - 4} 110 L${cx - b.chestW/2 + 4} 110 Z" fill="${primary}"/>
-                   <path d="M${cx - b.chestW/2 + 4} 107 L${cx + b.chestW/2 - 4} 107 L${cx + b.chestW/2 - 4} 111 L${cx - b.chestW/2 + 4} 111 Z" fill="#18181b" opacity="0.35"/>
-                   <path d="M${cx - b.waistW/2 - 2} 127 L${cx + b.waistW/2 + 2} 127 L${cx + b.waistW/2 + 5} 147 L${cx + 2} 147 L${cx} 141 L${cx - 2} 147 L${cx - b.waistW/2 - 5} 147 Z" fill="#18181b"/>
-                   <line x1="${cx - b.waistW/2 - 2}" y1="130" x2="${cx + b.waistW/2 + 2}" y2="130" stroke="${primary}" stroke-width="2"/>`
-                : `<path d="M${cx - b.shoulderW/2 + 2} 86 L${cx - 11} 86 Q${cx} 95 ${cx + 11} 86 L${cx + b.shoulderW/2 - 2} 86 L${cx + b.waistW/2} 128 L${cx - b.waistW/2} 128 Z" fill="#18181b"/>
-                   <path d="M${cx - b.chestW/3} 96 L${cx + b.chestW/3} 96" stroke="${primary}" stroke-width="2.5" stroke-linecap="round" opacity="0.85"/>
-                   <path d="M${cx - b.waistW/2 - 2} 126 L${cx + b.waistW/2 + 2} 126 L${cx + b.waistW/2 + 5} 150 L${cx + 2} 150 L${cx} 143 L${cx - 2} 150 L${cx - b.waistW/2 - 5} 150 Z" fill="${primary}"/>`;
+                ? `<path d="M${cx - b.chestW/2} 90 L${cx - 11} 90 Q${cx} 98 ${cx + 11} 90 L${cx + b.chestW/2} 90 L${cx + b.chestW/2 - 3} 113 L${cx - b.chestW/2 + 3} 113 Z" fill="url(#outfitGrad_${uid})"/>
+                   <path d="M${cx - b.chestW/2 + 3} 110 L${cx + b.chestW/2 - 3} 110 L${cx + b.chestW/2 - 3} 114 L${cx - b.chestW/2 + 3} 114 Z" fill="#09090b" opacity="0.4"/>
+                   <path d="M${cx - b.waistW/2 - 2} 129 L${cx + b.waistW/2 + 2} 129 L${cx + b.waistW/2 + 6} 150 L${cx + 2} 150 L${cx} 143 L${cx - 2} 150 L${cx - b.waistW/2 - 6} 150 Z" fill="#18181b"/>
+                   <line x1="${cx - b.waistW/2 - 2}" y1="132" x2="${cx + b.waistW/2 + 2}" y2="132" stroke="${primary}" stroke-width="2"/>`
+                : `<path d="M${cx - b.shoulderW/2 + 1} 90 L${cx - 12} 90 Q${cx} 99 ${cx + 12} 90 L${cx + b.shoulderW/2 - 1} 90 L${cx + b.waistW/2 + 1} 131 L${cx - b.waistW/2 - 1} 131 Z" fill="#18181b"/>
+                   <path d="M${cx - 12} 90 Q${cx} 99 ${cx + 12} 90" stroke="#3f3f46" stroke-width="2" fill="none"/>
+                   <path d="M${cx - b.chestW/3} 102 Q${cx} 105 ${cx + b.chestW/3} 102" stroke="${primary}" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.85"/>
+                   <path d="M${cx - b.waistW/2 - 2} 129 L${cx + b.waistW/2 + 2} 129 L${cx + b.waistW/2 + 6} 152 L${cx + 2} 152 L${cx} 145 L${cx - 2} 152 L${cx - b.waistW/2 - 6} 152 Z" fill="url(#outfitGrad_${uid})"/>
+                   <line x1="${cx - 2}" y1="133" x2="${cx - 3}" y2="140" stroke="#f4f4f5" stroke-width="1.4" stroke-linecap="round"/>
+                   <line x1="${cx + 2}" y1="133" x2="${cx + 3}" y2="140" stroke="#f4f4f5" stroke-width="1.4" stroke-linecap="round"/>`;
 
             const muscleSvg = b.muscleLines
-                ? `<line x1="100" y1="101" x2="100" y2="124" stroke="${skinShade}" stroke-width="1.5" opacity="0.55"/>
-                   <path d="M${cx - b.waistW/4} 115 L${cx + b.waistW/4} 115" stroke="${skinShade}" stroke-width="1.3" opacity="0.45"/>`
+                ? `<path d="M${cx - b.waistW/4} 118 Q${cx} 120 ${cx + b.waistW/4} 118" stroke="${skinShade}" stroke-width="1.3" fill="none" opacity="0.45"/>`
                 : '';
 
             const chainSvg = pet.gear === 'chain'
-                ? `<path d="M${cx - 12} 85 Q100 101 ${cx + 12} 85" stroke="#facc15" stroke-width="3.2" fill="none" stroke-linecap="round"/>`
+                ? `<path d="M${cx - 13} 89 Q100 106 ${cx + 13} 89" stroke="#facc15" stroke-width="3" fill="none" stroke-linecap="round"/>
+                   <circle cx="100" cy="99" r="3.2" fill="#facc15" stroke="#a16207" stroke-width="0.8"/>`
                 : '';
 
             const dumbbellSvg = pet.gear === 'dumbbell'
-                ? `<g transform="translate(${cx + b.shoulderW/2 + b.armW - 1}, 130)">
-                     <rect x="-13" y="-3" width="26" height="6" rx="2" fill="#71717a"/>
-                     <rect x="-16" y="-9" width="6" height="18" rx="2" fill="${primary}"/>
-                     <rect x="10" y="-9" width="6" height="18" rx="2" fill="${primary}"/>
+                ? `<g transform="translate(${cx + b.shoulderW/2 + b.armTop - 2}, 136)">
+                     <rect x="-14" y="-3" width="28" height="6" rx="2.5" fill="#71717a"/>
+                     <rect x="-17" y="-9.5" width="6.5" height="19" rx="2.5" fill="${primary}"/>
+                     <rect x="10.5" y="-9.5" width="6.5" height="19" rx="2.5" fill="${primary}"/>
                    </g>`
                 : '';
 
+            // Layered Bitmoji Front Hair
             const frontHairSvg = gender === 'female'
-                ? `<path d="M74 48 Q75 22 100 22 Q125 22 126 48 Q121 34 106 32 Q95 36 74 48 Z" fill="#18181b"/>
-                   <path d="M84 29 Q98 25 113 30" stroke="#3f3f46" stroke-width="2" fill="none" stroke-linecap="round"/>`
-                : `<path d="M74 48 Q73 23 100 21 Q127 23 126 48 Q122 36 114 34 Q100 31 86 34 Q78 36 74 48 Z" fill="#18181b"/>
-                   <path d="M84 28 Q100 24 116 28" stroke="#3f3f46" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+                ? `<path d="M71 49 C71 21, 129 21, 129 49 C125 36, 114 31, 103 33 C93 36, 80 39, 71 49 Z" fill="url(#hairGrad_${uid})"/>
+                   <path d="M84 28 Q100 23 116 29" stroke="#52525b" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.6"/>`
+                : `<path d="M71 48 C70 21, 130 21, 129 48 C125 35, 117 31, 108 31 C96 31, 86 35, 76 34 C73 38, 72 43, 71 48 Z" fill="url(#hairGrad_${uid})"/>
+                   <path d="M84 26 Q100 22 117 27" stroke="#52525b" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"/>`;
+
+            const lashesSvg = gender === 'female'
+                ? `<path d="M82 49 L79.5 47.2 M118 49 L120.5 47.2" stroke="#18181b" stroke-width="1.7" stroke-linecap="round"/>`
+                : '';
 
             let glassesSvg = '';
             if (pet.glasses === 'shades') {
-                glassesSvg = `<rect x="80" y="47" width="17" height="10" rx="3" fill="#09090b" stroke="#27272a" stroke-width="1.2"/>
-                              <rect x="103" y="47" width="17" height="10" rx="3" fill="#09090b" stroke="#27272a" stroke-width="1.2"/>
-                              <line x1="97" y1="50" x2="103" y2="50" stroke="#09090b" stroke-width="2.5"/>
-                              <line x1="83" y1="49" x2="88" y2="54" stroke="#ffffff" stroke-width="1.5" opacity="0.45" stroke-linecap="round"/>
-                              <line x1="106" y1="49" x2="111" y2="54" stroke="#ffffff" stroke-width="1.5" opacity="0.45" stroke-linecap="round"/>`;
+                glassesSvg = `<path d="M77 46 L97 46 L95 57 Q87 59 79 56 Z" fill="#09090b" stroke="#27272a" stroke-width="1.2"/>
+                              <path d="M103 46 L123 46 L121 56 Q113 59 105 57 Z" fill="#09090b" stroke="#27272a" stroke-width="1.2"/>
+                              <line x1="97" y1="48" x2="103" y2="48" stroke="#09090b" stroke-width="2.5"/>
+                              <line x1="81" y1="48" x2="87" y2="54" stroke="#ffffff" stroke-width="1.5" opacity="0.4" stroke-linecap="round"/>
+                              <line x1="107" y1="48" x2="113" y2="54" stroke="#ffffff" stroke-width="1.5" opacity="0.4" stroke-linecap="round"/>`;
             } else if (pet.glasses === 'visor') {
-                glassesSvg = `<rect x="78" y="46" width="44" height="11" rx="5" fill="#22d3ee" opacity="0.85" stroke="#ffffff" stroke-width="1"/>`;
+                glassesSvg = `<path d="M75 45 Q100 43 125 45 L123 56 Q100 59 77 56 Z" fill="#22d3ee" opacity="0.82" stroke="#ffffff" stroke-width="1"/>`;
             } else if (pet.glasses === 'monocle') {
-                glassesSvg = `<circle cx="111" cy="52" r="7.5" fill="none" stroke="#facc15" stroke-width="2"/>
-                              <path d="M118 54 Q123 64 119 72" stroke="#facc15" stroke-width="1.2" fill="none"/>`;
+                glassesSvg = `<circle cx="112" cy="51" r="8" fill="none" stroke="#facc15" stroke-width="2"/>
+                              <path d="M120 53 Q125 64 120 73" stroke="#facc15" stroke-width="1.3" fill="none"/>`;
             }
 
             let hatSvg = '';
             if (pet.hat === 'sweatband') {
-                hatSvg = `<rect x="75" y="36" width="50" height="7" rx="3" fill="${primary}"/>
-                          <line x1="76" y1="39.5" x2="124" y2="39.5" stroke="#18181b" stroke-width="1.5" opacity="0.4"/>`;
+                hatSvg = `<path d="M72 36 Q100 33 128 36 L128 42 Q100 39 72 42 Z" fill="${primary}"/>
+                          <path d="M72 39 Q100 36 128 39" stroke="#09090b" stroke-width="1.4" fill="none" opacity="0.35"/>`;
             } else if (pet.hat === 'cap') {
-                hatSvg = `<path d="M75 38 Q100 18 125 38 Z" fill="${primary}"/>
-                          <rect x="66" y="35" width="22" height="5" rx="2.5" fill="${secondary}"/>`;
+                hatSvg = `<path d="M72 37 C74 17, 126 17, 128 37 Q100 34 72 37 Z" fill="url(#outfitGrad_${uid})"/>
+                          <ellipse cx="100" cy="21" rx="3" ry="1.5" fill="${secondary}"/>
+                          <path d="M62 36 Q78 32 95 36 Q78 39 62 36 Z" fill="${secondary}"/>`;
             } else if (pet.hat === 'crown') {
-                hatSvg = `<path d="M81 31 L81 16 L91 24 L100 13 L109 24 L119 16 L119 31 Z" fill="#facc15" stroke="#ca8a04" stroke-width="1"/>
-                          <circle cx="100" cy="24" r="2" fill="${primary}"/>`;
+                hatSvg = `<path d="M79 30 L79 14 L90 23 L100 11 L110 23 L121 14 L121 30 Z" fill="#facc15" stroke="#a16207" stroke-width="1.1"/>
+                          <circle cx="100" cy="23" r="2.2" fill="${primary}"/>`;
             } else if (pet.hat === 'halo') {
-                hatSvg = `<ellipse cx="100" cy="14" rx="21" ry="5.5" fill="none" stroke="#e0ff33" stroke-width="3"/>`;
+                hatSvg = `<ellipse cx="100" cy="12" rx="22" ry="5.5" fill="none" stroke="#e0ff33" stroke-width="3"/>`;
             }
+
+            const lArmX = cx - b.shoulderW/2 - b.armTop + 5;
+            const rArmX = cx + b.shoulderW/2 - 5;
 
             return `
                 <svg width="${size}" height="${size}" viewBox="0 0 200 200" class="pet-float overflow-visible">
+                    <defs>
+                        <linearGradient id="skinGrad_${uid}" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="${skin}"/>
+                            <stop offset="100%" stop-color="${skinShade}"/>
+                        </linearGradient>
+                        <linearGradient id="hairGrad_${uid}" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#27272a"/>
+                            <stop offset="100%" stop-color="#09090b"/>
+                        </linearGradient>
+                        <linearGradient id="outfitGrad_${uid}" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="${primary}"/>
+                            <stop offset="100%" stop-color="${secondary}"/>
+                        </linearGradient>
+                        <radialGradient id="auraFlame_${uid}" cx="50%" cy="50%" r="50%">
+                            <stop offset="50%" stop-color="#fb923c" stop-opacity="0"/>
+                            <stop offset="100%" stop-color="#fb923c" stop-opacity="0.22"/>
+                        </radialGradient>
+                        <radialGradient id="auraVolt_${uid}" cx="50%" cy="50%" r="50%">
+                            <stop offset="50%" stop-color="#22d3ee" stop-opacity="0"/>
+                            <stop offset="100%" stop-color="#22d3ee" stop-opacity="0.22"/>
+                        </radialGradient>
+                        <radialGradient id="auraCosmic_${uid}" cx="50%" cy="50%" r="50%">
+                            <stop offset="50%" stop-color="#a78bfa" stop-opacity="0"/>
+                            <stop offset="100%" stop-color="#a78bfa" stop-opacity="0.22"/>
+                        </radialGradient>
+                    </defs>
+
+                    <!-- Ground Contact Shadow -->
+                    <ellipse cx="100" cy="191" rx="34" ry="5" fill="#000000" opacity="0.45"/>
+
                     ${auraSvg}
                     ${capeSvg}
                     ${backHairSvg}
 
-                    <!-- Athletic Legs -->
-                    <rect x="${cx - b.waistW/2 + 1}" y="145" width="${b.legW}" height="38" rx="${b.legW/2}" fill="${skin}"/>
-                    <rect x="${cx + b.waistW/2 - b.legW - 1}" y="145" width="${b.legW}" height="38" rx="${b.legW/2}" fill="${skin}"/>
+                    <!-- Tapered Athletic Legs -->
+                    <path d="M${cx - b.waistW/2 + 1} 148 L${cx - b.waistW/2 + b.legTop + 1} 148 L${cx - b.waistW/2 + b.legBot} 182 L${cx - b.waistW/2 + 2} 182 Z" fill="url(#skinGrad_${uid})"/>
+                    <path d="M${cx + b.waistW/2 - b.legTop - 1} 148 L${cx + b.waistW/2 - 1} 148 L${cx + b.waistW/2 - 2} 182 L${cx + b.waistW/2 - b.legBot} 182 Z" fill="url(#skinGrad_${uid})"/>
 
-                    <!-- Stylized Bitmoji Sneakers -->
-                    <rect x="${cx - b.waistW/2 - 3}" y="177" width="${b.legW + 7}" height="11" rx="5" fill="${primary}"/>
-                    <rect x="${cx - b.waistW/2 - 3}" y="185" width="${b.legW + 7}" height="3.5" rx="1.5" fill="#f4f4f5"/>
-                    <rect x="${cx + b.waistW/2 - b.legW - 4}" y="177" width="${b.legW + 7}" height="11" rx="5" fill="${primary}"/>
-                    <rect x="${cx + b.waistW/2 - b.legW - 4}" y="185" width="${b.legW + 7}" height="3.5" rx="1.5" fill="#f4f4f5"/>
+                    <!-- Detailed Athletic Sneakers with Laces -->
+                    <path d="M${cx - b.waistW/2 - 4} 186 Q${cx - b.waistW/2 - 4} 178 ${cx - b.waistW/2 + 4} 178 L${cx - b.waistW/2 + b.legBot + 3} 178 Q${cx - b.waistW/2 + b.legBot + 5} 182 ${cx - b.waistW/2 + b.legBot + 5} 186 Z" fill="url(#outfitGrad_${uid})"/>
+                    <rect x="${cx - b.waistW/2 - 4}" y="185" width="${b.legBot + 9}" height="4" rx="2" fill="#f4f4f5"/>
+                    <line x1="${cx - b.waistW/2 + 2}" y1="180" x2="${cx - b.waistW/2 + 6}" y2="180" stroke="#ffffff" stroke-width="1.3" stroke-linecap="round"/>
 
-                    <!-- Sculpted Arms & Hands -->
-                    <rect x="${cx - b.shoulderW/2 - b.armW + 4}" y="88" width="${b.armW}" height="46" rx="${b.armW/2}" fill="${skin}"/>
-                    <rect x="${cx + b.shoulderW/2 - 4}" y="88" width="${b.armW}" height="46" rx="${b.armW/2}" fill="${skin}"/>
-                    <circle cx="${cx - b.shoulderW/2 - b.armW/2 + 4}" cy="134" r="${b.armW/2 + 1}" fill="${skin}"/>
-                    <circle cx="${cx + b.shoulderW/2 + b.armW/2 - 4}" cy="134" r="${b.armW/2 + 1}" fill="${skin}"/>
+                    <path d="M${cx + b.waistW/2 - b.legBot - 5} 186 Q${cx + b.waistW/2 - b.legBot - 5} 182 ${cx + b.waistW/2 - b.legBot - 3} 178 L${cx + b.waistW/2 - 4} 178 Q${cx + b.waistW/2 + 4} 178 ${cx + b.waistW/2 + 4} 186 Z" fill="url(#outfitGrad_${uid})"/>
+                    <rect x="${cx + b.waistW/2 - b.legBot - 5}" y="185" width="${b.legBot + 9}" height="4" rx="2" fill="#f4f4f5"/>
+                    <line x1="${cx + b.waistW/2 - 6}" y1="180" x2="${cx + b.waistW/2 - 2}" y2="180" stroke="#ffffff" stroke-width="1.3" stroke-linecap="round"/>
+
+                    <!-- Tapered Arms & Sculpted Hands -->
+                    <path d="M${lArmX + 2} 91 Q${lArmX - 3} 112 ${lArmX} 134 L${lArmX + b.armBot} 134 Q${lArmX + b.armTop} 112 ${lArmX + b.armTop} 91 Z" fill="url(#skinGrad_${uid})"/>
+                    <ellipse cx="${lArmX + b.armBot/2}" cy="136" rx="${b.armBot/2 + 1.2}" ry="5" fill="${skin}"/>
+
+                    <path d="M${rArmX} 91 Q${rArmX} 112 ${rArmX + b.armTop - b.armBot} 134 L${rArmX + b.armTop} 134 Q${rArmX + b.armTop + 3} 112 ${rArmX + b.armTop - 2} 91 Z" fill="url(#skinGrad_${uid})"/>
+                    <ellipse cx="${rArmX + b.armTop - b.armBot/2}" cy="136" rx="${b.armBot/2 + 1.2}" ry="5" fill="${skin}"/>
 
                     <!-- Torso & Sportswear -->
-                    <path d="${torsoPath}" fill="${skin}"/>
+                    <path d="${torsoPath}" fill="url(#skinGrad_${uid})"/>
                     ${outfitSvg}
                     ${muscleSvg}
                     ${chainSvg}
 
-                    <!-- Neck with Jaw Shadow -->
-                    <rect x="92" y="72" width="16" height="17" rx="6" fill="${skin}"/>
-                    <path d="M92 75 Q100 81 108 75 L108 80 Q100 85 92 80 Z" fill="${skinShade}" opacity="0.65"/>
+                    <!-- Neck & Jawline Shadow -->
+                    <rect x="91" y="73" width="18" height="19" rx="7" fill="url(#skinGrad_${uid})"/>
+                    <path d="M91 75 Q100 84 109 75 L109 82 Q100 88 91 82 Z" fill="${skinShade}" opacity="0.72"/>
 
-                    <!-- Ears -->
-                    <circle cx="73" cy="53" r="5.5" fill="${skin}"/>
-                    <circle cx="127" cy="53" r="5.5" fill="${skin}"/>
+                    <!-- Ears with Inner Curve -->
+                    <ellipse cx="71" cy="53" rx="4.5" ry="6.5" fill="${skin}"/>
+                    <path d="M71.5 50 Q69.5 53 71.5 56" stroke="${skinShade}" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+                    <ellipse cx="129" cy="53" rx="4.5" ry="6.5" fill="${skin}"/>
+                    <path d="M128.5 50 Q130.5 53 128.5 56" stroke="${skinShade}" stroke-width="1.3" fill="none" stroke-linecap="round"/>
 
-                    <!-- Expressive Bitmoji Head Shape -->
-                    <path d="M74 47 C74 30, 126 30, 126 47 C126 65, 114 76, 100 76 C86 76, 74 65, 74 47 Z" fill="${skin}"/>
+                    <!-- Expressive Bitmoji Head with Tapered Jaw -->
+                    <path d="M72 46 C72 26, 128 26, 128 46 C128 62, 118 76, 100 78 C82 76, 72 62, 72 46 Z" fill="url(#skinGrad_${uid})"/>
+
+                    <!-- Subtle Cheek Warmth -->
+                    <ellipse cx="83" cy="58" rx="4.5" ry="2.5" fill="#e11d48" opacity="0.12"/>
+                    <ellipse cx="117" cy="58" rx="4.5" ry="2.5" fill="#e11d48" opacity="0.12"/>
+
                     ${frontHairSvg}
 
-                    <!-- Expressive Eyebrows -->
-                    <path d="M83 44 Q89 41 95 43.5" stroke="#18181b" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-                    <path d="M105 43.5 Q111 41 117 44" stroke="#18181b" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+                    <!-- Tapered Natural Eyebrows -->
+                    <path d="M81 43.5 Q88 40 95 43" stroke="#18181b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <path d="M105 43 Q112 40 119 43.5" stroke="#18181b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
 
-                    <!-- Large Expressive Eyes with Catchlights -->
-                    <ellipse cx="89" cy="52" rx="4.5" ry="5" fill="#ffffff"/>
-                    <ellipse cx="111" cy="52" rx="4.5" ry="5" fill="#ffffff"/>
-                    <circle cx="89.5" cy="52" r="3" fill="#18181b"/>
-                    <circle cx="110.5" cy="52" r="3" fill="#18181b"/>
-                    <circle cx="88.3" cy="50.7" r="1.1" fill="#ffffff"/>
-                    <circle cx="109.3" cy="50.7" r="1.1" fill="#ffffff"/>
+                    <!-- Expressive Almond Bitmoji Eyes -->
+                    <path d="M82 51 Q88.5 46 95 51 Q88.5 55.5 82 51 Z" fill="#ffffff"/>
+                    <path d="M105 51 Q111.5 46 118 51 Q111.5 55.5 105 51 Z" fill="#ffffff"/>
+                    <circle cx="88.8" cy="51" r="3.4" fill="${irisColor}"/>
+                    <circle cx="111.2" cy="51" r="3.4" fill="${irisColor}"/>
+                    <circle cx="88.8" cy="51" r="1.8" fill="#09090b"/>
+                    <circle cx="111.2" cy="51" r="1.8" fill="#09090b"/>
+                    <circle cx="87.5" cy="49.7" r="1.15" fill="#ffffff"/>
+                    <circle cx="109.9" cy="49.7" r="1.15" fill="#ffffff"/>
+                    <path d="M82 51 Q88.5 46 95 51" stroke="#18181b" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+                    <path d="M105 51 Q111.5 46 118 51" stroke="#18181b" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+                    ${lashesSvg}
 
-                    <!-- Subtle Nose & Confident Bitmoji Grin -->
-                    <path d="M99 54 Q97.5 58 100.5 59" stroke="${skinShade}" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-                    <path d="M92 64 Q100 71 108 64 Z" fill="#ffffff"/>
-                    <path d="M92 64 Q100 71 108 64" stroke="#18181b" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                    <!-- Sculpted Nose Bridge & Tip -->
+                    <path d="M100 49 L98.5 57.5 Q100.5 59.5 102.5 58" stroke="${skinShade}" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+
+                    <!-- Expressive Bitmoji Smile -->
+                    <path d="M91 64.5 Q100 66.5 109 64.5 Q106.5 72 100 72 Q93.5 72 91 64.5 Z" fill="#ffffff"/>
+                    <path d="M91 64.5 Q100 66.5 109 64.5" stroke="#18181b" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+                    <path d="M93.5 68.5 Q100 72.5 106.5 68.5" stroke="#18181b" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+                    <path d="M96.5 73.5 Q100 75 103.5 73.5" stroke="${skinShade}" stroke-width="1.4" fill="none" stroke-linecap="round"/>
 
                     ${glassesSvg}
                     ${hatSvg}
@@ -1153,21 +1261,68 @@
         }
 
         // --- 8. ACHIEVEMENTS ENGINE ---
+        function getBestStreak() {
+            const dates = Array.from(getAllActiveDatesSet()).sort();
+            if (dates.length === 0) return 0;
+            let best = 1;
+            let run = 1;
+            for (let i = 1; i < dates.length; i++) {
+                const [y1, m1, d1] = dates[i - 1].split('-').map(Number);
+                const [y2, m2, d2] = dates[i].split('-').map(Number);
+                const prev = new Date(y1, m1 - 1, d1);
+                const curr = new Date(y2, m2 - 1, d2);
+                const diffDays = Math.round((curr - prev) / (1000 * 60 * 60 * 24));
+                if (diffDays === 1) {
+                    run++;
+                    if (run > best) best = run;
+                } else if (diffDays > 1) {
+                    run = 1;
+                }
+            }
+            return Math.max(best, getStreakInfo().current);
+        }
+
         function getMedalProgress(medal) {
             const workouts = store.data.workouts;
             const checkIns = store.data.checkIns;
             const activeDays = getAllActiveDatesSet().size;
 
             if (medal.stat === 'workouts') return workouts.length;
+            if (medal.stat === 'best_streak') return getBestStreak();
+            if (medal.stat === 'total_sets') {
+                return workouts.reduce((sum, w) => sum + (w.exercises || []).reduce((s, e) => s + (e.sets || 1), 0), 0);
+            }
+            if (medal.stat === 'total_kudos') {
+                return workouts.reduce((sum, w) => sum + (w.kudos || 1), 0);
+            }
+            if (medal.stat === 'total_km') {
+                let km = 0;
+                workouts.forEach(w => {
+                    (w.exercises || []).forEach(e => {
+                        if (e.name && e.name.toLowerCase().includes('jogging') && e.reps) {
+                            const match = String(e.reps).match(/([\d.]+)\s*km/i);
+                            if (match) km += parseFloat(match[1]);
+                        }
+                    });
+                });
+                return Math.floor(km);
+            }
             if (medal.stat === 'checkins') return new Set(checkIns.map(c => c.date.slice(0, 10))).size;
             if (medal.stat === 'active_days') return activeDays;
             if (medal.stat === 'cardio') return workouts.filter(w => w.type === 'cardio').length;
             if (medal.stat === 'water') return new Set(checkIns.filter(c => c.water).map(c => c.date.slice(0, 10))).size;
+            if (medal.stat === 'sleep') return new Set(checkIns.filter(c => c.sleep).map(c => c.date.slice(0, 10))).size;
+            if (medal.stat === 'energy') return new Set(checkIns.filter(c => c.energy).map(c => c.date.slice(0, 10))).size;
             if (medal.stat === 'notes') return checkIns.filter(c => c.notes && c.notes.trim().length > 0).length;
             if (medal.stat === 'restores_used') return Math.max(0, 3 - (store.data.streakRestores ?? 3));
             if (medal.stat === 'micro') return store.data.microWorkouts || 0;
             if (medal.stat === 'battles') return store.data.battlesWon || 0;
             if (medal.stat === 'giant') return store.data.giantKilled ? 1 : 0;
+            if (medal.stat === 'stage_idx') return Math.max(0, STAGES.findIndex(s => s.id === store.data.difficulty));
+            if (medal.stat === 'coins') return store.data.coins || 0;
+            if (medal.stat === 'unlocked_items') {
+                return (store.data.pet.unlocked || []).filter(k => !k.endsWith(':none') && k !== 'species:dragon').length;
+            }
 
             if (medal.stat === 'weekly_strength') {
                 const weekCounts = {};
@@ -1216,30 +1371,95 @@
         }
 
         function checkAchievements() {
-            let newlyUnlocked = [];
+            if (!Array.isArray(store.data.achievements)) store.data.achievements = [];
+            const newlyUnlocked = [];
+
             MEDALS.forEach(medal => {
                 const alreadyUnlocked = store.data.achievements.some(a => a.id === medal.id);
-                if (!alreadyUnlocked) {
-                    const currentVal = getMedalProgress(medal);
-                    if (currentVal >= medal.target) {
-                        store.data.achievements.push({
-                            id: medal.id,
-                            date: new Date().toISOString()
-                        });
-                        store.data.coins = (store.data.coins || 0) + medal.reward;
-                        newlyUnlocked.push(medal);
-                    }
+                if (!alreadyUnlocked && getMedalProgress(medal) >= medal.target) {
+                    store.data.achievements.push({
+                        id: medal.id,
+                        unlockedAt: new Date().toISOString()
+                    });
+                    store.data.coins = (store.data.coins || 0) + (medal.reward || 0);
+                    newlyUnlocked.push(medal);
                 }
             });
 
             if (newlyUnlocked.length > 0) {
                 store.save();
-                const first = newlyUnlocked[0];
-                showNotification(`Medal Unlocked: <b>${first.title}</b> (+${first.reward} Coins)`);
+                const latest = newlyUnlocked[newlyUnlocked.length - 1];
+                const totalReward = newlyUnlocked.reduce((sum, m) => sum + (m.reward || 0), 0);
+                const msg = newlyUnlocked.length === 1
+                    ? `Medal Unlocked: ${latest.title} (+${totalReward} Coins)`
+                    : `${newlyUnlocked.length} Medals Unlocked (+${totalReward} Coins)`;
+                setTimeout(() => showNotification(msg), 350);
             }
         }
 
-        // --- 9. FIGHTER STUDIO & WARDROBE ---
+        // --- 9. FIGHTER STUDIO & WARDROBE (WITH LIVE PREVIEW) ---
+        let studioPreview = {};
+
+        function getActivePreviewOverrides() {
+            const overrides = {};
+            Object.keys(studioPreview).forEach(cat => {
+                if (studioPreview[cat]) overrides[cat] = studioPreview[cat];
+            });
+            return Object.keys(overrides).length > 0 ? overrides : null;
+        }
+
+        function getPreviewedLockedItems() {
+            const list = [];
+            Object.keys(studioPreview).forEach(cat => {
+                const itemId = studioPreview[cat];
+                if (!itemId) return;
+                const item = (PET_SHOP[cat] || []).find(i => i.id === itemId);
+                const key = `${cat}:${itemId}`;
+                if (item && item.cost > 0 && !store.data.pet.unlocked.includes(key)) {
+                    list.push({ category: cat, item });
+                }
+            });
+            return list;
+        }
+
+        function clearStudioPreview(activeTab = 'hat') {
+            studioPreview = {};
+            openPetStudio(activeTab);
+        }
+
+        function purchasePreviewedItems(activeTab = 'hat') {
+            const lockedList = getPreviewedLockedItems();
+            if (lockedList.length === 0) return;
+
+            const totalCost = lockedList.reduce((sum, entry) => sum + entry.item.cost, 0);
+            if ((store.data.coins || 0) < totalCost) {
+                showInfoModal("Not Enough FitCoins", `This previewed look costs ${totalCost} FitCoins, and you currently have ${store.data.coins || 0}. Complete workouts, 2-minute sparks, or win Arena battles to earn more.`);
+                return;
+            }
+
+            const names = lockedList.map(e => e.item.name).join(' + ');
+            showConfirmModal(
+                "Unlock & Equip Look",
+                `Spend ${totalCost} FitCoins to unlock and equip ${names}?`,
+                () => {
+                    store.data.coins -= totalCost;
+                    lockedList.forEach(({ category, item }) => {
+                        const key = `${category}:${item.id}`;
+                        if (!store.data.pet.unlocked.includes(key)) {
+                            store.data.pet.unlocked.push(key);
+                        }
+                        store.data.pet[category] = item.id;
+                    });
+                    studioPreview = {};
+                    store.save();
+                    checkAchievements();
+                    openPetStudio(activeTab);
+                    showNotification(`Unlocked & equipped ${names}!`);
+                },
+                `Buy (${totalCost} Coins)`
+            );
+        }
+
         function openPetStudio(activeTab = 'hat') {
             const overlay = document.getElementById('pet-modal');
             overlay.classList.remove('hidden');
@@ -1248,6 +1468,10 @@
             const pet = store.data.pet;
             const stageObj = STAGES.find(s => s.id === store.data.difficulty) || STAGES[2];
             const stats = getFighterStats();
+            const previewOverrides = getActivePreviewOverrides();
+            const lockedPreviewList = getPreviewedLockedItems();
+            const totalPreviewCost = lockedPreviewList.reduce((sum, e) => sum + e.item.cost, 0);
+
             const tabs = [
                 { id: 'hat', label: 'Headwear' },
                 { id: 'glasses', label: 'Eyewear' },
@@ -1260,17 +1484,34 @@
             (PET_SHOP[activeTab] || []).forEach(item => {
                 const key = `${activeTab}:${item.id}`;
                 const isUnlocked = pet.unlocked.includes(key) || item.cost === 0;
-                const isEquipped = pet[activeTab] === item.id;
+                const isEquipped = pet[activeTab] === item.id && !studioPreview[activeTab];
+                const isPreviewing = studioPreview[activeTab] === item.id;
+
+                let cardStyle = 'glass-card border-zinc-800';
+                let statusBadge = '';
+                let footerText = '';
+
+                if (isPreviewing) {
+                    cardStyle = 'bg-amber-950/30 border-amber-400';
+                    statusBadge = '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-black">Previewing</span>';
+                    footerText = `<span class="text-xs font-bold text-amber-300">${item.cost} Coins • Tap again to remove</span>`;
+                } else if (isEquipped) {
+                    cardStyle = 'bg-brand-bg border-brand-main';
+                    statusBadge = '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-main text-brand-contrast">Equipped</span>';
+                    footerText = '<span class="text-xs font-bold text-zinc-300">Active on Fighter</span>';
+                } else if (isUnlocked) {
+                    footerText = '<span class="text-xs font-bold text-zinc-400">Owned • Tap to Equip</span>';
+                } else {
+                    footerText = `<span class="text-xs font-bold text-brand-main">${item.cost} Coins • Tap to Preview</span>`;
+                }
 
                 itemsHtml += `
-                    <button onclick="buyOrEquipPetItem('${activeTab}', '${item.id}')" class="p-4 rounded-[1.5rem] border text-left flex flex-col justify-between transition-all active:scale-95 ${isEquipped ? 'bg-brand-bg border-brand-main' : 'glass-card border-zinc-800'}">
-                        <div class="flex justify-between items-start mb-2">
+                    <button onclick="buyOrEquipPetItem('${activeTab}', '${item.id}')" class="p-4 rounded-[1.5rem] border text-left flex flex-col justify-between transition-all active:scale-95 ${cardStyle}">
+                        <div class="flex justify-between items-start gap-1.5 mb-2">
                             <span class="text-xs font-bold text-white">${item.name}</span>
-                            ${isEquipped ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-main text-brand-contrast">Equipped</span>' : ''}
+                            ${statusBadge}
                         </div>
-                        <div class="text-xs font-bold ${isUnlocked ? 'text-zinc-400' : 'text-brand-main'}">
-                            ${isEquipped ? 'Active' : isUnlocked ? 'Tap to Equip' : `${item.cost} Coins`}
-                        </div>
+                        <div>${footerText}</div>
                     </button>
                 `;
             });
@@ -1288,7 +1529,7 @@
                 </div>
 
                 <div class="flex-1 overflow-y-auto p-5 hide-scrollbar">
-                    <div class="glass-card rounded-[2rem] p-5 flex flex-col items-center mb-5 relative">
+                    <div class="glass-card rounded-[2rem] p-5 flex flex-col items-center mb-4 relative ${lockedPreviewList.length > 0 ? 'border border-amber-400/50' : ''}">
                         <div class="w-full flex justify-between items-center mb-2">
                             <button onclick="renamePet()" class="flex items-center gap-1.5 text-sm font-bold text-white bg-zinc-900/90 px-3 py-1.5 rounded-full border border-zinc-800">
                                 <span>${pet.name}</span>
@@ -1300,7 +1541,24 @@
                             </div>
                         </div>
 
-                        ${renderFighterSvg(164)}
+                        ${lockedPreviewList.length > 0 ? `
+                            <div class="px-3 py-1 rounded-full bg-amber-400/15 border border-amber-400/40 text-[10px] font-bold text-amber-300 mb-1">
+                                Live Outfit Preview (${lockedPreviewList.map(e => e.item.name).join(', ')})
+                            </div>
+                        ` : ''}
+
+                        ${renderFighterSvg(168, previewOverrides)}
+
+                        ${lockedPreviewList.length > 0 ? `
+                            <div class="flex gap-2 w-full mt-3">
+                                <button onclick="purchasePreviewedItems('${activeTab}')" class="flex-1 py-3 px-4 rounded-full bg-brand-main text-brand-contrast font-bold text-xs shadow-lg active:scale-95 transition-transform">
+                                    Buy & Equip (${totalPreviewCost} Coins)
+                                </button>
+                                <button onclick="clearStudioPreview('${activeTab}')" class="px-4 py-3 rounded-full bg-zinc-900 border border-zinc-700 text-zinc-300 font-bold text-xs active:scale-95 transition-transform">
+                                    Reset
+                                </button>
+                            </div>
+                        ` : ''}
 
                         <!-- Skin Tone Swatches -->
                         <div class="flex items-center gap-2.5 mt-3 mb-1">
@@ -1334,6 +1592,7 @@
         }
 
         function closePetStudio() {
+            studioPreview = {};
             const overlay = document.getElementById('pet-modal');
             overlay.classList.add('hidden');
             overlay.classList.remove('flex');
@@ -1358,25 +1617,20 @@
             const pet = store.data.pet;
 
             if (pet.unlocked.includes(key) || item.cost === 0) {
+                delete studioPreview[category];
                 pet[category] = itemId;
                 store.save();
                 checkAchievements();
                 openPetStudio(category);
                 showNotification(`Equipped ${item.name}.`);
             } else {
-                if ((store.data.coins || 0) < item.cost) {
-                    showInfoModal("Not Enough FitCoins", `You need ${item.cost} FitCoins for ${item.name}. Complete workouts, 2-minute sparks, or win Arena battles to earn more.`);
-                    return;
+                // Toggle live preview before purchase
+                if (studioPreview[category] === itemId) {
+                    delete studioPreview[category];
+                } else {
+                    studioPreview[category] = itemId;
                 }
-                showConfirmModal("Unlock Style Item", `Spend ${item.cost} FitCoins to unlock ${item.name}?`, () => {
-                    store.data.coins -= item.cost;
-                    pet.unlocked.push(key);
-                    pet[category] = itemId;
-                    store.save();
-                    checkAchievements();
-                    openPetStudio(category);
-                    showNotification(`Unlocked & equipped ${item.name}.`);
-                }, `Unlock (${item.cost} Coins)`);
+                openPetStudio(category);
             }
         }
 
@@ -1954,16 +2208,16 @@
             };
 
             const feedbackHtml = existing.feedback
-                ? `<div class="glass-card rounded-[1.5rem] p-4 mb-5 border border-brand-main/40 bg-brand-bg/30">
-                     <p class="text-[11px] font-bold uppercase tracking-wider text-brand-main mb-1">AI Coach Feedback</p>
+                ? `<div class="glass-card rounded-2xl p-4 mb-5 border border-brand-main/30 bg-brand-bg/25">
+                     <p class="text-[11px] font-bold uppercase tracking-wider text-brand-main mb-1">Daily Takeaway</p>
                      <p class="text-xs text-zinc-200 leading-relaxed">${existing.feedback}</p>
                    </div>`
                 : '';
 
             overlay.innerHTML = `
-                <div class="flex justify-between items-center px-5 py-4 border-b border-zinc-800">
+                <div class="flex justify-between items-center px-5 py-4 border-b border-zinc-800/80">
                     <div>
-                        <h3 class="text-lg font-bold text-white">Daily Reflection</h3>
+                        <h3 class="text-lg font-bold text-white">Daily Check-In</h3>
                         <p class="text-xs text-zinc-400">${new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
                     </div>
                     <button onclick="closeCheckIn()" class="p-2 rounded-full bg-zinc-900 text-zinc-400"><i data-lucide="x" class="w-5 h-5"></i></button>
@@ -1971,17 +2225,17 @@
 
                 <div class="flex-1 overflow-y-auto p-5 hide-scrollbar">
                     ${feedbackHtml}
-                    <div class="space-y-3 mb-5">
+                    <div class="space-y-2.5 mb-5">
                         ${[
-                            { id: 'ci-activity', label: "I completed today's planned activity or recovery", checked: existing.activity },
-                            { id: 'ci-water', label: "I drank enough water throughout the day", checked: existing.water },
-                            { id: 'ci-sleep', label: "I made time for adequate sleep & rest", checked: existing.sleep },
-                            { id: 'ci-energy', label: "I checked in with my body and energy levels", checked: existing.energy }
+                            { id: 'ci-activity', label: "Completed today's workout or recovery", checked: existing.activity },
+                            { id: 'ci-water', label: "Stayed well hydrated", checked: existing.water },
+                            { id: 'ci-sleep', label: "Got solid sleep & rest", checked: existing.sleep },
+                            { id: 'ci-energy', label: "Checked in with energy & soreness", checked: existing.energy }
                         ].map(item => `
-                            <label class="custom-checkbox glass-card p-4 rounded-[1.5rem] flex items-center gap-3.5 cursor-pointer">
+                            <label class="custom-checkbox glass-card p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer">
                                 <input type="checkbox" id="${item.id}" class="hidden" ${item.checked ? 'checked' : ''}>
-                                <div class="w-6 h-6 rounded-full border-2 border-zinc-600 flex items-center justify-center shrink-0 transition-colors">
-                                    <svg class="w-3.5 h-3.5 hidden" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                <div class="w-5 h-5 rounded-full border-2 border-zinc-600 flex items-center justify-center shrink-0 transition-colors">
+                                    <svg class="w-3 h-3 hidden" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                                 </div>
                                 <span class="text-sm text-zinc-200 font-medium">${item.label}</span>
                             </label>
@@ -1989,14 +2243,14 @@
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2">Reflection Notes (How did it feel?)</label>
-                        <textarea id="ci-notes" rows="4" placeholder="How was your energy? Which exercise felt strong or challenging?" class="w-full bg-zinc-900 border border-zinc-800 rounded-[1.5rem] p-4 text-sm text-white placeholder-zinc-600 focus:border-brand-main outline-none">${existing.notes || ''}</textarea>
+                        <label class="block text-xs font-semibold text-zinc-400 mb-2">Quick Note (optional)</label>
+                        <textarea id="ci-notes" rows="3" placeholder="How did your body feel today?" class="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-3.5 text-sm text-white placeholder-zinc-600 focus:border-brand-main outline-none">${existing.notes || ''}</textarea>
                     </div>
                 </div>
 
-                <div class="p-5 border-t border-zinc-800 bg-zinc-950">
-                    <button onclick="saveCheckIn('${dateStr}')" class="w-full py-4 rounded-full bg-brand-main text-brand-contrast font-bold text-sm shadow-lg shadow-brand-main/20 active:scale-95 transition-transform">
-                        Save Reflection & Get Coach Feedback
+                <div class="p-5 border-t border-zinc-800/80 bg-zinc-950">
+                    <button onclick="saveCheckIn('${dateStr}')" class="w-full py-3.5 rounded-full bg-brand-main text-brand-contrast font-bold text-sm active:scale-95 transition-transform">
+                        Save Check-In
                     </button>
                 </div>
             `;
@@ -2089,7 +2343,7 @@
             const base = new Date();
             const mondayDate = new Date(base.getFullYear(), base.getMonth(), base.getDate() - base.getDay() + (base.getDay() === 0 ? -6 : 1));
 
-            let html = '<div class="flex justify-between items-center glass-card p-4 rounded-[2rem] mb-5">';
+            let html = '<div class="flex justify-between items-center py-2 px-1 mb-5">';
 
             orderedDays.forEach((dayNum, i) => {
                 const dayDate = new Date(mondayDate.getFullYear(), mondayDate.getMonth(), mondayDate.getDate() + i);
@@ -2100,21 +2354,22 @@
                 const checkInDone = store.data.checkIns.find(c => c.date && c.date.startsWith(dateStr));
                 const isCompleted = workoutDone || (checkInDone && checkInDone.activity) || (store.data.streakBridges || []).includes(dateStr);
 
-                let style = 'bg-zinc-800/80 text-zinc-500 border border-zinc-700/50';
+                let style = 'bg-zinc-900 text-zinc-500 border border-zinc-800';
                 if (isCompleted) {
-                    style = 'bg-brand-main text-brand-contrast shadow-md shadow-brand-main/20 border border-brand-main';
+                    style = 'bg-brand-main text-brand-contrast font-bold';
                 } else if (dateStr < todayDateStr) {
-                    style = 'bg-zinc-950/80 text-zinc-700 border border-zinc-800/50';
+                    style = 'bg-zinc-950 text-zinc-700 border border-zinc-900';
                 } else if (dateStr === todayDateStr) {
-                    style = 'bg-zinc-900 text-brand-main border-2 border-brand-main font-bold shadow-[0_0_10px_var(--brand-main)]';
+                    style = 'bg-zinc-900 text-brand-main border-2 border-brand-main font-bold';
                 } else if (plan.type === 'rest') {
-                    style = 'bg-zinc-900/50 text-zinc-600 border border-zinc-800 border-dashed';
+                    style = 'bg-transparent text-zinc-600 border border-zinc-800/80 border-dashed';
                 }
 
                 html += `
                     <div class="flex flex-col items-center gap-1.5">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-xs ${style} transition-all duration-300">
-                            ${isCompleted ? '<i data-lucide="check" class="w-4 h-4"></i>' : labels[i]}
+                        <span class="text-[10px] font-semibold ${dateStr === todayDateStr ? 'text-brand-main' : 'text-zinc-500'}">${labels[i]}</span>
+                        <div class="w-9 h-9 rounded-full flex items-center justify-center text-xs ${style} transition-all">
+                            ${isCompleted ? '🔥' : dayDate.getDate()}
                         </div>
                     </div>
                 `;
@@ -2128,8 +2383,7 @@
             const hour = now.getHours();
             const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
             const userName = store.data.userName || 'King';
-            const dateDisplay = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
-            const quote = MOTIVATIONAL_QUOTES[now.getDate() % MOTIVATIONAL_QUOTES.length];
+            const dateDisplay = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 
             const todayPlan = SCHEDULE.find(s => s.day === now.getDay());
             const streakInfo = getStreakInfo();
@@ -2141,161 +2395,126 @@
             const todayCheckIn = store.getTodayCheckIn();
 
             const avatarHtml = store.data.profilePic
-                ? `<img src="${store.data.profilePic}" alt="Profile" class="w-12 h-12 rounded-full object-cover border-2 border-brand-main">`
-                : `<div class="w-12 h-12 rounded-full bg-brand-bg border border-brand-main/40 flex items-center justify-center text-brand-main font-extrabold text-base">${userName.charAt(0).toUpperCase()}</div>`;
+                ? `<img src="${store.data.profilePic}" alt="Profile" class="w-10 h-10 rounded-full object-cover border border-zinc-700">`
+                : `<div class="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-brand-main font-bold text-sm">${userName.charAt(0).toUpperCase()}</div>`;
 
             const restoreBanner = streakInfo.canRestore ? `
-                <div class="glass-card rounded-[2rem] p-4 mb-5 border border-amber-500/40 bg-amber-950/20 flex items-center justify-between gap-3">
+                <div class="rounded-2xl p-3.5 mb-4 border border-amber-500/35 bg-amber-950/25 flex items-center justify-between gap-3">
                     <div>
-                        <p class="text-xs font-bold text-amber-300">Lost ${streakInfo.priorStreak}-Day Streak (${streakInfo.missedDays}d gap)</p>
-                        <p class="text-[11px] text-zinc-400 mt-0.5">${store.data.streakRestores}/3 Streak Restores left—never start over.</p>
+                        <p class="text-xs font-bold text-amber-300">🔥 ${streakInfo.priorStreak}-day streak paused</p>
+                        <p class="text-[11px] text-zinc-400">🧊 ${store.data.streakRestores}/3 restores left</p>
                     </div>
-                    <button onclick="useStreakRestore()" class="px-4 py-2.5 rounded-full bg-amber-400 text-black text-xs font-extrabold shrink-0 active:scale-95 transition-transform">
+                    <button onclick="useStreakRestore()" class="px-4 py-2 rounded-full bg-amber-400 text-black text-xs font-bold shrink-0 active:scale-95 transition-transform">
                         Restore
                     </button>
                 </div>
             ` : '';
 
-            const catchUpBanner = (store.data.workouts.length === 0 && store.data.checkIns.length === 0) ? `
-                <div class="glass-card rounded-[2rem] p-4 mb-5 border border-brand-main/40 bg-brand-bg/30 flex items-center justify-between gap-3">
-                    <div>
-                        <p class="text-xs font-bold text-brand-main">Recovering Lost Progress?</p>
-                        <p class="text-[11px] text-zinc-300 mt-0.5">Tap to restore your past workouts &amp; active streak.</p>
-                    </div>
-                    <button onclick="openCatchUpModal()" class="px-4 py-2.5 rounded-full bg-brand-main text-brand-contrast text-xs font-extrabold shrink-0 active:scale-95 transition-transform">
-                        Catch Up
-                    </button>
-                </div>
-            ` : '';
-
-            const nextMedal = MEDALS.find(m => !store.data.achievements.some(a => a.id === m.id));
-            const nextMedalVal = nextMedal ? Math.min(nextMedal.target, getMedalProgress(nextMedal)) : 0;
-            const nextMedalPct = nextMedal ? Math.round((nextMedalVal / nextMedal.target) * 100) : 100;
-
             const stageGoalTarget = nextStage ? nextStage.minWorkouts : stageObj.nextWorkouts;
             const stageGoalPct = Math.min(100, Math.round((store.data.workouts.length / Math.max(1, stageGoalTarget)) * 100));
 
             container.innerHTML = `
-                <!-- Header -->
-                <div class="flex justify-between items-start mb-4">
+                <!-- Top Header -->
+                <div class="flex justify-between items-center mb-4">
                     <div>
-                        <p class="text-xs font-bold uppercase tracking-wider text-brand-main mb-0.5">Fits • ${dateDisplay}</p>
+                        <p class="text-xs font-medium text-zinc-400">${dateDisplay}</p>
                         <h1 class="text-2xl font-extrabold text-white tracking-tight">${greeting}, ${userName}</h1>
-                        <p class="text-xs text-zinc-400 mt-1">${quote}</p>
                     </div>
-                    <button onclick="router.navigate('settings')" class="shrink-0 active:scale-95 transition-transform">
-                        ${avatarHtml}
-                    </button>
-                </div>
-
-                <!-- Status Pills -->
-                <div class="flex items-center gap-2 mb-5 overflow-x-auto hide-scrollbar">
-                    <span class="px-3.5 py-1.5 rounded-full glass-card text-xs font-bold text-white inline-flex items-center gap-1.5 shrink-0">
-                        <i data-lucide="flame" class="w-3.5 h-3.5 text-brand-main"></i>
-                        <span>${streakInfo.current}d Streak</span>
-                    </span>
-                    <span class="px-3.5 py-1.5 rounded-full glass-card text-xs font-bold text-brand-main inline-flex items-center gap-1.5 shrink-0">
-                        <i data-lucide="coins" class="w-3.5 h-3.5"></i>
-                        <span>${store.data.coins || 0}</span>
-                    </span>
-                    <button onclick="router.navigate('settings')" class="px-3.5 py-1.5 rounded-full glass-card text-xs font-bold text-zinc-300 inline-flex items-center gap-1.5 shrink-0">
-                        <i data-lucide="shield" class="w-3.5 h-3.5 text-brand-main"></i>
-                        <span>${stageObj.name}</span>
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button onclick="router.navigate('progress')" class="px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-xs font-bold text-white inline-flex items-center gap-1 active:scale-95 transition-transform">
+                            <span>🔥</span>
+                            <span>${streakInfo.current}</span>
+                        </button>
+                        <button onclick="router.navigate('settings')" class="shrink-0 active:scale-95 transition-transform">
+                            ${avatarHtml}
+                        </button>
+                    </div>
                 </div>
 
                 ${restoreBanner}
-                ${catchUpBanner}
 
-                <!-- Weekly Strip -->
+                <!-- Clean 7-Day Strip -->
                 ${getWeeklyStripHtml()}
 
-                <!-- Bitmoji Streak Fighter Card -->
-                <div class="glass-card rounded-[2rem] p-5 mb-5 flex items-center gap-4">
-                    <div class="shrink-0">${renderFighterSvg(110)}</div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center justify-between gap-2 mb-1">
-                            <span class="text-sm font-extrabold text-white truncate">${store.data.pet.name}</span>
-                            <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-brand-bg text-brand-main shrink-0">${stageObj.name} Build</span>
-                        </div>
-                        <p class="text-[11px] text-zinc-400 mb-2">
-                            ${nextStage ? `${store.data.workouts.length}/${nextStage.minWorkouts} workouts to ${nextStage.name} physique` : 'Peak Elite physique unlocked'}
-                        </p>
-                        <div class="w-full h-2 bg-zinc-900 rounded-full overflow-hidden mb-3">
-                            <div class="h-full bg-brand-main transition-all duration-300" style="width: ${stageGoalPct}%"></div>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="openPetStudio('hat')" class="flex-1 py-2 px-3 rounded-full bg-zinc-900 border border-zinc-700 text-white text-xs font-bold active:scale-95 transition-transform flex items-center justify-center gap-1">
-                                <i data-lucide="shirt" class="w-3.5 h-3.5 text-brand-main"></i>
-                                <span>Studio</span>
-                            </button>
-                            <button onclick="openBattleArena()" class="flex-1 py-2 px-3 rounded-full bg-brand-main text-brand-contrast text-xs font-bold active:scale-95 transition-transform flex items-center justify-center gap-1">
-                                <i data-lucide="swords" class="w-3.5 h-3.5"></i>
-                                <span>Arena</span>
-                            </button>
-                        </div>
+                <!-- Primary Focus Card: Today's Session -->
+                <div class="glass-card rounded-3xl p-5 mb-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-semibold text-brand-main">${todayPlan.name} • ${stageObj.name}</span>
+                        <span class="text-xs font-medium text-zinc-400">${todayPlan.duration}</span>
                     </div>
-                </div>
-
-                <!-- Today's Scheduled Activity Card -->
-                <div class="glass-card rounded-[2rem] p-5 mb-5 border border-brand-main/25">
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-brand-main">Today • ${todayPlan.name}</span>
-                            <h2 class="text-xl font-extrabold text-white mt-0.5">${todayPlan.title}</h2>
-                        </div>
-                        <span class="px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300">${todayPlan.duration}</span>
-                    </div>
-                    <p class="text-xs text-zinc-400 leading-relaxed mb-4">${todayPlan.desc}</p>
+                    <h2 class="text-2xl font-extrabold text-white tracking-tight mb-1">${todayPlan.title}</h2>
+                    <p class="text-xs text-zinc-400 mb-5">${todayPlan.desc}</p>
 
                     ${todayPlan.exercises ? `
-                        <button onclick="startWorkoutSession(${todayPlan.day})" class="w-full py-4 rounded-full bg-brand-main text-brand-contrast font-extrabold text-sm shadow-lg shadow-brand-main/20 active:scale-95 transition-transform flex items-center justify-center gap-2 mb-2.5">
-                            <i data-lucide="${workoutDoneToday ? 'check-circle' : 'play'}" class="w-4 h-4"></i>
-                            <span>${workoutDoneToday ? 'Completed Today • Train Again' : 'Start Workout'}</span>
-                        </button>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button onclick="startFiveSecondLaunch()" class="py-2.5 px-3 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs font-bold active:scale-95 transition-transform">
-                                5-4-3-2-1 Launch
+                        <div class="flex items-center gap-2">
+                            <button onclick="startWorkoutSession(${todayPlan.day})" class="flex-1 py-3.5 px-5 rounded-full bg-brand-main text-brand-contrast font-bold text-sm active:scale-95 transition-transform flex items-center justify-center gap-2">
+                                <i data-lucide="${workoutDoneToday ? 'check' : 'play'}" class="w-4 h-4"></i>
+                                <span>${workoutDoneToday ? 'Done Today' : 'Start Session'}</span>
                             </button>
-                            <button onclick="startMicroWorkout()" class="py-2.5 px-3 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs font-bold active:scale-95 transition-transform">
-                                2-Min Spark
+                            <button onclick="startFiveSecondLaunch()" title="5-Second Countdown" class="py-3.5 px-4 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-200 text-xs font-bold active:scale-95 transition-transform">
+                                5s Go
                             </button>
                         </div>
                     ` : `
-                        <button onclick="openCheckIn('${store.getTodayStr()}')" class="w-full py-4 rounded-full bg-brand-main text-brand-contrast font-extrabold text-sm shadow-lg shadow-brand-main/20 active:scale-95 transition-transform flex items-center justify-center gap-2 mb-2.5">
-                            <i data-lucide="check-square" class="w-4 h-4"></i>
-                            <span>${todayCheckIn && todayCheckIn.activity ? 'Recovery Logged • Edit Reflection' : 'Log Recovery & Activity'}</span>
-                        </button>
-                        <button onclick="startMicroWorkout()" class="w-full py-2.5 px-3 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs font-bold active:scale-95 transition-transform">
-                            Optional 2-Min Momentum Spark
+                        <button onclick="openCheckIn('${store.getTodayStr()}')" class="w-full py-3.5 rounded-full bg-brand-main text-brand-contrast font-bold text-sm active:scale-95 transition-transform">
+                            ${todayCheckIn && todayCheckIn.activity ? 'Recovery Logged ✓' : 'Log Recovery'}
                         </button>
                     `}
                 </div>
 
-                <!-- Daily Reflection & Next Medal -->
-                <div class="grid grid-cols-1 gap-3">
-                    <button onclick="openCheckIn('${store.getTodayStr()}')" class="glass-card rounded-[1.75rem] p-4 text-left flex items-center justify-between gap-3 active:scale-[0.99] transition-transform">
-                        <div class="flex-1 min-w-0">
-                            <p class="text-xs font-bold text-white">Daily Reflection &amp; AI Coach</p>
-                            <p class="text-[11px] text-zinc-400 truncate mt-0.5">
-                                ${todayCheckIn ? (todayCheckIn.feedback || 'Reflection logged for today.') : 'Check in on recovery, hydration, sleep & energy.'}
-                            </p>
+                <!-- 2-Column Bento Grid: Fighter & Daily Check-In -->
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <!-- Fighter Tile -->
+                    <div class="glass-card rounded-3xl p-4 flex flex-col justify-between">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs font-bold text-white truncate">${store.data.pet.name}</span>
+                            <span class="text-[11px] font-bold text-brand-main">🪙 ${store.data.coins || 0}</span>
                         </div>
-                        <span class="px-3 py-1.5 rounded-full ${todayCheckIn ? 'bg-brand-bg text-brand-main' : 'bg-zinc-900 text-zinc-300'} text-[11px] font-bold shrink-0">
-                            ${todayCheckIn ? 'Edit' : 'Check In'}
-                        </span>
-                    </button>
+                        <div class="flex justify-center my-1 cursor-pointer" onclick="openPetStudio('hat')">
+                            ${renderFighterSvg(88)}
+                        </div>
+                        <div class="flex gap-1.5 mt-2">
+                            <button onclick="openPetStudio('hat')" class="flex-1 py-2 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-bold text-zinc-200 active:scale-95 transition-transform">
+                                Style
+                            </button>
+                            <button onclick="openBattleArena()" class="flex-1 py-2 rounded-full bg-brand-bg text-brand-main text-[11px] font-bold active:scale-95 transition-transform">
+                                Arena
+                            </button>
+                        </div>
+                    </div>
 
-                    <button onclick="router.navigate('achievements')" class="glass-card rounded-[1.75rem] p-4 text-left active:scale-[0.99] transition-transform">
-                        <div class="flex justify-between items-center mb-1.5">
-                            <span class="text-xs font-bold text-white">${nextMedal ? `Next Medal: ${nextMedal.title}` : 'All Medals Unlocked!'}</span>
-                            <span class="text-[11px] font-bold text-brand-main">${nextMedal ? `${nextMedalVal}/${nextMedal.target}` : `${MEDALS.length}/${MEDALS.length}`}</span>
-                        </div>
-                        <div class="w-full h-2 bg-zinc-900 rounded-full overflow-hidden">
-                            <div class="h-full bg-brand-main" style="width: ${nextMedalPct}%"></div>
-                        </div>
-                    </button>
+                    <!-- Check-In & Spark Tile -->
+                    <div class="flex flex-col gap-3">
+                        <button onclick="openCheckIn('${store.getTodayStr()}')" class="flex-1 glass-card rounded-3xl p-4 text-left flex flex-col justify-between active:scale-[0.98] transition-transform">
+                            <div class="flex justify-between items-center w-full">
+                                <span class="text-xs font-bold text-white">Check-In</span>
+                                <span class="w-2 h-2 rounded-full ${todayCheckIn ? 'bg-brand-main' : 'bg-zinc-700'}"></span>
+                            </div>
+                            <p class="text-[11px] text-zinc-400 line-clamp-2 mt-2">
+                                ${todayCheckIn ? 'Logged today • Tap to edit' : 'Water, sleep & energy'}
+                            </p>
+                        </button>
+
+                        <button onclick="startMicroWorkout()" class="glass-card rounded-3xl p-4 text-left flex items-center justify-between active:scale-[0.98] transition-transform">
+                            <div>
+                                <p class="text-xs font-bold text-white">⚡ 2-Min Spark</p>
+                                <p class="text-[10px] text-zinc-400">Keep 🔥 alive fast</p>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-zinc-500"></i>
+                        </button>
+                    </div>
                 </div>
+
+                <!-- Slim Next-Stage Progress Strip -->
+                <button onclick="router.navigate('progress')" class="w-full glass-card rounded-2xl p-3.5 text-left active:scale-[0.99] transition-transform">
+                    <div class="flex justify-between items-center text-[11px] mb-1.5">
+                        <span class="font-semibold text-zinc-300">${nextStage ? `Next: ${nextStage.name} Stage` : 'Elite Stage Reached'}</span>
+                        <span class="font-bold text-brand-main">${store.data.workouts.length}/${stageGoalTarget}</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-zinc-900 rounded-full overflow-hidden">
+                        <div class="h-full bg-brand-main" style="width: ${stageGoalPct}%"></div>
+                    </div>
+                </button>
             `;
         }
 
@@ -2306,84 +2525,54 @@
             const todayNum = new Date().getDay();
 
             container.innerHTML = `
-                <div class="flex justify-between items-center mb-5">
-                    <div>
-                        <p class="text-xs font-bold uppercase tracking-wider text-brand-main">Weekly Blueprint</p>
-                        <h1 class="text-2xl font-extrabold text-white">Training Plan</h1>
-                    </div>
-                    <button onclick="openExerciseGuide()" class="px-4 py-2.5 rounded-full bg-brand-bg border border-brand-main/40 text-brand-main text-xs font-bold active:scale-95 transition-transform flex items-center gap-1.5">
-                        <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
-                        <span>Exercise Guide</span>
+                <div class="flex justify-between items-center mb-4">
+                    <h1 class="text-2xl font-extrabold text-white tracking-tight">Weekly Plan</h1>
+                    <button onclick="openExerciseGuide()" class="px-3.5 py-2 rounded-full bg-zinc-900 border border-zinc-800 text-brand-main text-xs font-bold active:scale-95 transition-transform">
+                        Form Guide
                     </button>
                 </div>
 
-                <!-- Stage Selector Bar -->
-                <div class="glass-card rounded-[1.75rem] p-4 mb-5">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-xs font-bold text-zinc-300">Active Intensity Stage</span>
-                        <span class="text-xs font-extrabold text-brand-main">${stageObj.name} (${stageObj.restSec}s rest)</span>
-                    </div>
-                    <div class="flex gap-1.5 overflow-x-auto hide-scrollbar">
-                        ${STAGES.map(s => `
-                            <button onclick="setDifficulty('${s.id}')" class="px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${s.id === diff ? 'bg-brand-main text-brand-contrast' : 'bg-zinc-900 text-zinc-400 border border-zinc-800'}">
-                                ${s.name}
-                            </button>
-                        `).join('')}
-                    </div>
+                <!-- Segmented Stage Pills -->
+                <div class="flex gap-1.5 overflow-x-auto hide-scrollbar mb-5">
+                    ${STAGES.map(s => `
+                        <button onclick="setDifficulty('${s.id}')" class="px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${s.id === diff ? 'bg-brand-main text-brand-contrast' : 'bg-zinc-900 text-zinc-400'}">
+                            ${s.name}
+                        </button>
+                    `).join('')}
                 </div>
 
-                <!-- Anti-Procrastination Quick Launch -->
-                <div class="glass-card rounded-[1.75rem] p-4 mb-5 flex items-center justify-between gap-3">
-                    <div>
-                        <p class="text-xs font-bold text-white">Low Energy or Procrastinating?</p>
-                        <p class="text-[11px] text-zinc-400 mt-0.5">Run a 2-minute micro-routine to keep your streak alive.</p>
-                    </div>
-                    <button onclick="startMicroWorkout()" class="px-4 py-2.5 rounded-full bg-zinc-900 border border-brand-main/40 text-brand-main text-xs font-bold shrink-0 active:scale-95 transition-transform">
-                        2-Min Spark
-                    </button>
-                </div>
-
-                <!-- Monday - Sunday Cards -->
-                <div class="space-y-3">
+                <!-- Clean Schedule List -->
+                <div class="space-y-2.5">
                     ${orderedDays.map(dayNum => {
                         const plan = SCHEDULE.find(s => s.day === dayNum);
                         const isToday = dayNum === todayNum;
-                        const badgeMap = {
-                            strength: 'Strength',
-                            cardio: 'Cardio & Core',
-                            light: 'Weekend Play',
-                            rest: 'Rest Day'
-                        };
 
-                        const exPreview = plan.exercises
+                        const exList = plan.exercises
                             ? plan.exercises.map(k => {
                                 const ex = EXERCISE_DB[k];
                                 const lvl = ex.levels[diff] || ex.levels.steady;
-                                return `<span class="inline-block px-2.5 py-1 rounded-full bg-zinc-900/90 border border-zinc-800 text-[11px] text-zinc-300">${ex.name} • ${lvl.sets}×${lvl.label}</span>`;
-                            }).join(' ')
-                            : '';
+                                return `${ex.name} (${lvl.sets}×${lvl.label})`;
+                            }).join(' • ')
+                            : plan.desc;
 
                         return `
-                            <div class="glass-card rounded-[1.75rem] p-4 ${isToday ? 'border border-brand-main/60' : ''}">
-                                <div class="flex justify-between items-start mb-1.5">
-                                    <div>
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-xs font-extrabold uppercase tracking-wider ${isToday ? 'text-brand-main' : 'text-zinc-400'}">${plan.name}</span>
-                                            ${isToday ? '<span class="px-2 py-0.5 rounded-full bg-brand-main text-brand-contrast text-[10px] font-extrabold">Today</span>' : ''}
-                                        </div>
-                                        <h3 class="text-base font-bold text-white mt-0.5">${plan.title}</h3>
+                            <div class="glass-card rounded-3xl p-4 ${isToday ? 'border border-brand-main/50' : ''}">
+                                <div class="flex justify-between items-center mb-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-bold ${isToday ? 'text-brand-main' : 'text-zinc-400'}">${plan.name}</span>
+                                        ${isToday ? '<span class="w-1.5 h-1.5 rounded-full bg-brand-main"></span>' : ''}
                                     </div>
-                                    <span class="text-[11px] font-bold px-3 py-1 rounded-full bg-zinc-900 text-zinc-300">${badgeMap[plan.type]} • ${plan.duration}</span>
+                                    <span class="text-[11px] text-zinc-500">${plan.duration} • ${stageObj.restSec}s rest</span>
                                 </div>
-                                <p class="text-xs text-zinc-400 mb-3">${plan.desc}</p>
-                                ${exPreview ? `<div class="flex flex-wrap gap-1.5 mb-3">${exPreview}</div>` : ''}
+                                <h3 class="text-base font-bold text-white mb-1">${plan.title}</h3>
+                                <p class="text-xs text-zinc-400 leading-relaxed mb-3">${exList}</p>
                                 ${plan.exercises ? `
-                                    <button onclick="startWorkoutSession(${plan.day})" class="w-full py-3 rounded-full ${isToday ? 'bg-brand-main text-brand-contrast' : 'bg-zinc-900 border border-zinc-700 text-white'} font-bold text-xs active:scale-95 transition-transform">
-                                        Start ${plan.title}
+                                    <button onclick="startWorkoutSession(${plan.day})" class="w-full py-2.5 rounded-full ${isToday ? 'bg-brand-main text-brand-contrast' : 'bg-zinc-900 text-zinc-200'} font-bold text-xs active:scale-95 transition-transform">
+                                        Start
                                     </button>
                                 ` : `
-                                    <button onclick="openCheckIn('${store.getTodayStr()}')" class="w-full py-3 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold text-xs active:scale-95 transition-transform">
-                                        Log Recovery Check-In
+                                    <button onclick="openCheckIn('${store.getTodayStr()}')" class="w-full py-2.5 rounded-full bg-zinc-900 text-zinc-300 font-bold text-xs active:scale-95 transition-transform">
+                                        Log Recovery
                                     </button>
                                 `}
                             </div>
@@ -2398,7 +2587,7 @@
                 store.data.workouts[realIdx].kudos = (store.data.workouts[realIdx].kudos || 1) + 1;
                 store.save();
                 renderView('progress');
-                showNotification("Kudos given!");
+                showNotification("Kudos added!");
             }
         }
 
@@ -2415,7 +2604,6 @@
             const readinessPct = Math.min(100, Math.round((workouts.length / Math.max(1, targetWorkouts)) * 100));
             const readyToLevelUp = nextStage && workouts.length >= nextStage.minWorkouts;
 
-            // Last 28 days heatmap
             const activeSet = getAllActiveDatesSet();
             const workoutDateSet = new Set(workouts.map(w => w.date.slice(0, 10)));
             const today = new Date();
@@ -2428,128 +2616,98 @@
                 const hasW = workoutDateSet.has(dStr);
                 const hasA = activeSet.has(dStr);
                 const cellClass = hasW
-                    ? 'bg-brand-main shadow-sm shadow-brand-main/30'
+                    ? 'bg-brand-main'
                     : hasA
-                        ? 'bg-brand-muted/70 border border-brand-main/40'
-                        : 'bg-zinc-900 border border-zinc-800/80';
+                        ? 'bg-brand-muted/70'
+                        : 'bg-zinc-900';
                 heatmapCells += `<div title="${dStr}" class="heatmap-cell ${cellClass}"></div>`;
             }
 
-            // Recent history feed (workouts + reflections)
-            const recentWorkouts = workouts.map((w, idx) => ({ kind: 'workout', date: w.date, data: w, idx })).reverse().slice(0, 15);
-            const recentCheckIns = [...checkIns].reverse().slice(0, 10);
+            const recentWorkouts = workouts.map((w, idx) => ({ data: w, idx })).reverse().slice(0, 12);
+            const recentCheckIns = [...checkIns].reverse().slice(0, 8);
 
             container.innerHTML = `
-                <div class="mb-5">
-                    <p class="text-xs font-bold uppercase tracking-wider text-brand-main">Analytics &amp; History</p>
-                    <h1 class="text-2xl font-extrabold text-white">Your Progress</h1>
-                </div>
+                <h1 class="text-2xl font-extrabold text-white tracking-tight mb-4">Stats</h1>
 
-                <!-- 4 Key Metrics -->
-                <div class="grid grid-cols-2 gap-3 mb-5">
-                    <div class="glass-card rounded-[1.75rem] p-4">
-                        <p class="text-[11px] font-bold uppercase text-zinc-400">Total Workouts</p>
-                        <p class="text-2xl font-extrabold text-white mt-1">${workouts.length}</p>
+                <!-- Clean 3-Stat Row -->
+                <div class="grid grid-cols-3 gap-2.5 mb-4">
+                    <div class="glass-card rounded-2xl p-3.5 text-center">
+                        <p class="text-[11px] text-zinc-400">Workouts</p>
+                        <p class="text-xl font-extrabold text-white mt-0.5">${workouts.length}</p>
                     </div>
-                    <div class="glass-card rounded-[1.75rem] p-4">
-                        <p class="text-[11px] font-bold uppercase text-zinc-400">Active Streak</p>
-                        <p class="text-2xl font-extrabold text-brand-main mt-1">${streakInfo.current} Days</p>
+                    <div class="glass-card rounded-2xl p-3.5 text-center">
+                        <p class="text-[11px] text-zinc-400">Streak</p>
+                        <p class="text-xl font-extrabold text-brand-main mt-0.5">🔥 ${streakInfo.current}d</p>
                     </div>
-                    <div class="glass-card rounded-[1.75rem] p-4">
-                        <p class="text-[11px] font-bold uppercase text-zinc-400">Active Days</p>
-                        <p class="text-2xl font-extrabold text-white mt-1">${activeDaysCount}</p>
-                    </div>
-                    <div class="glass-card rounded-[1.75rem] p-4">
-                        <p class="text-[11px] font-bold uppercase text-zinc-400">Arena Wins</p>
-                        <p class="text-2xl font-extrabold text-white mt-1">${store.data.battlesWon || 0}</p>
+                    <div class="glass-card rounded-2xl p-3.5 text-center">
+                        <p class="text-[11px] text-zinc-400">Active Days</p>
+                        <p class="text-xl font-extrabold text-white mt-0.5">${activeDaysCount}</p>
                     </div>
                 </div>
 
-                <!-- Intensity Readiness Goal -->
-                <div class="glass-card rounded-[2rem] p-5 mb-5">
-                    <div class="flex justify-between items-center mb-1.5">
-                        <span class="text-xs font-bold uppercase tracking-wider text-zinc-400">Intensity Progression Goal</span>
-                        <span class="text-xs font-extrabold text-brand-main">${stageObj.name}</span>
+                <!-- Stage Readiness -->
+                <div class="glass-card rounded-3xl p-4 mb-4">
+                    <div class="flex justify-between items-center text-xs mb-2">
+                        <span class="font-bold text-white">${nextStage ? `Goal: ${nextStage.name} Stage` : 'Elite Stage'}</span>
+                        <span class="font-bold text-brand-main">${workouts.length}/${targetWorkouts}</span>
                     </div>
-                    <p class="text-xs text-zinc-300 mb-3">
-                        ${nextStage
-                            ? `${workouts.length} of ${nextStage.minWorkouts} workouts completed toward <b>${nextStage.name}</b> intensity.`
-                            : `You have reached the highest <b>Elite</b> intensity tier!`}
-                    </p>
-                    <div class="w-full h-2.5 bg-zinc-900 rounded-full overflow-hidden mb-3">
-                        <div class="h-full bg-brand-main transition-all duration-300" style="width: ${readinessPct}%"></div>
+                    <div class="w-full h-2 bg-zinc-900 rounded-full overflow-hidden">
+                        <div class="h-full bg-brand-main" style="width: ${readinessPct}%"></div>
                     </div>
                     ${readyToLevelUp ? `
-                        <button onclick="setDifficulty('${nextStage.id}')" class="w-full py-3 rounded-full bg-brand-main text-brand-contrast font-bold text-xs active:scale-95 transition-transform">
-                            Ready! Upgrade to ${nextStage.name} Stage
+                        <button onclick="setDifficulty('${nextStage.id}')" class="w-full mt-3 py-2.5 rounded-full bg-brand-main text-brand-contrast font-bold text-xs active:scale-95 transition-transform">
+                            Unlock ${nextStage.name}
                         </button>
                     ` : ''}
                 </div>
 
-                <!-- 28-Day Consistency Heatmap -->
-                <div class="glass-card rounded-[2rem] p-5 mb-5">
+                <!-- 28-Day Heatmap -->
+                <div class="glass-card rounded-3xl p-4 mb-5">
                     <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400">Last 28 Days Consistency</h3>
-                        <div class="flex items-center gap-2 text-[10px] text-zinc-400">
-                            <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-brand-main inline-block"></span>Workout</span>
-                            <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-brand-muted/70 inline-block"></span>Recovery</span>
-                        </div>
+                        <span class="text-xs font-bold text-zinc-300">28-Day Activity</span>
+                        <span class="text-[10px] text-zinc-500">🧊 ${store.data.streakRestores}/3 restores</span>
                     </div>
                     <div class="heatmap-grid">${heatmapCells}</div>
                 </div>
 
-                <!-- Activity Feed -->
-                <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">Completed Workouts</h3>
-                <div class="space-y-3 mb-6">
+                <!-- Recent Sessions -->
+                <h3 class="text-xs font-bold text-zinc-400 mb-2.5 px-1">Recent Sessions</h3>
+                <div class="space-y-2.5 mb-5">
                     ${recentWorkouts.length === 0
-                        ? `<div class="glass-card rounded-[1.75rem] p-5 text-center text-xs text-zinc-400">No workouts logged yet. Complete your first session to build your feed!</div>`
+                        ? `<div class="glass-card rounded-2xl p-4 text-center text-xs text-zinc-500">No workouts logged yet.</div>`
                         : recentWorkouts.map(item => {
                             const w = item.data;
-                            const dLabel = new Date(w.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                            const exList = (w.exercises || []).map(e => `${e.name} (${e.sets}×${e.reps})`).join(' • ');
+                            const dLabel = new Date(w.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                             return `
-                                <div class="glass-card rounded-[1.75rem] p-4">
-                                    <div class="flex justify-between items-start mb-1.5">
-                                        <div>
-                                            <span class="text-[11px] text-zinc-400">${dLabel}</span>
-                                            <h4 class="text-sm font-bold text-white">${w.title}</h4>
-                                        </div>
-                                        <span class="px-2.5 py-0.5 rounded-full bg-brand-bg text-brand-main text-[10px] font-bold uppercase">${w.difficulty || 'steady'}</span>
+                                <div class="glass-card rounded-2xl p-3.5 flex items-center justify-between gap-3">
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-bold text-white truncate">${w.title}</p>
+                                        <p class="text-[11px] text-zinc-400">${dLabel} • ${(w.difficulty || 'steady').toUpperCase()}</p>
                                     </div>
-                                    ${exList ? `<p class="text-[11px] text-zinc-400 mb-3 leading-relaxed">${exList}</p>` : ''}
-                                    <div class="flex justify-between items-center pt-2 border-t border-zinc-800/80">
-                                        <span class="text-[11px] text-zinc-500">Logged &amp; Verified</span>
-                                        <button onclick="toggleWorkoutKudos(${item.idx})" class="px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-bold text-brand-main inline-flex items-center gap-1 active:scale-95 transition-transform">
-                                            <i data-lucide="thumbs-up" class="w-3 h-3"></i>
-                                            <span>Kudos (${w.kudos || 1})</span>
-                                        </button>
-                                    </div>
+                                    <button onclick="toggleWorkoutKudos(${item.idx})" class="px-3 py-1.5 rounded-full bg-zinc-900 text-[11px] font-bold text-brand-main shrink-0 active:scale-95 transition-transform">
+                                        👏 ${w.kudos || 1}
+                                    </button>
                                 </div>
                             `;
                         }).join('')
                     }
                 </div>
 
-                <!-- Past Reflections -->
-                <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">Reflection History</h3>
-                <div class="space-y-3">
+                <!-- Recent Reflections -->
+                <h3 class="text-xs font-bold text-zinc-400 mb-2.5 px-1">Recent Reflections</h3>
+                <div class="space-y-2.5 pb-4">
                     ${recentCheckIns.length === 0
-                        ? `<div class="glass-card rounded-[1.75rem] p-5 text-center text-xs text-zinc-400">No reflections saved yet.</div>`
+                        ? `<div class="glass-card rounded-2xl p-4 text-center text-xs text-zinc-500">No reflections logged yet.</div>`
                         : recentCheckIns.map(ci => {
-                            const dStr = ci.date.slice(0, 10);
-                            const dLabel = new Date(dStr + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-                            const score = (ci.activity ? 1 : 0) + (ci.water ? 1 : 0) + (ci.sleep ? 1 : 0) + (ci.energy ? 1 : 0);
+                            const dLabel = new Date(ci.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                            const pillars = [ci.activity, ci.water, ci.sleep, ci.energy].filter(Boolean).length;
                             return `
-                                <div class="glass-card rounded-[1.75rem] p-4">
-                                    <div class="flex justify-between items-center mb-1.5">
+                                <div class="glass-card rounded-2xl p-3.5">
+                                    <div class="flex justify-between items-center mb-1">
                                         <span class="text-xs font-bold text-white">${dLabel}</span>
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-[11px] font-bold text-brand-main">${score}/4 Pillars</span>
-                                            <button onclick="openCheckIn('${dStr}')" class="text-[11px] font-bold text-zinc-400 underline">Edit</button>
-                                        </div>
+                                        <span class="text-[11px] font-bold text-brand-main">${pillars}/4 Pillars</span>
                                     </div>
-                                    ${ci.notes ? `<p class="text-xs text-zinc-300 mb-2">"${ci.notes}"</p>` : ''}
-                                    ${ci.feedback ? `<p class="text-[11px] text-zinc-400 bg-zinc-900/80 p-2.5 rounded-xl">${ci.feedback}</p>` : ''}
+                                    <p class="text-xs text-zinc-400 leading-relaxed">${ci.feedback || ci.notes || 'Daily check-in completed.'}</p>
                                 </div>
                             `;
                         }).join('')
@@ -2558,52 +2716,68 @@
             `;
         }
 
+        let achievementFilter = 'all';
+        function setAchievementFilter(cat) {
+            achievementFilter = cat;
+            renderView('achievements');
+        }
+
         function renderAchievements(container) {
             const unlockedCount = store.data.achievements.length;
+            const filterTabs = [
+                { id: 'all', label: `All (${MEDALS.length})` },
+                { id: 'workouts', label: 'Workouts' },
+                { id: 'streaks', label: 'Streaks' },
+                { id: 'habits', label: 'Habits' },
+                { id: 'arena', label: 'Arena & Style' }
+            ];
+
+            const visibleMedals = achievementFilter === 'all'
+                ? MEDALS
+                : MEDALS.filter(m => m.cat === achievementFilter);
 
             container.innerHTML = `
-                <div class="flex justify-between items-center mb-5">
-                    <div>
-                        <p class="text-xs font-bold uppercase tracking-wider text-brand-main">Trophy Room</p>
-                        <h1 class="text-2xl font-extrabold text-white">Medals (${unlockedCount}/${MEDALS.length})</h1>
-                    </div>
-                    <button onclick="openPetStudio('hat')" class="px-3.5 py-2 rounded-full glass-card text-xs font-bold text-brand-main inline-flex items-center gap-1.5">
-                        <i data-lucide="coins" class="w-3.5 h-3.5"></i>
-                        <span>${store.data.coins || 0}</span>
+                <div class="flex justify-between items-center mb-3">
+                    <h1 class="text-2xl font-extrabold text-white tracking-tight">Medals <span class="text-zinc-500 text-lg font-bold">${unlockedCount}/${MEDALS.length}</span></h1>
+                    <button onclick="openPetStudio('hat')" class="px-3.5 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-xs font-bold text-brand-main">
+                        🪙 ${store.data.coins || 0}
                     </button>
                 </div>
 
-                <div class="space-y-3">
-                    ${MEDALS.map(medal => {
+                <div class="flex gap-1.5 overflow-x-auto hide-scrollbar mb-4">
+                    ${filterTabs.map(t => `
+                        <button onclick="setAchievementFilter('${t.id}')" class="px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${achievementFilter === t.id ? 'bg-brand-main text-brand-contrast' : 'bg-zinc-900 text-zinc-400'}">
+                            ${t.label}
+                        </button>
+                    `).join('')}
+                </div>
+
+                <div class="space-y-2.5">
+                    ${visibleMedals.map(medal => {
                         const unlockedRecord = store.data.achievements.find(a => a.id === medal.id);
                         const isUnlocked = Boolean(unlockedRecord);
                         const currentVal = Math.min(medal.target, getMedalProgress(medal));
                         const pct = Math.round((currentVal / medal.target) * 100);
-                        const earnedDate = isUnlocked
-                            ? new Date(unlockedRecord.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-                            : '';
 
                         return `
-                            <div class="glass-card rounded-[1.75rem] p-4 flex items-center gap-3.5 ${isUnlocked ? 'border border-brand-main/50' : 'opacity-75'}">
-                                <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${isUnlocked ? 'bg-brand-main text-brand-contrast shadow-md shadow-brand-main/25' : 'bg-zinc-900 text-zinc-500 border border-zinc-800'}">
-                                    <i data-lucide="${isUnlocked ? medal.icon : 'lock'}" class="w-5 h-5"></i>
+                            <div class="glass-card rounded-2xl p-3.5 flex items-center gap-3.5 ${isUnlocked ? 'border border-brand-main/40' : 'opacity-65'}">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isUnlocked ? 'bg-brand-main text-brand-contrast' : 'bg-zinc-900 text-zinc-500'}">
+                                    <i data-lucide="${isUnlocked ? medal.icon : 'lock'}" class="w-4 h-4"></i>
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <div class="flex justify-between items-center gap-2 mb-0.5">
+                                    <div class="flex justify-between items-center gap-2">
                                         <h4 class="text-sm font-bold text-white truncate">${medal.title}</h4>
-                                        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full ${isUnlocked ? 'bg-brand-bg text-brand-main' : 'bg-zinc-900 text-zinc-400'} shrink-0">+${medal.reward} Coins</span>
+                                        <span class="text-[11px] font-bold text-brand-main shrink-0">+${medal.reward}</span>
                                     </div>
-                                    <p class="text-xs text-zinc-400 mb-2">${medal.desc}</p>
-                                    ${isUnlocked ? `
-                                        <p class="text-[11px] font-semibold text-brand-main">Earned on ${earnedDate}</p>
-                                    ` : `
+                                    <p class="text-xs text-zinc-400 truncate mb-1.5">${medal.desc}</p>
+                                    ${!isUnlocked ? `
                                         <div class="flex items-center gap-2">
-                                            <div class="flex-1 h-1.5 bg-zinc-900 rounded-full overflow-hidden">
+                                            <div class="flex-1 h-1 bg-zinc-900 rounded-full overflow-hidden">
                                                 <div class="h-full bg-brand-main" style="width: ${pct}%"></div>
                                             </div>
-                                            <span class="text-[10px] font-bold text-zinc-400">${currentVal}/${medal.target}</span>
+                                            <span class="text-[10px] font-bold text-zinc-500">${currentVal}/${medal.target}</span>
                                         </div>
-                                    `}
+                                    ` : ''}
                                 </div>
                             </div>
                         `;
@@ -2618,24 +2792,21 @@
             const currentDiff = store.data.difficulty || 'steady';
 
             const avatarPreview = store.data.profilePic
-                ? `<img src="${store.data.profilePic}" alt="Profile" class="w-16 h-16 rounded-full object-cover border-2 border-brand-main">`
-                : `<div class="w-16 h-16 rounded-full bg-brand-bg border border-brand-main/40 flex items-center justify-center text-brand-main font-extrabold text-xl">${userName.charAt(0).toUpperCase()}</div>`;
+                ? `<img src="${store.data.profilePic}" alt="Profile" class="w-14 h-14 rounded-full object-cover border border-zinc-700">`
+                : `<div class="w-14 h-14 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-brand-main font-extrabold text-lg">${userName.charAt(0).toUpperCase()}</div>`;
 
             container.innerHTML = `
-                <div class="mb-5">
-                    <p class="text-xs font-bold uppercase tracking-wider text-brand-main">Preferences &amp; Safety</p>
-                    <h1 class="text-2xl font-extrabold text-white">Menu</h1>
-                </div>
+                <h1 class="text-2xl font-extrabold text-white tracking-tight mb-4">Settings</h1>
 
-                <!-- Profile & Fighter Customization -->
-                <div class="glass-card rounded-[2rem] p-5 mb-5">
-                    <div class="flex items-center gap-4 mb-4">
+                <!-- Grouped Profile & Fighter -->
+                <div class="glass-card rounded-3xl p-4 mb-4 divide-y divide-zinc-800/80">
+                    <div class="flex items-center gap-3.5 pb-3.5">
                         ${avatarPreview}
                         <div class="flex-1">
-                            <h3 class="text-lg font-extrabold text-white">${userName}</h3>
-                            <div class="flex gap-2 mt-1.5">
-                                <button onclick="updateUserNameFromSettings()" class="px-3.5 py-1.5 rounded-full bg-zinc-900 border border-zinc-700 text-xs font-bold text-white">Edit Name</button>
-                                <label class="px-3.5 py-1.5 rounded-full bg-brand-bg border border-brand-main/40 text-xs font-bold text-brand-main cursor-pointer">
+                            <h3 class="text-base font-bold text-white">${userName}</h3>
+                            <div class="flex gap-2 mt-1">
+                                <button onclick="updateUserNameFromSettings()" class="px-3 py-1 rounded-full bg-zinc-900 text-xs font-semibold text-zinc-200">Name</button>
+                                <label class="px-3 py-1 rounded-full bg-zinc-900 text-xs font-semibold text-brand-main cursor-pointer">
                                     Photo
                                     <input type="file" accept="image/*" class="hidden" onchange="handleProfilePicUpload(event)">
                                 </label>
@@ -2643,95 +2814,76 @@
                         </div>
                     </div>
 
-                    <div class="pt-3 border-t border-zinc-800/80 flex items-center justify-between">
-                        <span class="text-xs font-bold text-zinc-400">Fighter Physique</span>
-                        <div class="flex bg-zinc-900 p-1 rounded-full border border-zinc-800">
-                            <button onclick="setUserGender('male')" class="px-3.5 py-1 rounded-full text-xs font-bold ${store.data.gender === 'male' ? 'bg-brand-main text-brand-contrast' : 'text-zinc-400'}">Male</button>
-                            <button onclick="setUserGender('female')" class="px-3.5 py-1 rounded-full text-xs font-bold ${store.data.gender === 'female' ? 'bg-brand-main text-brand-contrast' : 'text-zinc-400'}">Female</button>
+                    <div class="py-3 flex items-center justify-between">
+                        <span class="text-xs font-semibold text-zinc-300">Fighter Build</span>
+                        <div class="flex bg-zinc-900 p-0.5 rounded-full">
+                            <button onclick="setUserGender('male')" class="px-3 py-1 rounded-full text-xs font-bold ${store.data.gender === 'male' ? 'bg-brand-main text-brand-contrast' : 'text-zinc-400'}">Male</button>
+                            <button onclick="setUserGender('female')" class="px-3 py-1 rounded-full text-xs font-bold ${store.data.gender === 'female' ? 'bg-brand-main text-brand-contrast' : 'text-zinc-400'}">Female</button>
                         </div>
                     </div>
 
-                    <div class="pt-3 mt-3 border-t border-zinc-800/80 flex items-center justify-between">
-                        <span class="text-xs font-bold text-zinc-400">Fighter Skin Tone</span>
+                    <div class="py-3 flex items-center justify-between">
+                        <span class="text-xs font-semibold text-zinc-300">Skin Tone</span>
                         <div class="flex items-center gap-2">
                             ${SKIN_TONES.map(st => `
-                                <button onclick="setUserSkinTone('${st.id}')" title="${st.label}" class="w-6 h-6 rounded-full border-2 ${store.data.skinTone === st.id ? 'border-brand-main scale-110' : 'border-zinc-700'}" style="background:${st.base}"></button>
+                                <button onclick="setUserSkinTone('${st.id}')" title="${st.label}" class="w-5 h-5 rounded-full border-2 ${store.data.skinTone === st.id ? 'border-brand-main scale-110' : 'border-transparent'}" style="background:${st.base}"></button>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="pt-3 flex items-center justify-between">
+                        <span class="text-xs font-semibold text-zinc-300">Accent</span>
+                        <div class="flex items-center gap-2">
+                            ${[
+                                { id: 'lemon', dot: '#e0ff33' },
+                                { id: 'purple', dot: '#a78bfa' },
+                                { id: 'cyan', dot: '#22d3ee' },
+                                { id: 'rose', dot: '#fb7185' }
+                            ].map(t => `
+                                <button onclick="setTheme('${t.id}')" class="w-6 h-6 rounded-full border-2 ${currentTheme === t.id ? 'border-white scale-110' : 'border-transparent'}" style="background:${t.dot}"></button>
                             `).join('')}
                         </div>
                     </div>
                 </div>
 
-                <!-- Accent Color Theme -->
-                <div class="glass-card rounded-[2rem] p-5 mb-5">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">Accent Color</h3>
-                    <div class="grid grid-cols-4 gap-2">
-                        ${[
-                            { id: 'lemon', label: 'Lemon', dot: '#e0ff33' },
-                            { id: 'purple', label: 'Purple', dot: '#a78bfa' },
-                            { id: 'cyan', label: 'Cyan', dot: '#22d3ee' },
-                            { id: 'rose', label: 'Rose', dot: '#fb7185' }
-                        ].map(t => `
-                            <button onclick="setTheme('${t.id}')" class="py-2.5 px-2 rounded-full border text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${currentTheme === t.id ? 'bg-brand-bg border-brand-main text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-400'}">
-                                <span class="w-2.5 h-2.5 rounded-full" style="background:${t.dot}"></span>
-                                <span>${t.label}</span>
-                            </button>
-                        `).join('')}
+                <!-- Intensity Stage -->
+                <div class="glass-card rounded-3xl p-4 mb-4">
+                    <div class="flex justify-between items-center mb-2.5">
+                        <span class="text-xs font-bold text-zinc-300">Intensity Stage</span>
+                        <span class="text-[11px] text-zinc-500">Past logs stay safe</span>
                     </div>
-                </div>
-
-                <!-- 5-Stage Intensity Level -->
-                <div class="glass-card rounded-[2rem] p-5 mb-5">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Intensity Stage</h3>
-                    <p class="text-[11px] text-zinc-400 mb-3">Only move up when your current stage feels manageable with clean form. Historical workout records are preserved.</p>
-                    <div class="space-y-2">
+                    <div class="flex gap-1.5 overflow-x-auto hide-scrollbar">
                         ${STAGES.map(s => `
-                            <button onclick="setDifficulty('${s.id}')" class="w-full p-3.5 rounded-[1.5rem] border text-left flex items-center justify-between transition-all ${currentDiff === s.id ? 'bg-brand-bg border-brand-main' : 'bg-zinc-900/70 border-zinc-800'}">
-                                <div>
-                                    <p class="text-xs font-bold text-white">${s.name} <span class="text-zinc-400 font-normal">• ${s.restSec}s rest</span></p>
-                                    <p class="text-[11px] text-zinc-400 mt-0.5">${s.desc}</p>
-                                </div>
-                                ${currentDiff === s.id ? '<span class="px-2.5 py-0.5 rounded-full bg-brand-main text-brand-contrast text-[10px] font-extrabold">Active</span>' : ''}
+                            <button onclick="setDifficulty('${s.id}')" class="px-3.5 py-2 rounded-full text-xs font-bold whitespace-nowrap ${currentDiff === s.id ? 'bg-brand-main text-brand-contrast' : 'bg-zinc-900 text-zinc-400'}">
+                                ${s.name}
                             </button>
                         `).join('')}
                     </div>
                 </div>
 
-                <!-- 7:00 AM Daily Reminder -->
-                <div class="glass-card rounded-[2rem] p-5 mb-5">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">7:00 AM Daily Reminder</h3>
-                    <p class="text-xs text-zinc-300 leading-relaxed mb-3">
-                        Because iOS Safari web apps cannot send reliable background push alerts while closed, download the recurring <b>7:00 AM Calendar Alert (.ics)</b> or add a daily 7:00 AM reminder in Apple Reminders.
-                    </p>
-                    <button onclick="downloadICS()" class="w-full py-3.5 rounded-full bg-brand-main text-brand-contrast font-bold text-xs active:scale-95 transition-transform flex items-center justify-center gap-2">
-                        <i data-lucide="bell" class="w-4 h-4"></i>
-                        <span>Add 7:00 AM Daily Alarm (.ics)</span>
+                <!-- Reminders & Data -->
+                <div class="glass-card rounded-3xl p-4 space-y-2 mb-6">
+                    <button onclick="downloadICS()" class="w-full py-3 px-4 rounded-2xl bg-zinc-900/90 text-left text-xs font-bold text-white flex items-center justify-between active:scale-[0.99] transition-transform">
+                        <span>7:00 AM Daily Calendar Alert (.ics)</span>
+                        <i data-lucide="bell" class="w-4 h-4 text-brand-main"></i>
                     </button>
-                </div>
-
-                <!-- Backup & Data Management -->
-                <div class="glass-card rounded-[2rem] p-5 mb-6">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">Backup &amp; Progress Safety</h3>
-                    <div class="space-y-2.5">
-                        <button onclick="openCatchUpModal()" class="w-full py-3.5 rounded-full bg-brand-bg border border-brand-main/40 text-brand-main font-bold text-xs active:scale-95 transition-transform flex items-center justify-center gap-2">
-                            <i data-lucide="history" class="w-4 h-4"></i>
-                            <span>Restore Past Progress (Catch-Up)</span>
-                        </button>
-                        <button onclick="exportData()" class="w-full py-3.5 rounded-full bg-zinc-900 border border-zinc-700 text-white font-bold text-xs active:scale-95 transition-transform flex items-center justify-center gap-2">
-                            <i data-lucide="upload" class="w-4 h-4 text-brand-main"></i>
-                            <span>Export Progress Backup (JSON)</span>
-                        </button>
-                        <label class="w-full py-3.5 rounded-full bg-zinc-900 border border-zinc-700 text-white font-bold text-xs active:scale-95 transition-transform flex items-center justify-center gap-2 cursor-pointer">
-                            <i data-lucide="download" class="w-4 h-4 text-brand-main"></i>
-                            <span>Import Backup File (.json)</span>
-                            <input type="file" accept=".json,application/json" class="hidden" onchange="importDataFromFile(event)">
-                        </label>
-                        <button onclick="openPasteImportModal()" class="w-full py-3 rounded-full bg-zinc-900/60 border border-zinc-800 text-zinc-300 font-bold text-xs active:scale-95 transition-transform">
-                            Paste Backup Text from Notes
-                        </button>
-                        <button onclick="resetProgress()" class="w-full py-3 rounded-full bg-rose-950/40 border border-rose-500/30 text-rose-400 font-bold text-xs active:scale-95 transition-transform mt-2">
-                            Reset All Progress
-                        </button>
-                    </div>
+                    <button onclick="exportData()" class="w-full py-3 px-4 rounded-2xl bg-zinc-900/90 text-left text-xs font-bold text-white flex items-center justify-between active:scale-[0.99] transition-transform">
+                        <span>Export Backup (JSON)</span>
+                        <i data-lucide="upload" class="w-4 h-4 text-brand-main"></i>
+                    </button>
+                    <label class="w-full py-3 px-4 rounded-2xl bg-zinc-900/90 text-left text-xs font-bold text-white flex items-center justify-between cursor-pointer active:scale-[0.99] transition-transform">
+                        <span>Import Backup File</span>
+                        <i data-lucide="download" class="w-4 h-4 text-brand-main"></i>
+                        <input type="file" accept=".json,application/json" class="hidden" onchange="importDataFromFile(event)">
+                    </label>
+                    <button onclick="openPasteImportModal()" class="w-full py-3 px-4 rounded-2xl bg-zinc-900/90 text-left text-xs font-bold text-zinc-300 flex items-center justify-between active:scale-[0.99] transition-transform">
+                        <span>Paste Backup from Notes</span>
+                        <i data-lucide="clipboard" class="w-4 h-4 text-zinc-500"></i>
+                    </button>
+                    <button onclick="resetProgress()" class="w-full py-3 px-4 rounded-2xl text-left text-xs font-bold text-rose-400 flex items-center justify-between">
+                        <span>Reset All Data</span>
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
                 </div>
             `;
         }
@@ -2898,105 +3050,6 @@
                 },
                 "Erase Everything"
             );
-        }
-
-        function openCatchUpModal() {
-            const dialog = document.getElementById('custom-dialog');
-            dialog.classList.remove('hidden');
-            dialog.classList.add('flex');
-            const currentStage = store.data.difficulty || 'easy';
-
-            dialog.innerHTML = `
-                <div class="glass-card bg-zinc-900 border border-zinc-700 rounded-[2rem] p-6 w-full max-w-sm text-left pop-in">
-                    <h3 class="text-lg font-extrabold text-white mb-1 text-center">Restore Past Progress</h3>
-                    <p class="text-xs text-zinc-400 mb-4 text-center">Enter your previous stats up through yesterday so you can pick up right where you left off.</p>
-
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1">Completed Workouts</label>
-                    <input type="number" id="catchup-workouts" value="10" min="0" max="500" class="w-full bg-zinc-950 border border-zinc-700 rounded-full py-2.5 px-4 text-white text-sm font-bold mb-3 focus:border-brand-main outline-none">
-
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1">Consecutive Streak Days (Before Today)</label>
-                    <input type="number" id="catchup-streak" value="13" min="0" max="365" class="w-full bg-zinc-950 border border-zinc-700 rounded-full py-2.5 px-4 text-white text-sm font-bold mb-3 focus:border-brand-main outline-none">
-
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1">Intensity Stage</label>
-                    <select id="catchup-stage" class="w-full bg-zinc-950 border border-zinc-700 rounded-full py-2.5 px-4 text-white text-sm font-bold mb-5 focus:border-brand-main outline-none">
-                        ${STAGES.map(s => `<option value="${s.id}" ${s.id === currentStage ? 'selected' : ''}>${s.name} (${s.minWorkouts}+ workouts)</option>`).join('')}
-                    </select>
-
-                    <div class="flex gap-2.5">
-                        <button onclick="closeCustomDialog()" class="flex-1 py-3.5 rounded-full bg-zinc-800 text-zinc-300 font-bold text-xs">Cancel</button>
-                        <button onclick="applyCatchUpProgress()" class="flex-1 py-3.5 rounded-full bg-brand-main text-brand-contrast font-bold text-xs">Restore Now</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        function applyCatchUpProgress() {
-            const workoutsCount = Math.max(0, Math.min(500, parseInt(document.getElementById('catchup-workouts').value, 10) || 0));
-            const streakDays = Math.max(0, Math.min(365, parseInt(document.getElementById('catchup-streak').value, 10) || 0));
-            const stageId = document.getElementById('catchup-stage').value || 'easy';
-
-            const today = new Date();
-            today.setHours(12, 0, 0, 0);
-
-            const restoredCheckIns = [];
-            for (let i = streakDays; i >= 1; i--) {
-                const d = new Date(today);
-                d.setDate(today.getDate() - i);
-                const dateStr = store.getDateStr(d);
-                restoredCheckIns.push({
-                    date: dateStr,
-                    timestamp: d.toISOString(),
-                    activity: true,
-                    water: true,
-                    sleep: true,
-                    energy: true,
-                    notes: 'Restored 2-week journey progress.',
-                    feedback: 'Strong Showing — Progress restored and streak momentum intact.'
-                });
-            }
-
-            const sessionTemplates = [
-                { title: 'Full Body A', type: 'strength', keys: ['squats', 'pushups_incline', 'superman', 'plank'] },
-                { title: 'Cardio & Core', type: 'cardio', keys: ['jogging', 'mountain_climbers'] },
-                { title: 'Full Body B', type: 'strength', keys: ['step_ups', 'pushups_wall', 'bird_dog', 'calf_raises'] },
-                { title: 'Cardio & Recovery', type: 'cardio', keys: ['jogging', 'wall_sit'] },
-                { title: 'Full Body C', type: 'strength', keys: ['squats', 'pushups_standard', 'step_ups', 'plank'] }
-            ];
-
-            const restoredWorkouts = [];
-            const spanDays = Math.max(streakDays, workoutsCount);
-            for (let w = 0; w < workoutsCount; w++) {
-                const daysAgo = Math.max(1, Math.round(((workoutsCount - w) / Math.max(1, workoutsCount)) * spanDays));
-                const d = new Date(today);
-                d.setDate(today.getDate() - daysAgo);
-                const tpl = sessionTemplates[w % sessionTemplates.length];
-
-                restoredWorkouts.push({
-                    date: d.toISOString(),
-                    title: tpl.title,
-                    type: tpl.type,
-                    difficulty: stageId,
-                    exercises: tpl.keys.map(k => {
-                        const ex = EXERCISE_DB[k];
-                        const lvl = ex.levels[stageId] || ex.levels.steady;
-                        return { name: ex.name, sets: lvl.sets, reps: lvl.label };
-                    }),
-                    kudos: 1
-                });
-            }
-
-            store.data.difficulty = stageId;
-            store.data.workouts = restoredWorkouts;
-            store.data.checkIns = restoredCheckIns;
-            store.data.achievements = [];
-            store.data.coins = 150 + (workoutsCount * 50) + (streakDays * 15);
-            store.data.xp = (workoutsCount * 100) + (streakDays * 30);
-
-            store.save();
-            checkAchievements();
-            closeCustomDialog();
-            router.navigate('home');
-            showNotification(`Restored ${workoutsCount} workouts &amp; ${streakDays}-day streak! Log today for Day ${streakDays + 1}.`);
         }
 
         // --- 16. CUSTOM DIALOGS & TOAST NOTIFICATIONS ---
